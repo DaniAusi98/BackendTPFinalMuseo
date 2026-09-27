@@ -1,18 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Application.MuseumResources.DataTransferObjects;
 using Core.Application;
 using static Domain.Eventos.Enums.Enums;
 
 
 namespace Application.Eventos.UseCases.Commands
 {
-    public class RecursoAsignadoDto
-    {
-        [Required]
-        public string RecursoId { get; set; } = string.Empty;
-
-        [Required]
-        public int CantidadAsignada { get; set; }
-    }
+    
 
     public class CrearEventoCommand : IRequestCommand<string>
     {

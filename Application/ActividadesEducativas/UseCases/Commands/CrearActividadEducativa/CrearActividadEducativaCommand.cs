@@ -1,18 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Application.MuseumResources.DataTransferObjects;
 using Core.Application;
 using static Domain.ActividadesAreaEducacion.Enums.Enums;
 
 namespace Application.ActividadesEducativas.UseCases.Commands.CrearActividadEducativa
 {
-    public class RecursoAsignadoDto
-    {
-        [Required]
-        public string RecursoId { get; set; } = string.Empty;
-
-        [Required]
-        public int CantidadAsignada { get; set; }
-    }
-
+    
     public class CrearActividadEducativaCommand : IRequestCommand<string>
     {
         [Required]

@@ -4,11 +4,11 @@ namespace Domain.ActividadesAreaEducacion.Entities
 {
     public class ProyectosAreaEducacion : DomainEntity<string>
     {
-        public string Nombre { get; set; }
-        public DateTime FechaInicio { get; set; }
-        public DateTime FechaFin { get; set; }
-        public List<EquipoTrabajoResponsable> EquipoTrabajoResponsable { get; set; } = new();
-        public string Publico { get; set; }
+        public string Nombre { get; private set; }
+        public DateTime FechaInicio { get; private set; }
+        public DateTime FechaFin { get; private set; }
+        public List<EquipoTrabajoResponsable> EquipoTrabajoResponsable { get; private set; } = new();
+        public string Publico { get; private set; }
 
         protected ProyectosAreaEducacion()
         {

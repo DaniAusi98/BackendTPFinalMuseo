@@ -1,7 +1,6 @@
 ﻿using Application.ActividadesEducativas.UseCases.Commands.CrearActividadEducativa;
 using Application.ActividadesEducativas.UseCases.Queries;
-
-
+using Application.ActividadesEducativas.UseCases.Queries.ProyectosEducativos;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,6 +39,13 @@ namespace Controllers.ActividadEducativaController
 
             var resultado = await _commandQueryBus.Send(query);
 
+            return Ok(resultado);
+        }
+        [HttpGet("proyectos-educativos")]
+        public async Task<IActionResult> ObtenerSalasDisponiblesParaEvento()
+        {
+            var query = new ObtenerProyectosEducativosQuery();
+            var resultado = await _commandQueryBus.Send(query);
             return Ok(resultado);
         }
 

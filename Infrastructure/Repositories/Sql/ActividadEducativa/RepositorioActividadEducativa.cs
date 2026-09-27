@@ -1,6 +1,7 @@
 ﻿using Application.ActividadesEducativas.Repositories;
 using Core.Infraestructure.Repositories.Sql;
 using Domain.ActividadesAreaEducacion.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace Infrastructure.Repositories.Sql.ActividadEducativa
 {
     internal sealed class RepositorioActividadEducativa(MuseoDbContext context) : BaseRepository<Domain.ActividadesAreaEducacion.Entities.ActividadEducativa>(context), IRepositorioActividadEducativa
     {
+        
     }
 }

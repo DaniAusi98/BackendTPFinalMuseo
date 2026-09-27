@@ -114,6 +114,7 @@ namespace Infrastructure.Factories
             services.AddTransient<IRepositorioEvento, RepositorioEvento>();
             services.AddTransient<IProvinciaRepository, ProvinciaRepository>();
             services.AddTransient<IRepositorioProyectoAreaEducacion, RepositorioProyectoEducativo>();
+            services.AddTransient<IRepositorioActividadEducativa, RepositorioActividadEducativa>();
 
 
 

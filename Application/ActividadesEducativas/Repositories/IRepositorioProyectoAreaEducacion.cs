@@ -6,5 +6,6 @@ namespace Application.ActividadesEducativas.Repositories
 {
     public interface IRepositorioProyectoAreaEducacion:IRepository<ProyectosAreaEducacion>
     {
+        Task<List<ProyectosAreaEducacion>> FindAllAsyncIncludes();
     }
 }

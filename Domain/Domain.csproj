@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ActividadesAreaEducacion\ValueObjets\" />
     <Folder Include="ActividadMuseo\DomainServices\" />
     <Folder Include="ActividadMuseo\Others\" />
     <Folder Include="ActividadMuseo\ValueObjets\" />
