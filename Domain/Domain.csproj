@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Aggregators\**" />
+    <Compile Remove="Contracts\**" />
+    <Compile Remove="ValueObjects\**" />
+    <EmbeddedResource Remove="Aggregators\**" />
+    <EmbeddedResource Remove="Contracts\**" />
+    <EmbeddedResource Remove="ValueObjects\**" />
+    <None Remove="Aggregators\**" />
+    <None Remove="Contracts\**" />
+    <None Remove="ValueObjects\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ActividadMuseo\DomainServices\" />
+    <Folder Include="ActividadMuseo\Others\" />
+    <Folder Include="ActividadMuseo\ValueObjets\" />
+    <Folder Include="Common\DomainServices\" />
+    <Folder Include="Common\Others\Helpers\" />
+    <Folder Include="Eventos\Constants\" />
+    <Folder Include="Eventos\DomainServices\" />
+    <Folder Include="Eventos\ValueObjets\" />
+    <Folder Include="Eventos\Others\" />
+    <Folder Include="Reportes\DomainServices\VisitaGrupalGuiada\" />
+    <Folder Include="Reportes\Enums\" />
+    <Folder Include="Reportes\Constants\" />
+    <Folder Include="Reportes\Others\" />
+    <Folder Include="Reportes\ValueObjets\" />
+    <Folder Include="VisitasGrupales\Exceptions\" />
+    <Folder Include="VisitasGrupales\Options\" />
+    <Folder Include="VisitasGrupales\Others\" />
+  </ItemGroup>
+
+</Project>
