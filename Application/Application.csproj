@@ -26,6 +26,10 @@
 		<Folder Include="Availability\Constants\" />
 		<Folder Include="Common\UseCases\Provincia\Commands\" />
 		<Folder Include="Common\UseCases\Provincia\Notifications\" />
+		<Folder Include="PersonalMuseo\ApplicationServices\" />
+		<Folder Include="PersonalMuseo\DataTrasnferObjets\" />
+		<Folder Include="PersonalMuseo\Mappings\" />
+		<Folder Include="PersonalMuseo\UseCases\" />
 		<Folder Include="Reportes\Validators\" />
 		<Folder Include="Reportes\Repositories\" />
 		<Folder Include="VisitaGrupal\UseCases\Queries\GetTurnosVisitas\" />

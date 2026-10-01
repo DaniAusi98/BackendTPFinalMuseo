@@ -4,7 +4,6 @@ using Application.MuseumResources.UseCases.MuseumGallery.Commands.DeleteMuseumGa
 using Application.MuseumResources.UseCases.MuseumGallery.Commands.UpdateMuseumGallery;
 using Application.MuseumResources.UseCases.MuseumGallery.Queries.GetAllSalas;
 using Application.MuseumResources.UseCases.MuseumGallery.Queries.GetSalaBy;
-using Application.MuseumResources.UseCases.MuseumGallery.Queries.SalasDisponibles;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,12 +62,6 @@ namespace Controllers
             return NoContent();
         }
 
-        [HttpGet("salas-disponibles")]
-        public async Task<IActionResult> ObtenerSalasDisponiblesParaEvento()
-        {
-            var query = new ObtenerSalasParaEventoQuery();
-            var resultado = await _commandQueryBus.Send(query);
-            return Ok(resultado);
-        }
+        
     }
 }

@@ -1,10 +1,8 @@
-﻿using Application.VisitaGrupal.UseCases.Comands.ConfirmarVisitaGrupal;
-using Application.VisitaGrupal.UseCases.Comands.CrearVisitaAutoguiada;
-using Application.VisitaGrupal.UseCases.Comands.CrearVisitaGuiada;
-using Application.VisitaGrupal.UseCases.Comands.NewFolder;
-using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
+﻿using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId;
 using Application.VisitaGrupal.UseCases.Queries.ReporteVisitaAutoguiada;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaAutoguiada;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -64,19 +62,19 @@ namespace Controllers.VisitasGrupales
             return NoContent();
         }
         [HttpGet("reporteautoguiadas")]
-    public async Task<IActionResult> GetReporteVisitaAutoGuiada(
+        public async Task<IActionResult> GetReporteVisitaAutoGuiada(
         [FromQuery] DateTime desde,
         [FromQuery] DateTime hasta)
-    {
-        if (desde == default || hasta == default)
         {
-            return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
-        }
+            if (desde == default || hasta == default)
+            {
+                return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+            }
 
-        var reporte = await _commandQueryBus.Send(new GetReportAllSelfGuidedToursQuery(desde, hasta));
-      
-        return Ok(reporte);
-    }
+            var reporte = await _commandQueryBus.Send(new GetReportAllSelfGuidedToursQuery(desde, hasta));
+
+            return Ok(reporte);
+        }
 
         //GET /api/Visitas/DisponibilidadTurnosVisitasAutoguiadas?fechaDesde=2026-08-10&fechaHasta=2026-08-15&salaIds=1&salaIds=3&salaIds=5&pageIndex=1&pageSize=10
 

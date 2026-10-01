@@ -1,7 +1,4 @@
 using Core.Domain.Entities;
-
-using System;
-using System.Collections.Generic;
 using Domain.Common.Exceptions;
 
 namespace Domain.PersonalMuseo.Entities.UsuarioInterno
@@ -10,17 +7,26 @@ namespace Domain.PersonalMuseo.Entities.UsuarioInterno
     {
         public string Nombre { get; private set; }
 
-        public List<AreaPuesto> AreaPuestos { get; private set; } = new List<AreaPuesto>();
-
+        public string Descripcion { get; private set; }
+        public bool Activo { get; private set; } = true;
         public Puesto()
         {
         }
 
-        public Puesto(string nombre)
+        public Puesto(string nombre, string descripcion)
         {
             Id = Guid.NewGuid().ToString();
 
             SetNombre(nombre);
+            SetDescripcion(descripcion);
+        }
+
+        private void SetDescripcion(string descripcion)
+        {
+            if (string.IsNullOrWhiteSpace(descripcion))
+                throw new DomainException("La descripción del puesto no puede estar vacía.");
+
+            Descripcion = descripcion.Trim();
         }
 
         public void SetNombre(string nombre)

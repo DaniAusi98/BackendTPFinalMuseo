@@ -1,4 +1,4 @@
-using Application.VisitaGrupal.UseCases.Commands.CreateConfiguracionVisitasGrupalesGuiadas;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateConfiguracionVisitasGrupalesGuiadas;
 using FluentValidation;
 
 namespace Application.VisitaGrupal.Validators

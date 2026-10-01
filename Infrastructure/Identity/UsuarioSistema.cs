@@ -18,11 +18,7 @@ namespace Infrastructure.Identity
             LastName = apellido ?? throw new ArgumentNullException(nameof(apellido));
             BirthDate = fechaNac;
         }
-        public UsuarioSistema(string id, string nombre, string apellido, DateOnly fechaNac)
-           : this(nombre, apellido, fechaNac)
-        {
-            Id = id;
-        }
+
 
 
     }

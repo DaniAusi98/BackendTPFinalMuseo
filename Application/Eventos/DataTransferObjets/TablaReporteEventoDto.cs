@@ -2,7 +2,7 @@ namespace Application.Eventos.DataTransferObjets
 {
     public class TablaReporteEventoDto
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public string TipoEvento { get; set; } = string.Empty;
@@ -14,7 +14,7 @@ namespace Application.Eventos.DataTransferObjets
         public string NombreSolicitante { get; set; } = string.Empty;
         public int CantidadEstimada { get; set; }
         public string Estado { get; set; } = string.Empty;
-        
+
     }
 }
 /*public string NombreyApellidoSolicitante { get; private set; }

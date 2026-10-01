@@ -37,9 +37,19 @@ namespace Infrastructure.Data.Seeders
                     tipoActividad: TipoActividad.Evento,
                     habilitada: true,
                     capacidadMaxima: 100),
+                new ConfiguracionSalaActividad(
+                    salaId: "4d6e2750-be3b-4c43-ae08-e68b3afac8ad",
+                    tipoActividad: TipoActividad.ActividadEducativa,
+                    habilitada: true,
+                    capacidadMaxima: 100),
+                 new ConfiguracionSalaActividad(
+                    salaId: "4d6e2750-be3b-4c43-ae08-e68b3afac8ad",
+                    tipoActividad: TipoActividad.ActividadEspecial,
+                    habilitada: true,
+                    capacidadMaxima: 100),
 
 
-               
+
             };
 
                 await context.AddRangeAsync(configuraciones);

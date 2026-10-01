@@ -9,11 +9,17 @@ namespace Application.ActividadesEducativas.DataTransferObjets
 {
     public class ProyectoEducativoDto
     {
-        public string Nombre { get;  set; }
-        public DateTime FechaInicio { get;  set; }
-        public DateTime FechaFin { get;  set; }
-        public List<EquipoResponsableDto> EquipoTrabajoResponsable { get;  set; } = new();
-        public string Publico { get;  set; }
+        public string Id { get; set; } = string.Empty;
+
+        public string Nombre { get; set; } = string.Empty;
+
+        public DateTime FechaInicio { get; set; }
+
+        public DateTime FechaFin { get; set; }
+
+        public List<EquipoResponsableDto> EquipoTrabajoResponsable { get; set; } = [];
+
+        public string Publico { get; set; } = string.Empty;
     }
 
     public class EquipoResponsableDto

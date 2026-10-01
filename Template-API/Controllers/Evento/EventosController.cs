@@ -1,6 +1,7 @@
 ﻿using Application.Eventos.UseCases.Commands;
 using Application.Eventos.UseCases.Queries;
 using Application.Eventos.UseCases.Queries.ReporteEventos;
+using Application.Eventos.UseCases.Queries.SalasDisponibles;
 using Application.MuseumResources.UseCases.Commands.ConfigurarSalaActividades;
 
 using Core.Application;
@@ -148,7 +149,14 @@ namespace Controllers.Evento
       
         return Ok(reporte);
     }
-    
+        [HttpGet("salas-disponibles-eventos")]
+        public async Task<IActionResult> ObtenerSalasDisponiblesParaEvento()
+        {
+            var query = new SalaDispEventosQuery();
+            var resultado = await _commandQueryBus.Send(query);
+            return Ok(resultado);
+        }
+
 
         private string BuildPublicImageUrl(string fileName)
         {

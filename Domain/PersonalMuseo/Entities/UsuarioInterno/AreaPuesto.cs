@@ -1,13 +1,11 @@
 using Core.Domain.Entities;
-
-using System;
 using Domain.Common.Exceptions;
 
 namespace Domain.PersonalMuseo.Entities.UsuarioInterno
 {
     public class AreaPuesto : DomainEntity<string>
     {
-        public string    AreaId { get; private set; }
+        public string AreaId { get; private set; }
         public Area Area { get; private set; }
 
         public string PuestoId { get; private set; }

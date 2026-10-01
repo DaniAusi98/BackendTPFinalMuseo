@@ -1,13 +1,13 @@
-using Application.VisitaGrupal.UseCases.Comands.CancelarVisitaGuiada;
-using Application.VisitaGrupal.UseCases.Comands.ConfirmarVisitaGrupal;
-using Application.VisitaGrupal.UseCases.Comands.CrearVisitaGuiada;
-using Application.VisitaGrupal.UseCases.Comands.NewFolder;
 using Application.VisitaGrupal.UseCases.Queries.ConsultarDisponibilidadTurnosVisitaGuiada;
 using Application.VisitaGrupal.UseCases.Queries.GetAllGroupVisitCalendar;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId;
 using Application.VisitaGrupal.UseCases.Queries.GetTematicaVisitaGrupal;
 using Application.VisitaGrupal.UseCases.Queries.ReporteVisitaGuiada;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CancelarVisitaGuiada;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ConfirmarVisitaGrupal;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaGuiada;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -86,10 +86,10 @@ public class VisitasGuiadasController(ICommandQueryBus commandQueryBus) : Contro
     {
         if (string.IsNullOrEmpty(id))
             return BadRequest();
-        var entity= await _commandQueryBus.Send(new GetReservationByIdQuery { ReservationId = id });
+        var entity = await _commandQueryBus.Send(new GetReservationByIdQuery { ReservationId = id });
         return Ok(entity);
     }
-    
+
 
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPut("{id}/cancel")]
@@ -131,7 +131,7 @@ public class VisitasGuiadasController(ICommandQueryBus commandQueryBus) : Contro
 
         var nuevaVisitaId = await _commandQueryBus.Send(command);
 
-        return Created($"api/v1/VisitasGuiadas/{nuevaVisitaId}",new { Id = nuevaVisitaId });
+        return Created($"api/v1/VisitasGuiadas/{nuevaVisitaId}", new { Id = nuevaVisitaId });
     }
 
     [HttpGet("calendar")]
@@ -158,7 +158,7 @@ public class VisitasGuiadasController(ICommandQueryBus commandQueryBus) : Contro
         }
 
         var reporte = await _commandQueryBus.Send(new GetReportAllGuidedToursQuery(desde, hasta));
-      
+
         return Ok(reporte);
     }
 

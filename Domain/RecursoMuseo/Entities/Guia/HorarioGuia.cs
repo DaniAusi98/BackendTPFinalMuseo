@@ -11,7 +11,7 @@ namespace Domain.RecursoMuseo.Entities.Guia
         public Guia Guia { get; private set; } = default!;
 
         // Días de la semana en los que aplica este horario
-        public DiaLaboral DiaAsignado { get; private set; } 
+        public DiaLaboral DiaAsignado { get; private set; }
         public TimeOnly HoraInicio { get; private set; }
         public TimeOnly HoraFin { get; private set; }
 
@@ -40,6 +40,17 @@ namespace Domain.RecursoMuseo.Entities.Guia
             HoraInicio = inicio;
             HoraFin = fin;
         }
-        
+        public void SetHorario(DiaLaboral dia, TimeOnly inicio, TimeOnly fin)
+        {
+            if (fin <= inicio)
+            {
+                throw new DomainException(
+                    "La hora de fin debe ser posterior a la hora de inicio.");
+            }
+            DiaAsignado = dia;
+            HoraInicio = inicio;
+            HoraFin = fin;
+        }
+
     }
 }

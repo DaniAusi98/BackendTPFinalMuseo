@@ -6,17 +6,28 @@ namespace Domain.PersonalMuseo.Entities.UsuarioInterno
     public class Area : DomainEntity<string>
     {
         public string Nombre { get; private set; }
-        public List<AreaPuesto> AreaPuestos { get; private set; } = new List<AreaPuesto>();
-
+        public string Descripcion { get; private set; }
+        public bool Activo { get; private set; } = true;
         public Area()
         {
         }
 
-        public Area(string nombre)
+        public Area(string nombre, string descripcion)
         {
             Id = Guid.NewGuid().ToString();
 
             SetNombre(nombre);
+            SetDescripcion(descripcion);
+
+        }
+
+        private void SetDescripcion(string descripcion)
+        {
+            if (string.IsNullOrWhiteSpace(descripcion))
+                throw new DomainException("La descripción del área no puede estar vacía.");
+
+            Descripcion = descripcion.Trim();
+        }   
         }
 
         public void SetNombre(string nombre)

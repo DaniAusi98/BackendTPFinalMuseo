@@ -1,10 +1,6 @@
 using Application.ActividadMuseo.Repositories;
 using Core.Infraestructure.Repositories.Sql;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories.Sql.DisponibilidadActividades
 {
@@ -17,12 +13,10 @@ namespace Infrastructure.Repositories.Sql.DisponibilidadActividades
         {
             if (fechaDesde == fechaHasta)
             {
-                fechaHasta = fechaHasta.Date.AddDays(1).AddSeconds(-1); // Ajusta hasta el final del d�a
+                fechaHasta = fechaHasta.Date.AddDays(1).AddSeconds(-1); // Ajusta hasta el final del dia
             }
 
-            // ============================================================
-            // CONSULTA OPTIMIZADA: Trae candidatos potenciales
-            // ============================================================
+
             var actividadesEnRango = await Repository
                 .Include(a => a.Salas)
                 .Include(a => a.Recursos)
@@ -37,10 +31,7 @@ namespace Infrastructure.Repositories.Sql.DisponibilidadActividades
                     (string.IsNullOrEmpty(a.RRule) && a.Horario.Inicio <= fechaHasta))
                 .ToListAsync();
 
-            // NOTA T�CTICA: Si una actividad recurrente tiene una fecha l�mite de finalizaci�n (UNTIL) 
-            // que qued� en el pasado (ej: termin� el a�o pasado), tu 'ActivityAvailabilityFactory' 
-            // al ejecutar el Engine e invocar a 'ExpandRule' generar� una lista vac�a de slots (0 elementos),
-            // descart�ndola autom�ticamente del c�lculo en memoria de forma ultra r�pida y segura.
+
 
             return actividadesEnRango;
         }

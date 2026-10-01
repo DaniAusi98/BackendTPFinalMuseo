@@ -1,15 +1,6 @@
 ﻿using Application.ActividadesEducativas.DataTransferObjets;
-using Application.ApplicationMuseo.DataTransferObjects;
-using Application.ApplicationMuseo.DomainEvents;
 using AutoMapper;
 using Domain.ActividadesAreaEducacion.Entities;
-using Domain.Common.Entities;
-using Domain.Common.ValueObjets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.ActividadesEducativas.Mappings
 {
@@ -21,10 +12,23 @@ namespace Application.ActividadesEducativas.Mappings
         public Mapping()
         {
             CreateMap<EquipoTrabajoResponsable, EquipoResponsableDto>();
-               
+
 
             CreateMap<ProyectosAreaEducacion, ProyectoEducativoDto>();
 
+            CreateMap<ActividadEducativa, ActividadEducativaDto>()
+
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.Titulo))
+                .ForMember(dest => dest.TipoActividadEducativa, opt => opt.MapFrom(src => src.TipoActividadEducativa.ToString()))
+                .ForMember(dest => dest.ProyectoVinculado, opt => opt.MapFrom(src => src.ProyectoVinculada))
+                .ForMember(dest => dest.InstitucionVinculada, opt => opt.MapFrom(src => src.InstitucionVinculada))
+                .ForMember(dest => dest.PublicoObjetivo, opt => opt.MapFrom(src => src.PublicoObjetivo))
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado.ToString()))
+                .ForMember(dest => dest.CantidadPersonas, opt => opt.MapFrom(src => src.CantidadPersonas))
+                .ForMember(dest => dest.TimeSlot, opt => opt.MapFrom(src => src.Horario))
+                .ForMember(dest => dest.Salas, opt => opt.MapFrom(src => src.Salas))
+                .ForMember(dest => dest.Recursos, opt => opt.MapFrom(src => src.Recursos));
         }
     }
 }

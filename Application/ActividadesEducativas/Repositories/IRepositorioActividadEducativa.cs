@@ -2,7 +2,9 @@
 using Domain.ActividadesAreaEducacion.Entities;
 namespace Application.ActividadesEducativas.Repositories
 {
-    public interface IRepositorioActividadEducativa :IRepository<ActividadEducativa>
+    public interface IRepositorioActividadEducativa : IRepository<ActividadEducativa>
     {
+        Task<List<ActividadEducativa>> GetAllActEducationAsync(DateTime fechaDesde, DateTime fechaHasta);
+
     }
 }
