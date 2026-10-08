@@ -1,6 +1,4 @@
 using Core.Domain.Entities;
-
-using System;
 using Domain.Common.Exceptions;
 
 namespace Domain.RecursoMuseo.Entities.Guia
@@ -17,11 +15,16 @@ namespace Domain.RecursoMuseo.Entities.Guia
         private AusenciaGuia() { }
 
         public AusenciaGuia(
+            string guiaId,
             DateTime fechaDesde,
             DateTime fechaHasta,
             string motivo)
         {
             Id = Guid.NewGuid().ToString();
+            if (string.IsNullOrWhiteSpace(guiaId))
+                throw new DomainException(
+                    "El id del guía no puede ser vacío.");
+
 
             if (fechaHasta < fechaDesde)
                 throw new DomainException(
@@ -30,7 +33,7 @@ namespace Domain.RecursoMuseo.Entities.Guia
             if (string.IsNullOrWhiteSpace(motivo))
                 throw new DomainException(
                     "El motivo de la ausencia no puede ser vacío.");
-
+            GuiaId = guiaId;
             FechaDesde = fechaDesde;
             FechaHasta = fechaHasta;
             Motivo = motivo.Trim();

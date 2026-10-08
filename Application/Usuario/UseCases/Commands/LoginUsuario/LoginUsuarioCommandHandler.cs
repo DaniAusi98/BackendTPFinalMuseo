@@ -1,8 +1,5 @@
-using Application.Usuario.ApplicationServices;
 using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
 using Application.Usuario.DataTransferObjets;
-
-using AutoMapper;
 
 using Core.Application;
 

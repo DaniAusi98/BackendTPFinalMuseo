@@ -1,4 +1,5 @@
-﻿using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
+﻿using Application.Common.ApplicationServices;
+using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
 using Application.VisitaGrupal.ApplicationServices;
 using Application.VisitaGrupal.DomainEvents;
 using MediatR;

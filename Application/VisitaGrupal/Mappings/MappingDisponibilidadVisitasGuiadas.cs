@@ -1,13 +1,14 @@
 using Application.VisitaGrupal.DataTransferObjets;
 using Application.VisitaGrupal.DomainEvents;
 using AutoMapper;
+using Domain.RecursoMuseo.Entities.Guia;
 using Domain.VisitasGrupales.Entities;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Domain.VisitasGrupales.ValueObjects;
 
 namespace Application.VisitaGrupal.Mappings
 {
-    public class MappingVisitasGuiadas:Profile
+    public class MappingVisitasGuiadas : Profile
     {
         public MappingVisitasGuiadas()
         {
@@ -52,10 +53,10 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.FechaFin, opt => opt.MapFrom(src => src.Horario.Fin))
                 .ForMember(dest => dest.CantidadPersonas, opt => opt.MapFrom(src => src.CantidadPersonas))
                 .ForMember(dest => dest.EstadoConfirmacion, opt => opt.MapFrom(src => src.EstadoConfirmacion))
-                .ForMember(dest => dest.Estado ,opt => opt.MapFrom(src => src.Estado));
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado));
 
 
-            CreateMap<VisitaGrupalGuiada,VisitaGuiadaCreated>()
+            CreateMap<VisitaGrupalGuiada, VisitaGuiadaCreated>()
                 .ForMember(dest => dest.VisitaId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UsuarioVisitanteId, opt => opt.MapFrom(src => src.UsuarioVisitanteId))
                 .ForMember(dest => dest.NombreInstitucion, opt => opt.MapFrom(src => src.Institucion))
@@ -83,6 +84,18 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.EstadoConfirmacion, opt => opt.MapFrom(src => src.EstadoConfirmacion))
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado));
 
-        }   
+            CreateMap<DisponibilidadGuiaFecha, DisponibilidadGuiaFechaDto>()
+                .ForMember(dest => dest.Fecha, opt => opt.MapFrom(src => src.Fecha))
+                .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.HoraInicio))
+                .ForMember(dest => dest.HoraFin, opt => opt.MapFrom(src => src.HoraFin))
+                .ForMember(dest => dest.Disponible, opt => opt.MapFrom(src => src.Disponible));
+
+            CreateMap<AusenciaGuia, AusenciaGuiaDto>()
+                .ForMember(dest => dest.GuiaId, opt => opt.MapFrom(src => src.GuiaId))
+                .ForMember(dest => dest.FechaDesde, opt => opt.MapFrom(src => src.FechaDesde))
+                .ForMember(dest => dest.FechaHasta, opt => opt.MapFrom(src => src.FechaHasta))
+                .ForMember(dest => dest.Motivo, opt => opt.MapFrom(src => src.Motivo));
+
+        }
     }
 }

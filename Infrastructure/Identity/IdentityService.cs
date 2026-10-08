@@ -11,18 +11,22 @@ namespace Infrastructure.Identity
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<UsuarioSistema> _userManager;
+
+        private readonly RoleManager<IdentityRole> _roleManager;
+
         private readonly SignInManager<UsuarioSistema> _signInManager;
         private readonly JwtTokenService _jwtTokenService;
 
         public IdentityService(
-            UserManager<UsuarioSistema> userManager, JwtTokenService jwtTokenService,SignInManager<UsuarioSistema> signInManager)
+            UserManager<UsuarioSistema> userManager, RoleManager<IdentityRole> roleManager, JwtTokenService jwtTokenService, SignInManager<UsuarioSistema> signInManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
             _jwtTokenService = jwtTokenService;
             _signInManager = signInManager;
 
         }
-        public async Task<LoginResponseDto?> LoginAsync(string email,string password)
+        public async Task<LoginResponseDto?> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -48,7 +52,7 @@ namespace Infrastructure.Identity
 
             return new LoginResponseDto
             {
-                User= new UserDto
+                User = new UserDto
                 {
                     Id = user.Id,
                     Email = user.Email,
@@ -119,6 +123,52 @@ namespace Infrastructure.Identity
             ;
         }
 
+        public async Task<string> RegistrarPersonalAsync(
+            string nombre,
+            string apellido,
+            string email,
+            string telefono,
+            DateOnly fechaNac,
+            string rolUsuarioId,
+            string password)
+        {
+            var user = new UsuarioSistema(nombre, apellido, fechaNac)
+            {
+                Email = email,
+                UserName = email,
+                PhoneNumber = telefono,
+                BirthDate = fechaNac
+            };
+
+            var result = await _userManager.CreateAsync(
+                user,
+                password
+            );
+            if (!result.Succeeded)
+            {
+                throw new DomainException(
+                    string.Join(",", result.Errors.Select(x => x.Description))
+                );
+            }
+            var role = await _roleManager.FindByIdAsync(rolUsuarioId);
+            if (role is null)
+            {
+                throw new DomainException("El rol no existe.");
+            }
+
+            await _userManager.AddToRoleAsync(
+                user,
+                role.Name
+            );
+
+            return user.Id;
+        }
+
+        public async Task<IdentityRole?> FindRoleByIdAsync(string roleId)
+        {
+            return await _roleManager.FindByIdAsync(roleId);
+        }
+
         public async Task<bool> UserExistsAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -145,7 +195,7 @@ namespace Infrastructure.Identity
                 Roles = roles.ToList()
             };
         }
-        public async Task<string>FindEmailById (string idUser)
+        public async Task<string> FindEmailById(string idUser)
         {
             var user = await _userManager.FindByIdAsync(idUser);
             if (user is null)
@@ -162,7 +212,7 @@ namespace Infrastructure.Identity
                 ? throw new DomainException("El usuario no existe.")
                 : await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
-        public async Task<bool> ConfirmEmailAsync(string userId,string token)
+        public async Task<bool> ConfirmEmailAsync(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
 

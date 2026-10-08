@@ -3,9 +3,7 @@ using Application.Usuario.UseCases.Commands.LoginUsuario;
 using Application.Usuario.UseCases.Commands.Register;
 using Application.Usuario.UseCases.Commands.UpdateUsuario;
 using Application.Usuario.UseCases.Queries;
-
 using Core.Application;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +14,7 @@ namespace Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class UsuarioVisitanteController(ICommandQueryBus commandQueryBus,IConfirmEmailService confirmarEmailService) : BaseController
+    public class UsuarioVisitanteController(ICommandQueryBus commandQueryBus, IConfirmEmailService confirmarEmailService) : BaseController
     {
         private readonly ICommandQueryBus _commandQueryBus =
             commandQueryBus ?? throw new ArgumentNullException(nameof(commandQueryBus));
@@ -43,7 +41,7 @@ namespace Controllers
         /// Crea un nuevo usuario visitante
         /// </summary>
         [HttpPost("register")]
-        public async Task<IActionResult> Create( [FromBody] RegistrarVisitanteCommand command)
+        public async Task<IActionResult> Create([FromBody] RegistrarVisitanteCommand command)
         {
             if (command is null) return BadRequest();
 

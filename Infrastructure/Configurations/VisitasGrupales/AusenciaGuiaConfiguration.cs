@@ -10,6 +10,7 @@ namespace Infrastructure.Configurations.VisitasGrupales
         {
             builder.ToTable("AusenciasGuia");
 
+
             builder.HasKey(a => a.Id);
 
             builder.Property(a => a.GuiaId)

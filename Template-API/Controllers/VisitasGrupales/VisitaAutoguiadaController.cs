@@ -1,6 +1,7 @@
 ﻿using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId;
 using Application.VisitaGrupal.UseCases.Queries.ReporteVisitaAutoguiada;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ConfirmarVisitaGrupal;
 using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaAutoguiada;
 using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal;
 using Core.Application;

@@ -1,49 +1,36 @@
-using Application.Availability.Models;
 using Application.Availability.Factories;
+using Application.Availability.Models;
 using Application.VisitaGrupal.Repositories;
+using Domain.Common.ValueObjets;
 using Domain.VisitasGrupales.DomainServices;
 using Domain.VisitasGrupales.Entities;
-using Domain.Common.ValueObjets;
-using static Domain.VisitasGrupales.Enums.Enums;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Microsoft.Extensions.Logging;
+using static Domain.VisitasGrupales.Enums.Enums;
 
 namespace Application.Availability.Producers
 {
-    public class GuidedAvailabilityProducerService
+    public class GuidedAvailabilityProducerService(
+        IServicioDisponibilidadTurnosVisitasGuiadas servicioGuiadas,
+        IRepositorioGuia repositorioGuia,
+        IRepositorioVisitaGuiada repositorioVisitaGuiada,
+        ActividadMuseo.Repositories.IRepositorioActividadMuseo repositorioActividadMuseo,
+        IRepositorioConfiguracionVisitasGrupalesGuiadas repositorioConfiguracion,
+        ActividadMuseo.Repositories.IRepositorioCalendarioMuseo repositorioCalendario,
+        ActivityAvailabilityFactory availabilityFactory, // <--- 2) INYECTAMOS EN EL CONSTRUCTOR
+
+        AvailabilityEngine engine,
+        ILogger<GuidedAvailabilityProducerService> logger)
     {
-        private readonly IServicioDisponibilidadTurnosVisitasGuiadas _servicioGuiadas;
-        private readonly IRepositorioGuia _repositorioGuia;
-        private readonly IRepositorioVisitaGuiada _repositorioVisitaGuiada;
-        private readonly ActividadMuseo.Repositories.IRepositorioActividadMuseo _repositorioActividadMuseo;
-        private readonly IRepositorioConfiguracionVisitasGrupalesGuiadas _repositorioConfiguracion;
-        private readonly ActividadMuseo.Repositories.IRepositorioCalendarioMuseo _repositorioCalendario;
-        private readonly ActivityAvailabilityFactory _availabilityFactory; // <--- 1) AGREGAMOS EL CAMPO
-        private readonly AvailabilityEngine _engine;
-        private readonly ILogger<GuidedAvailabilityProducerService> _logger;
-
-        public GuidedAvailabilityProducerService(
-            IServicioDisponibilidadTurnosVisitasGuiadas servicioGuiadas,
-            IRepositorioGuia repositorioGuia,
-            IRepositorioVisitaGuiada repositorioVisitaGuiada,
-            ActividadMuseo.Repositories.IRepositorioActividadMuseo repositorioActividadMuseo,
-            IRepositorioConfiguracionVisitasGrupalesGuiadas repositorioConfiguracion,
-            ActividadMuseo.Repositories.IRepositorioCalendarioMuseo repositorioCalendario,
-            ActivityAvailabilityFactory availabilityFactory, // <--- 2) INYECTAMOS EN EL CONSTRUCTOR
-
-            AvailabilityEngine engine,
-            ILogger<GuidedAvailabilityProducerService> logger)
-        {
-            _servicioGuiadas = servicioGuiadas;
-            _repositorioGuia = repositorioGuia;
-            _repositorioVisitaGuiada = repositorioVisitaGuiada;
-            _repositorioActividadMuseo = repositorioActividadMuseo;
-            _repositorioConfiguracion = repositorioConfiguracion;
-            _repositorioCalendario = repositorioCalendario;
-            _availabilityFactory = availabilityFactory; // <--- 3) ASIGNAMOS EL CAMPO
-            _engine = engine;
-            _logger = logger;
-        }
+        private readonly IServicioDisponibilidadTurnosVisitasGuiadas _servicioGuiadas = servicioGuiadas;
+        private readonly IRepositorioGuia _repositorioGuia = repositorioGuia;
+        private readonly IRepositorioVisitaGuiada _repositorioVisitaGuiada = repositorioVisitaGuiada;
+        private readonly ActividadMuseo.Repositories.IRepositorioActividadMuseo _repositorioActividadMuseo = repositorioActividadMuseo;
+        private readonly IRepositorioConfiguracionVisitasGrupalesGuiadas _repositorioConfiguracion = repositorioConfiguracion;
+        private readonly ActividadMuseo.Repositories.IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario;
+        private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory; // <--- 1) AGREGAMOS EL CAMPO
+        private readonly AvailabilityEngine _engine = engine;
+        private readonly ILogger<GuidedAvailabilityProducerService> _logger = logger;
 
         public async Task<List<TurnoDisponible>> GetAvailableTurnsAsync(
             DateTime desde,

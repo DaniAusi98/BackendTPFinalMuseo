@@ -3,7 +3,7 @@ using Domain.RecursoMuseo.Entities.Guia;
 
 namespace Domain.VisitasGrupales.DomainServices
 {
-    public class DisponibilidadGuiaFecha
+    public class ValidarDisponibilidadGuia
     {
 
         public static bool GuiaPuedeCubrirTurno(Guia guia, TimeSlot horario)

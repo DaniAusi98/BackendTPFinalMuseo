@@ -3,16 +3,17 @@ using Application.ApplicationMuseo.Integrations.Handlers.Subscribers;
 using Application.Registrations;
 using AutoMapper;
 using Core.Application;
+using Core.Application.Mapping;
 using Filters;
+using Infrastructure.Identity;
 using Infrastructure.Registrations;
 using Infrastructure.Repositories.Sql;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
-using Infrastructure.Identity;
-using Core.Application.Mapping;
+
 
 namespace API
 {
@@ -27,7 +28,7 @@ namespace API
 
         public void ConfigureServices(IServiceCollection services)
         {
-           
+
             services.AddControllers();
             services.AddEndpointsApiExplorer();
 
@@ -61,15 +62,15 @@ namespace API
                    {
                        ValidateIssuer = true,
                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtSettings["Issuer"],
-                        ValidAudience = jwtSettings["Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtSettings["Key"])) 
-                        // Configure your issuer, audience, and signing key here
-                    };
-                });
+                       ValidateLifetime = true,
+                       ValidateIssuerSigningKey = true,
+                       ValidIssuer = jwtSettings["Issuer"],
+                       ValidAudience = jwtSettings["Audience"],
+                       IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+                       // Configure your issuer, audience, and signing key here
+                   };
+               });
 
             services.AddAuthorization();
 
@@ -108,9 +109,9 @@ namespace API
             }
 
             CustomMapper.Instance = app.ApplicationServices.GetRequiredService<IMapper>();
-            app.SeedIdentityRoles();
             app.SeedCalendarioMuseo();
-            app.SeedConfiguracionVisitas();  
+            app.SeedRolesPermissions();  // 🔽 Nueva línea
+            app.SeedConfiguracionVisitas();
             app.SeedConfiguracionHorarioAutoguiadas();
             app.SeedProvinciasArgentina();
             app.SeedDepartamentosArgentina();
@@ -121,6 +122,9 @@ namespace API
             app.SeedConfiguracionUsoSalas();
             app.SeedRecursosMuseo();
             app.SeedProyectoEducativo();
+            app.SeedAreasMuseo();
+            app.SeedPuestosMuseo();
+            app.SeedAreaPuestoMuseo();
 
 
 

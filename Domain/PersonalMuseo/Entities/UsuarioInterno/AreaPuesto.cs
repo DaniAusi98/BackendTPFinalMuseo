@@ -11,7 +11,7 @@ namespace Domain.PersonalMuseo.Entities.UsuarioInterno
         public string PuestoId { get; private set; }
         public Puesto Puesto { get; private set; }
 
-        public AreaPuesto()
+        protected AreaPuesto()
         {
         }
 
@@ -25,16 +25,18 @@ namespace Domain.PersonalMuseo.Entities.UsuarioInterno
 
         public void SetAreaId(string areaId)
         {
-            if (areaId == null || areaId.Trim() == "")
+            if (string.IsNullOrWhiteSpace(areaId))
                 throw new DomainException("AreaId no puede ser nulo o vacío.");
-            AreaId = areaId;
+
+            AreaId = areaId.Trim();
         }
 
         public void SetPuestoId(string puestoId)
         {
-            if (puestoId == null || puestoId.Trim() == "")
+            if (string.IsNullOrWhiteSpace(puestoId))
                 throw new DomainException("PuestoId no puede ser nulo o vacío.");
-            PuestoId = puestoId;
+
+            PuestoId = puestoId.Trim();
         }
     }
 }

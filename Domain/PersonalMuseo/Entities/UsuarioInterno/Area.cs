@@ -27,8 +27,8 @@ namespace Domain.PersonalMuseo.Entities.UsuarioInterno
                 throw new DomainException("La descripción del área no puede estar vacía.");
 
             Descripcion = descripcion.Trim();
-        }   
         }
+
 
         public void SetNombre(string nombre)
         {

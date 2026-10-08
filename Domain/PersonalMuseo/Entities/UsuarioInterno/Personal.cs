@@ -1,5 +1,6 @@
 using Core.Domain.Entities;
 using Domain.Common.Exceptions;
+using Domain.Common.ValueObjets;
 
 namespace Domain.PersonalMuseo.Entities.UsuarioInterno
 {
@@ -8,40 +9,48 @@ namespace Domain.PersonalMuseo.Entities.UsuarioInterno
         public string IdentityUserId { get; private set; }
         public string Nombre { get; private set; }
         public string Apellido { get; private set; }
+        public Telefono Telefono { get; private set; }
+        public Email Email { get; private set; }
         public string DNI { get; private set; }
-        public DateTime FechaNacimiento { get; private set; }
-        public DateTime FechaIngreso { get; private set; }
-        public DateTime? FechaBaja { get; private set; }
-        public bool Estado { get; private set; }
+        public DateOnly FechaNacimiento { get; private set; }
+        public bool Activo { get; private set; }
 
-        public ICollection<PuestoPersonalMuseo> Asignaciones { get; private set; }
-       = new List<PuestoPersonalMuseo>();
+        public ICollection<AsignacionPersonal> Asignaciones { get; private set; }
+            = new List<AsignacionPersonal>();
 
         protected Personal()
         {
         }
 
-        public Personal(string identityUserId, string nombre, string apellido, string dNI, DateTime fechaNacimiento, DateTime fechaIngreso)
+        public Personal(
+            string identityUserId,
+            string nombre,
+            string apellido,
+            string dni,
+            DateOnly fechaNacimiento,
+            Telefono telefono,
+            Email email)
         {
             Id = Guid.NewGuid().ToString();
+
             SetIdentityUserId(identityUserId);
             SetNombre(nombre);
             SetApellido(apellido);
-            SetDNI(dNI);
+            SetDNI(dni);
             SetFechaNacimiento(fechaNacimiento);
-            SetFechaIngreso(fechaIngreso);
+
+            Telefono = telefono
+                ?? throw new DomainException("Teléfono no puede ser nulo.");
+
+            Email = email
+                ?? throw new DomainException("Email no puede ser nulo.");
+
+            Activo = true;
         }
 
-        public void SetIdentityUserId(string identityUserId)
+        public void AgregarAsignacion(AsignacionPersonal asignacion)
         {
-            if (string.IsNullOrWhiteSpace(identityUserId))
-                throw new DomainException("IdentityUserId no puede estar vacío.");
-
-            IdentityUserId = identityUserId.Trim();
-        }
-        public void AgregarAsignacion(PuestoPersonalMuseo asignacion)
-        {
-            if (asignacion == null)
+            if (asignacion is null)
                 throw new DomainException("La asignación no puede ser nula.");
 
             Asignaciones.Add(asignacion);
@@ -49,69 +58,63 @@ namespace Domain.PersonalMuseo.Entities.UsuarioInterno
 
         public void EliminarAsignacion(string asignacionId)
         {
-            var asignacion = Asignaciones.FirstOrDefault(x => x.Id == asignacionId);
+            var asignacion = Asignaciones
+                .FirstOrDefault(x => x.Id == asignacionId);
 
-            if (asignacion == null)
+            if (asignacion is null)
                 throw new DomainException("La asignación no existe.");
 
             Asignaciones.Remove(asignacion);
         }
 
-        public void ModificarAsignacion(PuestoPersonalMuseo asignacion)
+        public void SetIdentityUserId(string identityUserId)
         {
-            if (asignacion == null)
-                throw new DomainException("La asignación no puede ser nula.");
+            if (string.IsNullOrWhiteSpace(identityUserId))
+                throw new DomainException(
+                    "IdentityUserId no puede estar vacío.");
 
-            var existente = Asignaciones.FirstOrDefault(x => x.Id == asignacion.Id);
-
-            if (existente == null)
-                throw new DomainException("La asignación no existe.");
-
-            existente.Modificar(
-                asignacion.AreaPuestoId,
-                asignacion.FechaDesde,
-                asignacion.FechaHasta);
+            IdentityUserId = identityUserId.Trim();
         }
 
         public void SetNombre(string nombre)
         {
             if (string.IsNullOrWhiteSpace(nombre))
-                throw new DomainException("Nombre no puede estar vacío.");
+                throw new DomainException(
+                    "Nombre no puede estar vacío.");
+
             Nombre = nombre.Trim();
         }
+
         public void SetApellido(string apellido)
         {
             if (string.IsNullOrWhiteSpace(apellido))
-                throw new DomainException("Apellido no puede estar vacío.");
+                throw new DomainException(
+                    "Apellido no puede estar vacío.");
+
             Apellido = apellido.Trim();
         }
-        public void SetDNI(string dNI)
+
+        public void SetDNI(string dni)
         {
-            if (string.IsNullOrWhiteSpace(dNI))
-                throw new DomainException("DNI no puede estar vacío.");
-            DNI = dNI.Trim();
+            if (string.IsNullOrWhiteSpace(dni))
+                throw new DomainException(
+                    "DNI no puede estar vacío.");
+
+            DNI = dni.Trim();
         }
-        public void SetFechaNacimiento(DateTime fechaNacimiento)
+
+        public void SetFechaNacimiento(DateOnly fechaNacimiento)
         {
-            if (fechaNacimiento > DateTime.Now)
-                throw new DomainException("Fecha de nacimiento no puede ser en el futuro.");
+            if (fechaNacimiento > DateOnly.FromDateTime(DateTime.UtcNow))
+                throw new DomainException(
+                    "La fecha de nacimiento no puede ser futura.");
+
             FechaNacimiento = fechaNacimiento;
         }
-        public void SetFechaIngreso(DateTime fechaIngreso)
-        {
-            if (fechaIngreso > DateTime.Now)
-                throw new DomainException("Fecha de ingreso no puede ser en el futuro.");
-            FechaIngreso = fechaIngreso;
-        }
-        public void SetFechaBaja(DateTime? fechaBaja)
-        {
-            if (fechaBaja.HasValue && fechaBaja.Value < FechaIngreso)
-                throw new DomainException("Fecha de baja no puede ser anterior a la fecha de ingreso.");
-            FechaBaja = fechaBaja;
-        }
+
         public void SetEstado(bool estado)
         {
-            Estado = estado;
+            Activo = estado;
         }
     }
 }

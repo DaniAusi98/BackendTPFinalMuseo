@@ -1,10 +1,9 @@
-using Application.VisitaGrupal.DataTransferObjets;
-using Application.VisitaGrupal.UseCases.Commands.DeleteConfiguracionVisitasGrupalesGuiadas;
 using Application.VisitaGrupal.UseCases.Queries.GetConfiguracionVisitasGrupalesGuiadas;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateConfiguracionVisitasGrupalesGuiadas;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.DeleteConfiguracionVisitasGrupalesGuiadas;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.UpdateConfiguracionVisitasGrupalesGuiadas;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateConfiguracionVisitasGrupalesGuiadas;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.UpdateConfiguracionVisitasGrupalesGuiadas;
 
 namespace Controllers.VisitasGrupales
 {

@@ -15,9 +15,24 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
             // HorariosGuia was converted to a value object; EF Include on it is invalid.
             // Include only the navigational collection of absences to avoid EF Core Include errors.
             return await Repository
-                .Include(g=> g.HorariosGuia)
+                .Include(g => g.HorariosGuia)
                 .Include(g => g.AusenciasProgramadas)
                 .ToListAsync();
+        }
+        public async Task<Guia?> ObtenerGuiaConDisponibilidadAsync(string guiaId)
+        {
+            return await Repository
+                .Include(g => g.HorariosGuia)
+                .Include(g => g.AusenciasProgramadas)
+                .FirstOrDefaultAsync(g => g.Id == guiaId);
+        }
+
+        public async Task<Guia?> ObtenerGuiaPersonalId(string personalId)
+        {
+            return await Repository
+                .Include(g => g.HorariosGuia)
+                .Include(g => g.AusenciasProgramadas)
+                .FirstOrDefaultAsync(g => g.PersonalInternoId == personalId);
         }
     }
 }

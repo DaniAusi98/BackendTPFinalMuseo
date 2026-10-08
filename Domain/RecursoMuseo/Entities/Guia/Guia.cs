@@ -12,6 +12,8 @@ namespace Domain.RecursoMuseo.Entities.Guia
 
         public string PersonalInternoId { get; private set; }
 
+
+
         public bool Activo { get; private set; } = true;
 
         protected Guia()
@@ -27,7 +29,7 @@ namespace Domain.RecursoMuseo.Entities.Guia
 
             if (string.IsNullOrWhiteSpace(nombrecompleto))
                 throw new DomainException("El nombre completo del guía no puede estar vacío.");
-            NombreCompleto= nombrecompleto.Trim();
+            NombreCompleto = nombrecompleto.Trim();
             AsignarHorarios(horariosGuia);
 
 
@@ -90,7 +92,7 @@ namespace Domain.RecursoMuseo.Entities.Guia
             string motivo)
         {
             AusenciasProgramadas.Add(
-                new AusenciaGuia(desde, hasta, motivo));
+                new AusenciaGuia(this.Id, desde, hasta, motivo));
         }
 
         public void EliminarAusencia(string ausenciaId)

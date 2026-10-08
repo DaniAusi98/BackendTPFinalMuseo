@@ -1,5 +1,4 @@
 using AutoMapper;
-using Core.Domain.Entities;
 
 namespace Core.Application.Mapping
 {
@@ -13,7 +12,7 @@ namespace Core.Application.Mapping
             return mapper.Map<T>(input);
         }
 
-        
+
 
         public static IEnumerable<T> To<T>(this IEnumerable<object> input)
         {

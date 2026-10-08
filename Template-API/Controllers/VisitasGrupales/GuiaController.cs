@@ -1,9 +1,15 @@
+using Application.VisitaGrupal.UseCases.Guias.Commands.CrearNoDisponibilidadGuia;
 using Application.VisitaGrupal.UseCases.Guias.Commands.CreateGuia;
+using Application.VisitaGrupal.UseCases.Guias.Commands.DeleteGuia;
 using Application.VisitaGrupal.UseCases.Guias.Commands.UpdateGuia;
+using Application.VisitaGrupal.UseCases.Guias.Queries.DisponibilidadGuia;
 using Application.VisitaGrupal.UseCases.Queries.GetAllGuias;
 using Application.VisitaGrupal.UseCases.Queries.GetGuiaBy;
 using Core.Application;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Controllers.VisitasGrupales
 {
@@ -65,19 +71,55 @@ namespace Controllers.VisitasGrupales
 
         [HttpGet("DisponibilidadGuias")]
         public async Task<IActionResult> DisponibilidadGuias(
+            [FromQuery] string guiaId,
             [FromQuery] DateTime fechaDesde,
-            [FromQuery] DateTime fechaHasta,
-            [FromQuery] uint pageIndex = 1,
-            [FromQuery] uint pageSize = 10)
+            [FromQuery] DateTime fechaHasta
+          )
         {
             var guias = await _commandQueryBus.Send(
-                new Application.VisitaGrupal.UseCases.Guias.Queries.ConsultarDisponibilidadGuiasQuery(fechaDesde, fechaHasta)
+                new Application.VisitaGrupal.UseCases.Guias.Queries.DisponibilidadGuiaQuery(fechaDesde, fechaHasta, guiaId)
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize
                 });
+
             return Ok(guias);
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("DisponGuiaAutenticado")]
+        public async Task<IActionResult> DisponGuiaAutenticado(
+            [FromQuery] DateTime fechaDesde,
+            [FromQuery] DateTime fechaHasta)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var disponGuia = await _commandQueryBus.Send(
+                new DisponGuiaUserIdQuery(fechaDesde, fechaHasta, userId)
+                {
+                });
+
+            return Ok(disponGuia);
+        }
+
+
+
+
+
+
+
+        [HttpPost("NoDisponibilidadGuia")]
+        public async Task<IActionResult> CrearAusenciaProgramada(CrearNoDisponibilidadGuiaCommand command)
+        {
+            if (command is null) return BadRequest();
+
+            var id = await _commandQueryBus.Send(command);
+
+            return Created($"api/[Controller]/{id}", new { Id = id });
+        }
+
 
 
     }

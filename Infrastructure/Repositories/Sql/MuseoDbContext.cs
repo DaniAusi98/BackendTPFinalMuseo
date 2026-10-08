@@ -3,6 +3,7 @@ using Domain.ActividadMuseo.Entities;
 using Domain.Common.Entities;
 using Domain.Common.Entities.Ubicacion;
 using Domain.Eventos.Entities;
+using Domain.PersonalMuseo.Entities.UsuarioInterno;
 using Domain.RecursoMuseo.Entities;
 using Domain.RecursoMuseo.Entities.Guia;
 using Domain.Reportes.Entities;
@@ -63,6 +64,16 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<ProyectosAreaEducacion> ProyectosAreaEducacion { get; set; }
         public DbSet<EquipoTrabajoResponsable> EquipoTrabajoResponsables { get; set; }
 
+        public DbSet<Area> Areas { get; set; }
+        public DbSet<AreaPuesto> AreaPuestos { get; set; }
+
+        public DbSet<Puesto> Puestos { get; set; }
+
+        public DbSet<Personal> PersonalMuseo { get; set; }
+        public DbSet<AsignacionPersonal> AsignacionesPersonal { get; set; }
+
+
+
 
 
         protected MuseoDbContext()
@@ -109,6 +120,16 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new ActividadEducativaConfig());
             modelBuilder.ApplyConfiguration(new ProyectosAreaEducacionConfig());
             modelBuilder.ApplyConfiguration(new EquipoTrabajoResponsableConfig());
+            modelBuilder.ApplyConfiguration(new AreaConfig());
+            modelBuilder.ApplyConfiguration(new AreaPuestoConfig());
+            modelBuilder.ApplyConfiguration(new PuestoConfig());
+            modelBuilder.ApplyConfiguration(new PersonalConfig());
+            modelBuilder.ApplyConfiguration(new AsignacionPersonalConfig());
+
+
+
+
+
 
             // ... Aquí tienes tus configuraciones actuales de tablas (Entidades, Claves, etc.) ...
 

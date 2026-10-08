@@ -1,6 +1,9 @@
-﻿namespace Application.PersonalMuseo.Repositories
+﻿using Core.Application.Repositories;
+using Domain.PersonalMuseo.Entities.UsuarioInterno;
+
+namespace Application.PersonalMuseo.Repositories
 {
-    internal interface IRepositorioPuestoPersonal
+    public interface IRepositorioAsignacionPuestoPersonal : IRepository<AsignacionPersonal>
     {
     }
 }

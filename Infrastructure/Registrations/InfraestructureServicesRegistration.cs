@@ -1,6 +1,7 @@
 using Application.ApplicationMuseo.ApplicationServices;
 using Application.Availability.ApplicationServices;
 using Application.Common.ApplicationServices;
+using Application.PersonalMuseo.ApplicationServices;
 using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
 using Application.VisitaGrupal.ApplicationServices;
 using Core.Application.Adapters.Http;
@@ -13,6 +14,8 @@ using Infrastructure.Adapters.EmailSender.ResendEmailService;
 using Infrastructure.Adapters.EmailSender.ResendEmailService.ConfirmarVisitaUrl;
 using Infrastructure.Adapters.EmailSender.ResendEmailService.User;
 using Infrastructure.Constants;
+using Infrastructure.Data.Seeders;
+using Infrastructure.Data.Seeders.Ubicacion;
 using Infrastructure.Factories;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +36,7 @@ namespace Infrastructure.Registrations
         {
             /* Database Context */
             services.AddRepositories(configuration);
+
 
 
             /* REGISTRO DE HANGFIRE JUSTO AQUÍ*/
@@ -79,6 +83,9 @@ namespace Infrastructure.Registrations
             services.AddHttpClient<ResendClient>();
             services.AddTransient<IResend, ResendClient>();
             services.AddScoped<IConfirmUserUrl, ConfirmUserUrl>();
+            services.AddScoped<IConfirmUserUrlDashboard, ConfirmUserUrlDashboard>();
+
+
             services.AddScoped<IURLConfirmacionVisitaGrupal, UrlConfirmacionVisitaGrupal>();
 
             services.AddScoped<IEmailService, ResendEmailService>();
@@ -130,7 +137,7 @@ namespace Infrastructure.Registrations
         }
         public static void SeedCalendarioMuseo(this IApplicationBuilder app)
         {
-            Infrastructure.Data.Seeders.CalendarioMuseoSeeder
+            CalendarioMuseoSeeder
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
@@ -141,14 +148,14 @@ namespace Infrastructure.Registrations
         /// </summary>
         public static void SeedConfiguracionVisitas(this IApplicationBuilder app)
         {
-            Infrastructure.Data.Seeders.ConfiguracionVisitasSeeder
+            ConfiguracionVisitasSeeder
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
         }
         public static void SeedConfiguracionHorarioAutoguiadas(this IApplicationBuilder app)
         {
-            Infrastructure.Data.Seeders.ConfiguracionHorarioAutoguiadasSeeder
+            ConfiguracionHorarioAutoguiadasSeeder
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
@@ -177,21 +184,21 @@ namespace Infrastructure.Registrations
         }
         public static void SeedSalasMuseo(this IApplicationBuilder app)
         {
-            Data.Seeders.SalaSeeder
+            SalaSeeder
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
         }
         public static void SeedTematicasVisitas(this IApplicationBuilder app)
         {
-            Data.Seeders.TematicaVisitaSeeder
+            TematicaVisitaSeeder
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
         }
         public static void SeedGuiasMuseo(this IApplicationBuilder app)
         {
-            Data.Seeders.Ubicacion.SeederGuias
+            SeederGuias
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
@@ -199,27 +206,54 @@ namespace Infrastructure.Registrations
 
         public static void SeedConfiguracionUsoSalas(this IApplicationBuilder app)
         {
-            Data.Seeders.ConfiguracionUsoSalas
+            ConfiguracionUsoSalas
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
         }
         public static void SeedRecursosMuseo(this IApplicationBuilder app)
         {
-            Data.Seeders.RecursoSeeder
+            RecursoSeeder
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
         }
-        public static void SeedProyectoEducativo (this IApplicationBuilder app)
+        public static void SeedProyectoEducativo(this IApplicationBuilder app)
         {
 
-            Data.Seeders.ProyectoAreaEducacionSeeder
+            ProyectoAreaEducacionSeeder
                 .SeedAsync(app.ApplicationServices)
                 .GetAwaiter()
                 .GetResult();
 
         }
-
+        public static void SeedRolesPermissions(this IApplicationBuilder app)
+        {
+            RolePermissionsSeeder
+                .SeedAsync(app.ApplicationServices)
+                .GetAwaiter()
+                .GetResult();
+        }
+        public static void SeedAreasMuseo(this IApplicationBuilder app)
+        {
+            AreasSeeder
+                .SeedAsync(app.ApplicationServices)
+                .GetAwaiter()
+                .GetResult();
+        }
+        public static void SeedPuestosMuseo(this IApplicationBuilder app)
+        {
+            PuestoSeeder
+                .SeedAsync(app.ApplicationServices)
+                .GetAwaiter()
+                .GetResult();
+        }
+        public static void SeedAreaPuestoMuseo(this IApplicationBuilder app)
+        {
+            AreaPuestoSeeder
+                .SeedAsync(app.ApplicationServices)
+                .GetAwaiter()
+                .GetResult();
+        }
     }
 }

@@ -91,7 +91,7 @@ namespace Domain.VisitasGrupales.DomainServices
                     // 3.3. Obtener guías que pueden cubrir el turno
                     int cantidadGuias =
                         guias.Count(g =>
-                            DisponibilidadGuiaFecha
+                            ValidarDisponibilidadGuia
                                 .GuiaPuedeCubrirTurno(g, horario));
 
                     // 3.4. Calcular guías ocupados por visitas existentes

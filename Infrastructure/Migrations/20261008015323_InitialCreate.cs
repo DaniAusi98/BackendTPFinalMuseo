@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,6 +34,24 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ActividadesMuseo", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Areas",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Nombre = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Descripcion = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Activo = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Areas", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -222,6 +240,33 @@ namespace Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Personal",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdentityUserId = table.Column<string>(type: "varchar(450)", maxLength: 450, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Nombre = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Apellido = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Telefono = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(254)", maxLength: 254, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DNI = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FechaNacimiento = table.Column<DateOnly>(type: "date", nullable: false),
+                    Activo = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Personal", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Provincias",
                 columns: table => new
                 {
@@ -233,6 +278,43 @@ namespace Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Provincias", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ProyectosAreaEducacion",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Nombre = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FechaInicio = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    FechaFin = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Publico = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProyectosAreaEducacion", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Puestos",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Nombre = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Descripcion = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Activo = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Puestos", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -866,6 +948,101 @@ namespace Infrastructure.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ActividadesEducativas",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Titulo = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TipoActividadEducativa = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProyectoVinculadaId = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    InstitucionVinculada = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PublicoObjetivo = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RequiereDifusion = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    SolicitaFlyer = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    UrlImagenes = table.Column<string>(type: "json", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Observaciones = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActividadesEducativas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ActividadesEducativas_ActividadesMuseo_Id",
+                        column: x => x.Id,
+                        principalTable: "ActividadesMuseo",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ActividadesEducativas_ProyectosAreaEducacion_ProyectoVincula~",
+                        column: x => x.ProyectoVinculadaId,
+                        principalTable: "ProyectosAreaEducacion",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "EquiposTrabajoResponsables",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NombreCompleto = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    InstitucionPerteneciente = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProyectoId = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EquiposTrabajoResponsables", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EquiposTrabajoResponsables_ProyectosAreaEducacion_ProyectoId",
+                        column: x => x.ProyectoId,
+                        principalTable: "ProyectosAreaEducacion",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AreaPuesto",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AreaId = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PuestoId = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AreaPuesto", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AreaPuesto_Areas_AreaId",
+                        column: x => x.AreaId,
+                        principalTable: "Areas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AreaPuesto_Puestos_PuestoId",
+                        column: x => x.PuestoId,
+                        principalTable: "Puestos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ActividadRecursosAsignados",
                 columns: table => new
                 {
@@ -1092,6 +1269,42 @@ namespace Infrastructure.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "AsignacionesPersonal",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PersonalId = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AreaPuestoId = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FechaAsignacion = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Activa = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AsignacionesPersonal", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AsignacionesPersonal_AreaPuesto_AreaPuestoId",
+                        column: x => x.AreaPuestoId,
+                        principalTable: "AreaPuesto",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AsignacionesPersonal_Personal_PersonalId",
+                        column: x => x.PersonalId,
+                        principalTable: "Personal",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActividadesEducativas_ProyectoVinculadaId",
+                table: "ActividadesEducativas",
+                column: "ProyectoVinculadaId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_ActividadExceptions_ActividadId_Fecha",
                 table: "ActividadExceptions",
@@ -1117,6 +1330,33 @@ namespace Infrastructure.Migrations
                 name: "IX_ActividadTimeSlots_ActividadMuseoId",
                 table: "ActividadTimeSlots",
                 column: "ActividadMuseoId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AreaPuesto_AreaId",
+                table: "AreaPuesto",
+                column: "AreaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AreaPuesto_PuestoId",
+                table: "AreaPuesto",
+                column: "PuestoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Areas_Nombre",
+                table: "Areas",
+                column: "Nombre",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AsignacionesPersonal_AreaPuestoId",
+                table: "AsignacionesPersonal",
+                column: "AreaPuestoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AsignacionesPersonal_PersonalId_AreaPuestoId",
+                table: "AsignacionesPersonal",
+                columns: new[] { "PersonalId", "AreaPuestoId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -1213,6 +1453,11 @@ namespace Infrastructure.Migrations
                 column: "PaisId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EquiposTrabajoResponsables_ProyectoId",
+                table: "EquiposTrabajoResponsables",
+                column: "ProyectoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HorariosGuia_GuiaId",
                 table: "HorariosGuia",
                 column: "GuiaId");
@@ -1233,9 +1478,27 @@ namespace Infrastructure.Migrations
                 column: "DivisionAdministrativaId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Personal_DNI",
+                table: "Personal",
+                column: "DNI",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Personal_IdentityUserId",
+                table: "Personal",
+                column: "IdentityUserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Provincias_Nombre",
                 table: "Provincias",
                 column: "Nombre");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Puestos_Nombre",
+                table: "Puestos",
+                column: "Nombre",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TematicaSalas_SalaId",
@@ -1262,6 +1525,9 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ActividadesEducativas");
+
+            migrationBuilder.DropTable(
                 name: "ActividadExceptions");
 
             migrationBuilder.DropTable(
@@ -1272,6 +1538,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ActividadTimeSlots");
+
+            migrationBuilder.DropTable(
+                name: "AsignacionesPersonal");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -1310,6 +1579,9 @@ namespace Infrastructure.Migrations
                 name: "DummyEntity");
 
             migrationBuilder.DropTable(
+                name: "EquiposTrabajoResponsables");
+
+            migrationBuilder.DropTable(
                 name: "Eventos");
 
             migrationBuilder.DropTable(
@@ -1346,6 +1618,12 @@ namespace Infrastructure.Migrations
                 name: "Recursos");
 
             migrationBuilder.DropTable(
+                name: "AreaPuesto");
+
+            migrationBuilder.DropTable(
+                name: "Personal");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -1356,6 +1634,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "CalendariosMuseo");
+
+            migrationBuilder.DropTable(
+                name: "ProyectosAreaEducacion");
 
             migrationBuilder.DropTable(
                 name: "Guias");
@@ -1380,6 +1661,12 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "VisitasGrupalesGuiadas");
+
+            migrationBuilder.DropTable(
+                name: "Areas");
+
+            migrationBuilder.DropTable(
+                name: "Puestos");
 
             migrationBuilder.DropTable(
                 name: "Provincias");

@@ -9,6 +9,7 @@ using Application.Behaivors;
 using Application.Eventos.ApplicationServices;
 using Application.Eventos.Options;
 using Application.MuseumResources.ApplicationServices;
+using Application.PersonalMuseo.ApplicationServices;
 using Application.Reportes.ApplicationServices;
 using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
 using Application.Usuario.UseCases.Commands.UpdateUsuario;
@@ -60,6 +61,8 @@ namespace Application.Registrations
             /* Application Services */
             services.AddScoped<IDummyEntityApplicationService, DummyEntityApplicationService>();
             services.AddScoped<IEventoApplicationService, EventoApplicationService>();
+            services.AddScoped<IUserConfirmationEmailService, UserConfirmationEmailService>();
+
 
             //services.AddScoped<IUsuarioApplicationService,UsuarioVisitanteApplicationService>();
 
@@ -76,6 +79,7 @@ namespace Application.Registrations
             // Register availability service (now uses ConfiguracionVisitasGrupalesGuiadas entity from database)
             services.AddScoped<IServicioDisponibilidadTurnosVisitasGuiadas, ServicioDisponibilidadTurnosVisitasGuiadas>();
             services.AddScoped<IServicioDisponibilidadSlotsAutoguiadas, ServicioDisponibilidadSlotsAutoguiadas>();
+            services.AddScoped<IDisponibilidadGuia, DisponibilidadGuia>();
 
             // Register availability engine, rule factory and providers (moved from Application.Availability.ServiceCollectionExtensions)
             services.AddScoped<AvailabilityEngine>();
@@ -122,7 +126,7 @@ namespace Application.Registrations
             // services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             services.AddScoped<IVisitaGuiadaSinConfirmacion, VisitaGuiadaSinConfirmar>();
-            services.AddScoped<IServicioReporteVisitasGrupales,ServicioReporteVisitasGrupales>();
+            services.AddScoped<IServicioReporteVisitasGrupales, ServicioReporteVisitasGrupales>();
             services.AddScoped<IServicioReporteVisitasGuiadas, ServicioReporteVisitasGuiadas>();
             services.AddScoped<IServicioReporteVisitasAutoguiadas, ServicioReporteVisitasAutoguiadas>();
 

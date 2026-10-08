@@ -1,6 +1,13 @@
-﻿namespace Application.PersonalMuseo.Repositories
+﻿using Core.Application.Repositories;
+using Domain.PersonalMuseo.Entities.UsuarioInterno;
+
+namespace Application.PersonalMuseo.Repositories
 {
-    internal interface IRepositorioPersonal
+    public interface IRepositorioPersonal : IRepository<Personal>
     {
+        Task<Personal?> GetPersonalMuseo(string userId);
+
+
+
     }
 }

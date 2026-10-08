@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MuseoDbContext))]
-    [Migration("20260924033244_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20261008015323_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -132,6 +132,60 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ActividadRecursosAsignados", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.EquipoTrabajoResponsable", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("InstitucionPerteneciente")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("NombreCompleto")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("ProyectoId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProyectoId");
+
+                    b.ToTable("EquiposTrabajoResponsables", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.ProyectosAreaEducacion", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime>("FechaFin")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Publico")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProyectosAreaEducacion", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Common.Entities.BloqueoSala", b =>
@@ -377,6 +431,159 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Paises", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.Area", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Areas", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.AreaPuesto", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<string>("AreaId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<string>("PuestoId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AreaId");
+
+                    b.HasIndex("PuestoId");
+
+                    b.ToTable("AreaPuesto", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.AsignacionPersonal", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<bool>("Activa")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("AreaPuestoId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<DateTime>("FechaAsignacion")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PersonalId")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AreaPuestoId");
+
+                    b.HasIndex("PersonalId", "AreaPuestoId")
+                        .IsUnique();
+
+                    b.ToTable("AsignacionesPersonal", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.Personal", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("DNI")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateOnly>("FechaNacimiento")
+                        .HasColumnType("date");
+
+                    b.Property<string>("IdentityUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DNI")
+                        .IsUnique();
+
+                    b.HasIndex("IdentityUserId")
+                        .IsUnique();
+
+                    b.ToTable("Personal", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.Puesto", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Puestos", (string)null);
                 });
 
             modelBuilder.Entity("Domain.RecursoMuseo.Entities.ConfiguracionSalaActividad", b =>
@@ -960,6 +1167,53 @@ namespace Infrastructure.Migrations
                     b.ToTable("VisitaGuiadaTematicas");
                 });
 
+            modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.ActividadEducativa", b =>
+                {
+                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
+
+                    b.Property<string>("InstitucionVinculada")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Observaciones")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("ProyectoVinculadaId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("PublicoObjetivo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<bool>("RequiereDifusion")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("SolicitaFlyer")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("TipoActividadEducativa")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("UrlImagenes")
+                        .HasColumnType("json");
+
+                    b.HasIndex("ProyectoVinculadaId");
+
+                    b.ToTable("ActividadesEducativas", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Eventos.Entities.Evento", b =>
                 {
                     b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
@@ -1188,6 +1442,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Recurso");
                 });
 
+            modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.EquipoTrabajoResponsable", b =>
+                {
+                    b.HasOne("Domain.ActividadesAreaEducacion.Entities.ProyectosAreaEducacion", "Proyecto")
+                        .WithMany("EquipoTrabajoResponsable")
+                        .HasForeignKey("ProyectoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proyecto");
+                });
+
             modelBuilder.Entity("Domain.Common.Entities.BloqueoSala", b =>
                 {
                     b.HasOne("Domain.RecursoMuseo.Entities.Sala", "Sala")
@@ -1302,6 +1567,89 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("DivisionAdministrativa");
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.AreaPuesto", b =>
+                {
+                    b.HasOne("Domain.PersonalMuseo.Entities.UsuarioInterno.Area", "Area")
+                        .WithMany()
+                        .HasForeignKey("AreaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.PersonalMuseo.Entities.UsuarioInterno.Puesto", "Puesto")
+                        .WithMany()
+                        .HasForeignKey("PuestoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Area");
+
+                    b.Navigation("Puesto");
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.AsignacionPersonal", b =>
+                {
+                    b.HasOne("Domain.PersonalMuseo.Entities.UsuarioInterno.AreaPuesto", "AreaPuesto")
+                        .WithMany()
+                        .HasForeignKey("AreaPuestoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.PersonalMuseo.Entities.UsuarioInterno.Personal", "Personal")
+                        .WithMany("Asignaciones")
+                        .HasForeignKey("PersonalId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AreaPuesto");
+
+                    b.Navigation("Personal");
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.Personal", b =>
+                {
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "Email", b1 =>
+                        {
+                            b1.Property<string>("PersonalId")
+                                .HasColumnType("varchar(36)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(254)
+                                .HasColumnType("varchar(254)")
+                                .HasColumnName("Email");
+
+                            b1.HasKey("PersonalId");
+
+                            b1.ToTable("Personal");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PersonalId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "Telefono", b1 =>
+                        {
+                            b1.Property<string>("PersonalId")
+                                .HasColumnType("varchar(36)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(10)
+                                .HasColumnType("varchar(10)")
+                                .HasColumnName("Telefono");
+
+                            b1.HasKey("PersonalId");
+
+                            b1.ToTable("Personal");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PersonalId");
+                        });
+
+                    b.Navigation("Email");
+
+                    b.Navigation("Telefono");
                 });
 
             modelBuilder.Entity("Domain.RecursoMuseo.Entities.Guia.AusenciaGuia", b =>
@@ -1615,6 +1963,23 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.ActividadEducativa", b =>
+                {
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.ActividadesAreaEducacion.Entities.ActividadEducativa", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.ActividadesAreaEducacion.Entities.ProyectosAreaEducacion", "ProyectoVinculada")
+                        .WithMany()
+                        .HasForeignKey("ProyectoVinculadaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ProyectoVinculada");
+                });
+
             modelBuilder.Entity("Domain.Eventos.Entities.Evento", b =>
                 {
                     b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
@@ -1754,6 +2119,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Recursos");
                 });
 
+            modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.ProyectosAreaEducacion", b =>
+                {
+                    b.Navigation("EquipoTrabajoResponsable");
+                });
+
             modelBuilder.Entity("Domain.Common.Entities.CalendarioMuseo", b =>
                 {
                     b.Navigation("DiasCierre");
@@ -1769,6 +2139,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Common.Entities.Ubicacion.Pais", b =>
                 {
                     b.Navigation("Divisiones");
+                });
+
+            modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.Personal", b =>
+                {
+                    b.Navigation("Asignaciones");
                 });
 
             modelBuilder.Entity("Domain.RecursoMuseo.Entities.Guia.Guia", b =>
