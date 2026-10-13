@@ -8,9 +8,6 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
         public DateTime Desde { get; } = desde;
         public DateTime Hasta { get; } = hasta;
     }
-    
 
 
-
-    
 }

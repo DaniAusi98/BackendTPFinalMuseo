@@ -14,9 +14,9 @@ namespace Infrastructure.Configurations
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.CategoriaActividad)
-                .HasConversion<string>()
-                .HasMaxLength(50)
+
+
+            builder.Property(x => x.Titulo)
                 .IsRequired();
 
             builder.Property(x => x.TipoActividad)
@@ -35,11 +35,11 @@ namespace Infrastructure.Configurations
             // ==========================================
             // RECURRENCIA (Mapeo Simple del String RRule)
             // ==========================================
-            // Se almacena como un VARCHAR/NVARCHAR com˙n en la base de datos
+            // Se almacena como un VARCHAR/NVARCHAR com√∫n en la base de datos
             builder.Property(x => x.RRule)
                 .HasColumnName("RRule")
                 .HasMaxLength(255)
-                .IsRequired(false); // Es opcional porque hay actividades ˙nicas
+                .IsRequired(false); // Es opcional porque hay actividades √∫nicas
             // =========================
             // HORARIO
             // =========================
@@ -63,14 +63,14 @@ namespace Infrastructure.Configurations
             });
 
             // ==========================================
-            // EXCEPCIONES (Mapeo de ColecciÛn Privada Encapsulada)
+            // EXCEPCIONES (Mapeo de Colecci√≥n Privada Encapsulada)
             // ==========================================
             builder.HasMany(x => x.Exceptions)
                 .WithOne()
-                .HasForeignKey("ActividadMuseoId") // Clave for·nea en la tabla ActividadExceptions
+                .HasForeignKey("ActividadMuseoId") // Clave for√°nea en la tabla ActividadExceptions
                 .OnDelete(DeleteBehavior.Cascade);
 
-          
+
 
 
             // =========================

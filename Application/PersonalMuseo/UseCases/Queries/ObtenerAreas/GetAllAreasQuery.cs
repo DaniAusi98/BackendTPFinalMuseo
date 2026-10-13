@@ -3,7 +3,7 @@ using Core.Application;
 
 namespace Application.PersonalMuseo.UseCases.Queries.ObtenerAreas
 {
-    public class ObtenerPuestoAreaQuery : QueryRequest<QueryResult<AreaDto>>
+    public class ObtenerAreasQuery : QueryRequest<QueryResult<AreaDto>>
     {
     }
 }

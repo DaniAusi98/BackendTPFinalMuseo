@@ -9,7 +9,7 @@ using Application.VisitaGrupal.Repositories;
 
 using Core.Application;
 using Core.Application.Mapping;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Application.VisitaGrupal.UseCases.Queries.GetTematicaVisitaGrupal
 {

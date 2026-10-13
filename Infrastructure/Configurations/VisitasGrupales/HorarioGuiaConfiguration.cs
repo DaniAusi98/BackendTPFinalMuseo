@@ -1,4 +1,4 @@
-using Domain.RecursoMuseo.Entities.Guia;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

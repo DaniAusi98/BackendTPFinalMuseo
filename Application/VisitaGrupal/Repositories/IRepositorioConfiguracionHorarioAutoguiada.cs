@@ -1,5 +1,5 @@
 ﻿using Core.Application.Repositories;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 
 namespace Application.VisitaGrupal.Repositories
 {

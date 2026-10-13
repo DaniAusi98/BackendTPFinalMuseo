@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using static Domain.ActividadMuseo.Enums.Enums;
-using static Domain.VisitasGrupales.Enums.Enums;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Application.Reportes.DataTransferObjets
 {

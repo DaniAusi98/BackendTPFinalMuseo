@@ -1,5 +1,5 @@
 using Domain.Common.ValueObjets;
-using static Domain.VisitasGrupales.Enums.Enums;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Domain.VisitasGrupales.Entities.GrupalGuiada
 {

@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Core.Application.Repositories;
-
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Application.VisitaGrupal.Repositories
 {

@@ -1,5 +1,4 @@
 ﻿using Application.Availability.ApplicationServices;
-using Application.Eventos.DataTransferObjets;
 using Domain.Common.ValueObjets;
 using Ical.Net;
 using Ical.Net.CalendarComponents;

@@ -1,10 +1,10 @@
 using Domain.Common.Entities;
 using Domain.Common.ValueObjets;
-using Domain.RecursoMuseo.Entities.Guia;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
 using Domain.VisitasGrupales.ValueObjects;
-using static Domain.VisitasGrupales.Enums.Enums;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Domain.VisitasGrupales.DomainServices
 {

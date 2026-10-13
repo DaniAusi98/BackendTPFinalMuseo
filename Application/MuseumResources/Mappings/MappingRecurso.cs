@@ -10,8 +10,7 @@ using Application.VisitaGrupal.DataTransferObjets;
 using AutoMapper;
 
 using Domain.RecursoMuseo.Entities;
-using Domain.VisitasGrupales.Entities;
-
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using static Domain.RecursoMuseo.Enums.Enums;
 
 namespace Application.MuseumResources.Mappings

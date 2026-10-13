@@ -1,4 +1,5 @@
 ﻿using Application.Usuario.UseCases.Commands.LoginUsuario;
+using Application.Usuario.UseCases.Queries.GetAllRoles;
 using Application.Usuario.UseCases.Queries.GetUsuarioById;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,6 +62,7 @@ namespace Controllers
 
             return Ok(entities);
         }
+
 
     }
 }

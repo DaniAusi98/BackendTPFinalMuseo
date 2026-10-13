@@ -1,6 +1,6 @@
 using Domain.Common.Entities;
-using Domain.RecursoMuseo.Entities.Guia;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 
 namespace Domain.VisitasGrupales.DomainServices
 {

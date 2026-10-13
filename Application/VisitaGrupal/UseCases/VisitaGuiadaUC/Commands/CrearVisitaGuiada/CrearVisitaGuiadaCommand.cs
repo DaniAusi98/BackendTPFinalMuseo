@@ -1,14 +1,22 @@
-using System.ComponentModel.DataAnnotations;
 using Core.Application;
-
-using static Domain.VisitasGrupales.Enums.Enums;
+using System.ComponentModel.DataAnnotations;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaGuiada
 {
-    public class CrearVisitaGuiadaCommand:IRequestCommand<string>
+    public class CrearVisitaGuiadaCommand : IRequestCommand<string>
     {
         [Required]
         public string UsuarioVisitanteId { get; set; }
+
+        public string NombreSolicitante { get; set; }
+
+        public string ApellidoSolicitante { get; set; }
+
+        public string EmailSolicitante { get; set; }
+        public string TelefonoSolicitante { get; set; }
+
+
 
         [Required]
         public string Institucion { get; set; }
@@ -43,9 +51,9 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaG
 
         public List<string> TematicasIds { get; set; } = [];
 
-        public List <string>SalasIds { get; set; } = [];
+        public List<string> SalasIds { get; set; } = [];
         [Required]
-        public DateTime  Inicio { get; set; }
+        public DateTime Inicio { get; set; }
         [Required]
         public DateTime Fin { get; set; }
         public CrearVisitaGuiadaCommand()

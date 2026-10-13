@@ -1,8 +1,8 @@
 ﻿using Application.MuseumResources.Repositories;
 using Domain.RecursoMuseo.Entities;
 using Microsoft.Extensions.DependencyInjection;
-using static Domain.ActividadMuseo.Enums.Enums;
 using Microsoft.Extensions.Logging;
+using static Domain.ActividadMuseo.Enums.Enums;
 
 
 namespace Infrastructure.Data.Seeders
@@ -34,7 +34,7 @@ namespace Infrastructure.Data.Seeders
                 // Auditorio (ID: "sala-auditorio-001")
                 new ConfiguracionSalaActividad(
                     salaId: "4d6e2750-be3b-4c43-ae08-e68b3afac8ad",
-                    tipoActividad: TipoActividad.Evento,
+                    tipoActividad: TipoActividad.EventoActividadExterna,
                     habilitada: true,
                     capacidadMaxima: 100),
                 new ConfiguracionSalaActividad(
@@ -44,7 +44,7 @@ namespace Infrastructure.Data.Seeders
                     capacidadMaxima: 100),
                  new ConfiguracionSalaActividad(
                     salaId: "4d6e2750-be3b-4c43-ae08-e68b3afac8ad",
-                    tipoActividad: TipoActividad.ActividadEspecial,
+                    tipoActividad: TipoActividad.EventoEspecial,
                     habilitada: true,
                     capacidadMaxima: 100),
 

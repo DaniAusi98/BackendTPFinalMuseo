@@ -1,4 +1,4 @@
-﻿using Domain.VisitasGrupales.Entities;
+﻿using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Text.Json;

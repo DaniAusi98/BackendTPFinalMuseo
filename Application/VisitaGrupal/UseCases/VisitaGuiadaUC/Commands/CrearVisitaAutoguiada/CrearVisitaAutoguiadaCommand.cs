@@ -9,6 +9,15 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaA
     {
         [Required]
         public string UsuarioVisitanteId { get; set; }
+
+        [Required]
+        public string NombreSolicitante { get; set; }
+        [Required]
+        public string ApellidoSolicitante { get; set; }
+        [Required]
+        public string EmailSolicitante { get; set; }
+        [Required]
+        public string TelefonoSolicitante { get; set; }
         [Required]
         public string Institucion { get; set; }
         [Required]
@@ -17,7 +26,7 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaA
         public string PaisInstitucion { get; set; }
         [Required]
         public string ProvinciaInstitucion { get; set; }
-       
+
         [Required]
         public string LocalidadInstitucion { get; set; }
         public string DiversidadFuncionalDescripcion { get; set; } = string.Empty;

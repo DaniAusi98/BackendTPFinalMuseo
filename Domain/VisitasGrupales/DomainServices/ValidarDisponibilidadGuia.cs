@@ -1,5 +1,5 @@
 using Domain.Common.ValueObjets;
-using Domain.RecursoMuseo.Entities.Guia;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 
 namespace Domain.VisitasGrupales.DomainServices
 {

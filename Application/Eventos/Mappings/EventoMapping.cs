@@ -13,7 +13,7 @@ namespace Application.Eventos.Mappings
                 .ForMember(dest => dest.FechaInicio, opt => opt.MapFrom(src => src.Horario.Inicio))
                 .ForMember(dest => dest.FechaFin, opt => opt.MapFrom(src => src.Horario.Fin))
                 .ForMember(dest => dest.TipoEvento, opt => opt.MapFrom(src => src.TipoEvento.ToString()))
-                .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.TituloEvento))
+                .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.Titulo))
                 .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.DescripcionEvento))
                 .ForMember(dest => dest.Institucion, opt => opt.MapFrom(src => src.Institucion))
                 .ForMember(dest => dest.TipoPublico, opt => opt.MapFrom(src => src.TipoPublico.Select(tp => tp.ToString()).ToList()))
@@ -27,7 +27,7 @@ namespace Application.Eventos.Mappings
                 .ForMember(dest => dest.FechaInicio, opt => opt.MapFrom(src => src.Horario.Inicio))
                 .ForMember(dest => dest.FechaFin, opt => opt.MapFrom(src => src.Horario.Fin))
                 .ForMember(dest => dest.TipoEvento, opt => opt.MapFrom(src => src.TipoEvento.ToString()))
-                .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.TituloEvento))
+                .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.Titulo))
                 .ForMember(dest => dest.TipoPublico, opt => opt.MapFrom(src => src.TipoPublico.Select(tp => tp.ToString()).ToList()))
                 .ForMember(dest => dest.CantidadPersonas, opt => opt.MapFrom(src => src.CantidadEstimada ?? 0))
                 .ForMember(dest => dest.Recursos, opt => opt.MapFrom(src => src.Recursos.Select(r => r.Recurso.NombreRecurso).ToList()));

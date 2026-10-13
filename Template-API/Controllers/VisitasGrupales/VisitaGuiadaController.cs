@@ -1,5 +1,6 @@
 using Application.VisitaGrupal.UseCases.Queries.ConsultarDisponibilidadTurnosVisitaGuiada;
 using Application.VisitaGrupal.UseCases.Queries.GetAllGroupVisitCalendar;
+using Application.VisitaGrupal.UseCases.Queries.GetAllVisitasGuiadasReprogramadas;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId;
 using Application.VisitaGrupal.UseCases.Queries.GetTematicaVisitaGrupal;
@@ -7,7 +8,7 @@ using Application.VisitaGrupal.UseCases.Queries.ReporteVisitaGuiada;
 using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CancelarVisitaGuiada;
 using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ConfirmarVisitaGrupal;
 using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaGuiada;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal.ReprogramarVisitaGuiada;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -39,15 +40,20 @@ public class VisitasGuiadasController(ICommandQueryBus commandQueryBus) : Contro
     }
     [HttpGet("DisponibilidadTurnosVisitasGuiadas")]
     public async Task<IActionResult> DisponibilidadTurnosVisitasGuiadas(
-        DateTime fechaDesde,
-        DateTime fechaHasta,
-        uint pageIndex = 1,
-        uint pageSize = 10)
+    DateTime fechaDesde,
+    DateTime fechaHasta,
+    string? visitaId = null,
+    [FromQuery] List<string>? tematicaIds = null,
+    uint pageIndex = 1,
+    uint pageSize = 10)
     {
         var visitas = await _commandQueryBus.Send(
-            new ConsultarDisponibilidadTurnosDiaQuery(fechaDesde, fechaHasta)
+            new ConsultarDisponibilidadTurnosDiaQuery(
+                fechaDesde,
+                fechaHasta,
+                visitaId,
+                tematicaIds)
             {
-
                 PageIndex = pageIndex,
                 PageSize = pageSize
             });
@@ -160,6 +166,13 @@ public class VisitasGuiadasController(ICommandQueryBus commandQueryBus) : Contro
         var reporte = await _commandQueryBus.Send(new GetReportAllGuidedToursQuery(desde, hasta));
 
         return Ok(reporte);
+    }
+    [HttpGet("visitasguidasreprogramadas")]
+    public async Task<IActionResult> GetGuiadasReprogramadas()
+    {
+        var entities = await _commandQueryBus.Send(new GetAllVisitasReprogramadasQuery());
+
+        return Ok(entities);
     }
 
 

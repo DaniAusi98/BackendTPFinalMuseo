@@ -4,10 +4,11 @@ using Application.MuseumResources.Repositories;
 using Application.VisitaGrupal.Repositories;
 using Core.Application;
 using Domain.Common.ValueObjets;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 
 namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaAutoguiada
 {
-    internal sealed class CrearVisitaAutoguiadaHandler(ICommandQueryBus commandQueryBus,IRepositorioVisitaGrupalAutoguiada repositorioVisitaGrupalAutoguiada,IRepositorioSala repositorioSala, IRepositorioTematicas _tematicaRepository) : IRequestCommandHandler<CrearVisitaAutoguiadaCommand, string>
+    internal sealed class CrearVisitaAutoguiadaHandler(ICommandQueryBus commandQueryBus, IRepositorioVisitaGrupalAutoguiada repositorioVisitaGrupalAutoguiada, IRepositorioSala repositorioSala, IRepositorioTematicas _tematicaRepository) : IRequestCommandHandler<CrearVisitaAutoguiadaCommand, string>
     {
         private readonly ICommandQueryBus _commandQueryBus = commandQueryBus ?? throw new ArgumentNullException(nameof(commandQueryBus));
         private readonly IRepositorioVisitaGrupalAutoguiada _repositorioVisitaGrupalAutoguiada = repositorioVisitaGrupalAutoguiada ?? throw new ArgumentNullException(nameof(repositorioVisitaGrupalAutoguiada));
@@ -41,8 +42,12 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaA
                     "Una o más salas no existen.");
             }
 
-            var visita = new Domain.VisitasGrupales.Entities.VisitaGrupalAutoguiada(
+            var visita = new VisitaGrupalAutoguiada(
                 usuarioVisitanteId: request.UsuarioVisitanteId,
+                nombreSolicitante: request.NombreSolicitante,
+                apellidoSolicitante: request.ApellidoSolicitante,
+                emailSolicitante: new Email(request.EmailSolicitante),
+                telefonoSolicitante: new Telefono(request.TelefonoSolicitante),
                 institucion: request.Institucion,
                 emailInstitucion: new Email(request.EmailInstitucion),
                 paisInstitucion: request.PaisInstitucion,

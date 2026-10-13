@@ -1,9 +1,7 @@
 using Application.VisitaGrupal.Repositories;
 
 using Core.Infraestructure.Repositories.Sql;
-
-using Domain.RecursoMuseo.Entities.Guia;
-
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Sql.VisitaGrupal
@@ -32,7 +30,7 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
             return await Repository
                 .Include(g => g.HorariosGuia)
                 .Include(g => g.AusenciasProgramadas)
-                .FirstOrDefaultAsync(g => g.PersonalInternoId == personalId);
+                .FirstOrDefaultAsync(g => g.UserId == personalId);
         }
     }
 }

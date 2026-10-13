@@ -24,12 +24,12 @@ namespace Application.VisitaGrupal.UseCases.Queries.GetAllGroupVisitCalendar
             CancellationToken cancellationToken)
         {
             var visitasGuiadas =
-                await _repositorioVisitaGuiada.GetAllGroupVisitAsync(
+                await _repositorioVisitaGuiada.GetAllGroupVisitCalendarAsync(
                     request.FechaConsultaDesde,
                     request.FechaConsultaHasta);
 
             var visitasAutoguiadas =
-                await _repositorioVisitaGrupalAutoguiada.GetAllGroupVisitAuAsync(
+                await _repositorioVisitaGrupalAutoguiada.GetAllGroupVisitCalendarAsync(
                     request.FechaConsultaDesde,
                     request.FechaConsultaHasta);
 
@@ -39,11 +39,13 @@ namespace Application.VisitaGrupal.UseCases.Queries.GetAllGroupVisitCalendar
             foreach (var visitaGuiada in visitasGuiadas)
             {
                 var slot = visitaGuiada.Horario;
-                  
+
 
                 visitasGrupalesDto.Add(new VisitaGrupalCalendarDto
                 {
+
                     Id = visitaGuiada.Id,
+                    Titulo = visitaGuiada.Titulo,
                     Tipo = VisitaGrupalCalendarDto.TipoVisitaGrupal.Guiada,
 
                     Pais = visitaGuiada.PaisInstitucion,
@@ -63,11 +65,12 @@ namespace Application.VisitaGrupal.UseCases.Queries.GetAllGroupVisitCalendar
             foreach (var visitaAutoguiada in visitasAutoguiadas)
             {
                 var slot = visitaAutoguiada.Horario;
-                  
+
 
                 visitasGrupalesDto.Add(new VisitaGrupalCalendarDto
                 {
                     Id = visitaAutoguiada.Id,
+                    Titulo = visitaAutoguiada.Titulo,
                     Tipo = VisitaGrupalCalendarDto.TipoVisitaGrupal.Autoguiada,
 
                     Pais = visitaAutoguiada.PaisInstitucion,

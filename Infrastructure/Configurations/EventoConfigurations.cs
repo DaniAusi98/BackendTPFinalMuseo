@@ -1,8 +1,8 @@
 ﻿using Domain.ActividadMuseo.Entities;
 using Domain.Eventos.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 
 namespace Infrastructure.Configurations
 {
@@ -28,7 +28,7 @@ namespace Infrastructure.Configurations
                 .HasMaxLength(50)
                 .IsRequired();
 
-            builder.Property(x => x.TituloEvento)
+            builder.Property(x => x.Titulo)
                 .HasMaxLength(200)
                 .IsRequired();
 

@@ -1,9 +1,9 @@
 using Application.VisitaGrupal.DataTransferObjets;
 using Application.VisitaGrupal.DomainEvents;
 using AutoMapper;
-using Domain.RecursoMuseo.Entities.Guia;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Domain.VisitasGrupales.ValueObjects;
 
 namespace Application.VisitaGrupal.Mappings
@@ -39,6 +39,12 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UsuarioVisitanteId, opt => opt.MapFrom(src => src.UsuarioVisitanteId))
                 .ForMember(dest => dest.Institucion, opt => opt.MapFrom(src => src.Institucion))
+                .ForMember(dest => dest.NombreSolicitante, opt => opt.MapFrom(src => src.NombreSolicitante))
+                .ForMember(dest => dest.ApellidoSolicitante, opt => opt.MapFrom(src => src.ApellidoSolicitante))
+                .ForMember(dest => dest.EmailSolicitante, opt => opt.MapFrom(src => src.EmailSolicitante.Valor))
+                .ForMember(dest => dest.TelefonoSolicitante, opt => opt.MapFrom(src => src.TelefonoSolicitante.Valor))
+
+                .ForMember(dest => dest.TelefonoInstitucion, opt => opt.MapFrom(src => src.TelefonoInstitucion.Valor))
                 .ForMember(dest => dest.EmailInstitucion, opt => opt.MapFrom(src => src.EmailInstitucion.Valor))
                 .ForMember(dest => dest.PaisInstitucion, opt => opt.MapFrom(src => src.PaisInstitucion))
                 .ForMember(dest => dest.ProvinciaInstitucion, opt => opt.MapFrom(src => src.ProvinciaInstitucion))
@@ -72,6 +78,10 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UsuarioVisitanteId, opt => opt.MapFrom(src => src.UsuarioVisitanteId))
                 .ForMember(dest => dest.Institucion, opt => opt.MapFrom(src => src.Institucion))
+                .ForMember(dest => dest.NombreSolicitante, opt => opt.MapFrom(src => src.NombreSolicitante))
+                .ForMember(dest => dest.ApellidoSolicitante, opt => opt.MapFrom(src => src.ApellidoSolicitante))
+                .ForMember(dest => dest.EmailSolicitante, opt => opt.MapFrom(src => src.EmailSolicitante.Valor))
+                .ForMember(dest => dest.TelefonoSolicitante, opt => opt.MapFrom(src => src.TelefonoSolicitante.Valor))
                 .ForMember(dest => dest.EmailInstitucion, opt => opt.MapFrom(src => src.EmailInstitucion.Valor))
                 .ForMember(dest => dest.PaisInstitucion, opt => opt.MapFrom(src => src.PaisInstitucion))
                 .ForMember(dest => dest.ProvinciaInstitucion, opt => opt.MapFrom(src => src.ProvinciaInstitucion))
@@ -95,6 +105,14 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.FechaDesde, opt => opt.MapFrom(src => src.FechaDesde))
                 .ForMember(dest => dest.FechaHasta, opt => opt.MapFrom(src => src.FechaHasta))
                 .ForMember(dest => dest.Motivo, opt => opt.MapFrom(src => src.Motivo));
+
+
+
+            CreateMap<VisitaReprogramada, VisitaGuiadaReprogramadaDto>();
+
+
+
+
 
         }
     }

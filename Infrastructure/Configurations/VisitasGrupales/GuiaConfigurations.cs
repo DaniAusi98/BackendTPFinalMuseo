@@ -1,10 +1,6 @@
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Linq;
-
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Domain.RecursoMuseo.Entities.Guia;
 
 namespace Infrastructure.Configurations.VisitasGrupales
 {
@@ -22,7 +18,7 @@ namespace Infrastructure.Configurations.VisitasGrupales
             builder.Property(g => g.Activo)
                 .IsRequired();
 
-            builder.Property(g => g.PersonalInternoId)
+            builder.Property(g => g.UserId)
                 .IsRequired();
 
             // HorariosGuia como entidad separada (HasMany)

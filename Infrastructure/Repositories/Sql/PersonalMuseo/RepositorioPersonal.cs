@@ -11,6 +11,12 @@ namespace Infrastructure.Repositories.Sql.PersonalMuseo
         public async Task<Personal?> GetPersonalMuseo(string userId)
         {
             return await Repository
+              .Include(p => p.Asignaciones)
+                .ThenInclude(a => a.AreaPuesto)
+                   .ThenInclude(ap => ap.Area)
+              .Include(p => p.Asignaciones)
+                .ThenInclude(a => a.AreaPuesto)
+                    .ThenInclude(ap => ap.Puesto)
              .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
         }

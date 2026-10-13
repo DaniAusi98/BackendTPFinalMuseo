@@ -3,7 +3,7 @@ using Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId;
 using Application.VisitaGrupal.UseCases.Queries.ReporteVisitaAutoguiada;
 using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ConfirmarVisitaGrupal;
 using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaAutoguiada;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal;
+using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal.ReprogramarAutoguiada;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +37,8 @@ namespace Controllers.VisitasGrupales
         public async Task<IActionResult> DisponibilidadTurnosVisitasAutoguiadas(
           [FromQuery] DateTime fechaDesde,
           [FromQuery] DateTime fechaHasta,
+          string? visitaId = null,
+          [FromQuery] List<string>? tematicaIds = null,
           [FromQuery] uint pageIndex = 1,
           [FromQuery] uint pageSize = 10)
         {
@@ -83,7 +85,7 @@ namespace Controllers.VisitasGrupales
         [HttpPost("{id}/reprogramar")]
         public async Task<IActionResult> Reprogram(
        string id,
-       ReprogramarCommand command)
+       ReprogramarVisitaAutoguiadaCommand command)
         {
             var usuarioId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             command.UsuarioVisitanteId = usuarioId;

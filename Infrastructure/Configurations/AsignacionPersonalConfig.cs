@@ -28,10 +28,7 @@ namespace Infrastructure.Configurations
             builder.Property(x => x.Activa)
                 .IsRequired();
 
-            builder.HasOne(x => x.Personal)
-                .WithMany(x => x.Asignaciones)
-                .HasForeignKey(x => x.PersonalId)
-                .OnDelete(DeleteBehavior.Restrict);
+
 
             builder.HasOne(x => x.AreaPuesto)
                 .WithMany()

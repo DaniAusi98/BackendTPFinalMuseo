@@ -6,10 +6,10 @@ using Domain.PersonalMuseo.Entities.UsuarioInterno;
 
 namespace Application.PersonalMuseo.UseCases.Queries.ObtenerAreas
 {
-    internal sealed class GetAllAreasHandler(IRepositorioArea repositorioArea) : IRequestQueryHandler<ObtenerPuestoAreaQuery, QueryResult<AreaDto>>
+    internal sealed class GetAllAreasHandler(IRepositorioArea repositorioArea) : IRequestQueryHandler<ObtenerAreasQuery, QueryResult<AreaDto>>
     {
         private readonly IRepositorioArea _repositorioArea = repositorioArea ?? throw new ArgumentNullException(nameof(repositorioArea));
-        public async Task<QueryResult<AreaDto>> Handle(ObtenerPuestoAreaQuery request, CancellationToken cancellationToken)
+        public async Task<QueryResult<AreaDto>> Handle(ObtenerAreasQuery request, CancellationToken cancellationToken)
         {
             IList<Area> areas = await _repositorioArea.FindAllAsync();
             return new QueryResult<AreaDto>(areas.To<AreaDto>(), areas.Count, request.PageIndex, request.PageSize);

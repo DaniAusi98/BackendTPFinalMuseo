@@ -153,7 +153,7 @@ namespace Application.Eventos.ApplicationServices
                 {
                     {
                         "tipoActividad",
-                        TipoActividad.Evento
+                        TipoActividad.EventoActividadExterna
                     },
                     {
                         "salasIds",

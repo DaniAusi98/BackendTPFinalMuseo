@@ -3,6 +3,7 @@ namespace Application.VisitaGrupal.DataTransferObjets
     public class GetVisitaGuidadByIdDto
     {
         public int Id { get; set; }
+        public string Titulo { get; set; }
         public string UsuarioVisitanteId { get; set; } = default!;
         public string EstadoConfirmacion { get; set; } = string.Empty;
         public string Institucion { get; set; } = string.Empty;

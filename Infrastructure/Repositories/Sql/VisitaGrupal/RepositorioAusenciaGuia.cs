@@ -1,6 +1,6 @@
 ﻿using Application.VisitaGrupal.Repositories;
 using Core.Infraestructure.Repositories.Sql;
-using Domain.RecursoMuseo.Entities.Guia;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Microsoft.EntityFrameworkCore; // Asegúrate de tener esta importación
 
 namespace Infrastructure.Repositories.Sql.VisitaGrupal

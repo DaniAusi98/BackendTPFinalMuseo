@@ -5,7 +5,7 @@ namespace Application.PersonalMuseo.Repositories
 {
     public interface IRepositorioAreaPuesto : IRepository<AreaPuesto>
     {
-        public Task<List<Puesto>> ObtenerPuestosPorArea(string areaId);
+        public Task<List<AreaPuesto>> ObtenerPuestosPorArea(string areaId);
 
     }
 }

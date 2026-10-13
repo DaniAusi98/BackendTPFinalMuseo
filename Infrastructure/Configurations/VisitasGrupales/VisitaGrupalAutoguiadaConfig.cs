@@ -1,5 +1,6 @@
 using Domain.ActividadMuseo.Entities;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,6 +17,29 @@ namespace Infrastructure.Configurations.VisitasGrupales
 
             builder.Property(x => x.UsuarioVisitanteId)
                 .IsRequired();
+            builder.Property(x => x.NombreSolicitante)
+             .HasMaxLength(200)
+             .IsRequired();
+            builder.Property(x => x.ApellidoSolicitante)
+               .HasMaxLength(200)
+               .IsRequired();
+
+
+            builder.OwnsOne(x => x.EmailSolicitante, email =>
+            {
+                email.Property(e => e.Valor)
+                    .HasColumnName("EmailSolicitante")
+                    .HasMaxLength(200)
+                    .IsRequired();
+            });
+
+            builder.OwnsOne(x => x.TelefonoSolicitante, telefono =>
+            {
+                telefono.Property(t => t.Valor)
+                    .HasColumnName("TelefonoSolicitante")
+                    .HasMaxLength(50)
+                    .IsRequired();
+            });
 
             builder.Property(x => x.Institucion)
                 .HasMaxLength(200)

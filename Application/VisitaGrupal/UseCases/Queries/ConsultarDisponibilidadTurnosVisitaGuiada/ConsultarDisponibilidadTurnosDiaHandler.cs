@@ -26,7 +26,7 @@ namespace Application.VisitaGrupal.UseCases.Queries.ConsultarDisponibilidadTurno
             var hasta = request.FechaHasta.Date;
 
             var turnosDisponibles = await _guidedAvailabilityProducer
-                .GetAvailableTurnsAsync(desde, hasta);
+                .GetAvailableTurnsAsync(desde, hasta, request.VisitaId, request.TematicasIds);
 
             return new QueryResult<TurnoDisponibleDto>(
                 turnosDisponibles.To<TurnoDisponibleDto>(),

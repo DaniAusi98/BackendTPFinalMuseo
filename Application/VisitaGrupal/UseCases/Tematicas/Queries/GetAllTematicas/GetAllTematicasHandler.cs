@@ -7,6 +7,7 @@ using Application.VisitaGrupal.Repositories;
 
 using Core.Application;
 using Core.Application.Mapping;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Application.VisitaGrupal.UseCases.Tematicas.Queries.GetAllTematicas
 {
@@ -15,7 +16,7 @@ namespace Application.VisitaGrupal.UseCases.Tematicas.Queries.GetAllTematicas
         private readonly IRepositorioTematicas _repositorioTematica = repositorioTematica ?? throw new ArgumentNullException(nameof(repositorioTematica));
         public async Task<QueryResult<TematicaVisitaDto>> Handle(GetAllTematicasQuery request, CancellationToken cancellationToken)
         {
-            IList<Domain.VisitasGrupales.Entities.TematicaVisita> entities = await _repositorioTematica.FindAllAsync();
+            IList<TematicaVisita> entities = await _repositorioTematica.FindAllAsync();
             return new QueryResult<TematicaVisitaDto>(entities.To<TematicaVisitaDto>(), entities.Count, request.PageIndex, request.PageSize);
         }
     }

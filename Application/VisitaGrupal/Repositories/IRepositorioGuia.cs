@@ -1,7 +1,5 @@
 using Core.Application.Repositories;
-
-using Domain.RecursoMuseo.Entities.Guia;
-
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 
 namespace Application.VisitaGrupal.Repositories
 {
@@ -10,7 +8,7 @@ namespace Application.VisitaGrupal.Repositories
         Task<List<Guia>> ObtenerGuiasConDisponibilidadAsync();
         Task<Guia?> ObtenerGuiaConDisponibilidadAsync(string guiaId);
 
-        Task<Guia?> ObtenerGuiaPersonalId(string personalId);
+        Task<Guia?> ObtenerGuiaPersonalId(string userId);
 
 
 

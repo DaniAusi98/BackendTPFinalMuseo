@@ -5,14 +5,12 @@ using Application.VisitaGrupal.Repositories;
 using Core.Application;
 using Core.Application.Mapping;
 using Domain.Common.ValueObjets;
-using Domain.VisitasGrupales.Entities;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
-using Domain.VisitasGrupales.Enums;
 
 
 namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaGuiada
 {
-    internal sealed class CrearVisitaGuiadaHandler(ICommandQueryBus domainBus, IRepositorioVisitaGuiada repositorioVisitaGuiada,IRepositorioTematicas tematicaRepository) : IRequestCommandHandler<CrearVisitaGuiadaCommand, string>
+    internal sealed class CrearVisitaGuiadaHandler(ICommandQueryBus domainBus, IRepositorioVisitaGuiada repositorioVisitaGuiada, IRepositorioTematicas tematicaRepository) : IRequestCommandHandler<CrearVisitaGuiadaCommand, string>
     {
         private readonly ICommandQueryBus _domainBus = domainBus ?? throw new ArgumentNullException(nameof(domainBus));
         private readonly IRepositorioVisitaGuiada _repositorioVisitaGuiada = repositorioVisitaGuiada ?? throw new ArgumentNullException(nameof(repositorioVisitaGuiada));
@@ -41,6 +39,10 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaG
 
             var visita = new VisitaGrupalGuiada(
                 usuarioVisitanteId: request.UsuarioVisitanteId,
+                nombreSolicitante: request.NombreSolicitante,
+                apellidoSolicitante: request.ApellidoSolicitante,
+                emailSolicitante: new Email(request.EmailSolicitante),
+                telefonoSolicitante: new Telefono(request.TelefonoSolicitante),
                 nivelEducativo: request.NivelEducativo,
                 anioGrado: request.AnioGrado,
                 cantidadPersonas: request.CantidadPersonas,
@@ -57,7 +59,7 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaG
                 tematicas: tematicas,
                 salas: salas
             );
-          
+
             try
             {
                 object createdId = await _repositorioVisitaGuiada.AddAsync(visita);

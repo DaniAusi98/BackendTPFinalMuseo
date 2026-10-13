@@ -1,5 +1,5 @@
 using Application.Availability.Models;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Microsoft.Extensions.Logging;
 

@@ -1,8 +1,8 @@
 ﻿using Application.Reportes.DataTransferObjets;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using static Domain.ActividadMuseo.Enums.Enums;
-using static Domain.VisitasGrupales.Enums.Enums;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 
 namespace Application.Reportes.ApplicationServices

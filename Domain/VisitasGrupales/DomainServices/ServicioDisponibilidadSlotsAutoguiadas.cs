@@ -1,8 +1,7 @@
 ﻿using Domain.Common.Entities;
 using Domain.Common.ValueObjets;
-using Domain.VisitasGrupales.Entities;
-
-using static Domain.VisitasGrupales.Enums.Enums;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Domain.VisitasGrupales.DomainServices
 {

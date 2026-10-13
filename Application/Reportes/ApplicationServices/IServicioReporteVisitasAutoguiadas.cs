@@ -1,5 +1,5 @@
 ﻿using Application.Reportes.DataTransferObjets;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 
 
 namespace Application.Reportes.ApplicationServices

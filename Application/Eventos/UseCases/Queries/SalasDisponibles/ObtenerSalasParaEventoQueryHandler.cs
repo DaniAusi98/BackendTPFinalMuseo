@@ -1,8 +1,7 @@
 using Application.MuseumResources.Repositories;
 using AutoMapper;
 using Core.Application;
-using static Domain.ActividadMuseo.Enums.Enums;
-using static Domain.RecursoMuseo.Enums.Enums;
+using Domain.RecursoMuseo.Entities;
 
 namespace Application.Eventos.UseCases.Queries.SalasDisponibles
 {
@@ -12,33 +11,22 @@ namespace Application.Eventos.UseCases.Queries.SalasDisponibles
         IMapper mapper)
         : IRequestQueryHandler<SalaDispEventosQuery, QueryResult<SalaDisponibleParaEventoDto>>
     {
-        private readonly IRepositorioSala _repositorioSala = 
+        private readonly IRepositorioSala _repositorioSala =
             repositorioSala ?? throw new ArgumentNullException(nameof(repositorioSala));
 
         private readonly IRepositorioConfiguracionSalaActividad _repositorioConfiguracion =
             repositorioConfiguracion ?? throw new ArgumentNullException(nameof(repositorioConfiguracion));
 
-        private readonly IMapper _mapper = 
+        private readonly IMapper _mapper =
             mapper ?? throw new ArgumentNullException(nameof(mapper));
 
         public async Task<QueryResult<SalaDisponibleParaEventoDto>> Handle(
             SalaDispEventosQuery request,
             CancellationToken cancellationToken)
         {
-            // 1. Obtener todas las salas activas
-            var salasActivas = await _repositorioSala.ObtenerSalasDisponiblesAsync();
 
-            // 2. Obtener configuraciones habilitadas para Evento
-            var configuracionesEvento = await _repositorioConfiguracion
-                .ObtenerPorTipoActividadAsync(TipoActividad.Evento);
 
-            // 3. Filtrar: salas activas que tienen configuración habilitada para Evento
-            var salasParaEventos = salasActivas
-                .Where(s => s.EstadoSala == EstadoSala.Activa &&
-                            configuracionesEvento.Any(config => 
-                                config.SalaId == s.Id && 
-                                config.Habilitada))
-                .ToList();
+            List<Sala> salasParaEventos = await _repositorioSala.ObtenerSalasEventoAsync();
 
             // 4. Mapear a DTOs
             var dtos = salasParaEventos

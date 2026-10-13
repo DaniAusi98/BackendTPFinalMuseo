@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.RecursoMuseo.Entities;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Domain.VisitasGrupales.Factories
 {

@@ -1,5 +1,5 @@
 ﻿using Domain.Common.Entities;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 
 namespace Domain.VisitasGrupales.DomainServices
 {

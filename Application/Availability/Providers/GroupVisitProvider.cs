@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Application.Availability.Rules;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Application.Availability.Providers
@@ -32,7 +33,7 @@ namespace Application.Availability.Providers
         {
             // Aplicable a cualquier visita grupal
             return candidate is VisitaGrupalGuiada
-                || candidate is Domain.VisitasGrupales.Entities.VisitaGrupalAutoguiada;
+                || (candidate is VisitaGrupalAutoguiada);
         }
 
         public IEnumerable<IAvailabilityRule> CreateRules(

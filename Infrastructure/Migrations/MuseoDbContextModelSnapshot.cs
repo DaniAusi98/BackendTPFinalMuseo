@@ -74,11 +74,6 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("CantidadPersonas")
                         .HasColumnType("int");
 
-                    b.Property<string>("CategoriaActividad")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
                     b.Property<string>("Estado")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -93,6 +88,11 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.HasKey("Id");
 
@@ -851,7 +851,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("ReporteVisitasGuiadas", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.VisitasGrupales.Entities.ConfiguracionHorarioAutoguiada", b =>
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.ConfiguracionHorarioAutoguiada", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -873,6 +873,56 @@ namespace Infrastructure.Migrations
                     b.ToTable("ConfiguracionVisitaAutoguiada", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaAutoguiadaReprogramada", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int?>("CantidadPersonas")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Institucion")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("LocalidadInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("NuevaVisitaId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("PaisInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("ProvinciaInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("VisitaReprogramadaId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NuevaVisitaId");
+
+                    b.HasIndex("VisitaReprogramadaId");
+
+                    b.ToTable("VisitasAutoguiadasReprogramadas", (string)null);
+                });
+
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.ConfiguracionVisitasGrupalesGuiadas", b =>
                 {
                     b.Property<string>("Id")
@@ -892,7 +942,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("ConfiguracionVisitasGrupalesGuiadas", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.VisitasGrupales.Entities.TematicaVisita", b =>
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.TematicaVisita", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -912,6 +962,64 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TematicasVisita", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaReprogramada", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("AnioGrado")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int?>("CantidadPersonas")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Institucion")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("LocalidadInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("NivelEducativo")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("NuevaVisitaId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("PaisInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("ProvinciaInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("VisitaReprogramadaId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NuevaVisitaId");
+
+                    b.HasIndex("VisitaReprogramadaId");
+
+                    b.ToTable("VisitasReprogramadas", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Identity.UsuarioSistema", b =>
@@ -1198,11 +1306,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
                     b.Property<string>("UrlImagenes")
                         .HasColumnType("json");
 
@@ -1262,12 +1365,71 @@ namespace Infrastructure.Migrations
                     b.ToTable("Eventos", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaGrupalAutoguiada", b =>
+                {
+                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
+
+                    b.Property<string>("ApellidoSolicitante")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("DiversidadFuncional")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("EstadoConfirmacion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Institucion")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("LocalidadInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("NombreSolicitante")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Observaciones")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("PaisInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("ProvinciaInstitucion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("UsuarioVisitanteId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.ToTable("VisitasGrupalesAutoguiadas", (string)null);
+                });
+
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaGrupalGuiada", b =>
                 {
                     b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
 
                     b.Property<string>("AnioGrado")
                         .HasColumnType("longtext");
+
+                    b.Property<string>("ApellidoSolicitante")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.Property<string>("DiversidadFuncionalDescripcion")
                         .HasMaxLength(500)
@@ -1299,6 +1461,11 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("NombreSolicitante")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
                     b.Property<string>("Observaciones")
                         .HasMaxLength(1000)
                         .HasColumnType("varchar(1000)");
@@ -1318,50 +1485,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.ToTable("VisitasGrupalesGuiadas", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.VisitasGrupales.Entities.VisitaGrupalAutoguiada", b =>
-                {
-                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
-
-                    b.Property<string>("DiversidadFuncional")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("EstadoConfirmacion")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Institucion")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("LocalidadInstitucion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("Observaciones")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<string>("PaisInstitucion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("ProvinciaInstitucion")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("UsuarioVisitanteId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.ToTable("VisitasGrupalesAutoguiadas", (string)null);
                 });
 
             modelBuilder.Entity("ActividadSala", b =>
@@ -1593,15 +1716,13 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.PersonalMuseo.Entities.UsuarioInterno.Personal", "Personal")
+                    b.HasOne("Domain.PersonalMuseo.Entities.UsuarioInterno.Personal", null)
                         .WithMany("Asignaciones")
                         .HasForeignKey("PersonalId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AreaPuesto");
-
-                    b.Navigation("Personal");
                 });
 
             modelBuilder.Entity("Domain.PersonalMuseo.Entities.UsuarioInterno.Personal", b =>
@@ -1690,7 +1811,7 @@ namespace Infrastructure.Migrations
                     b.Navigation("Guia");
                 });
 
-            modelBuilder.Entity("Domain.VisitasGrupales.Entities.ConfiguracionHorarioAutoguiada", b =>
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.ConfiguracionHorarioAutoguiada", b =>
                 {
                     b.OwnsOne("Domain.Common.ValueObjets.DiasLaboralesMuseo", "DiasDisponibles", b1 =>
                         {
@@ -1772,6 +1893,69 @@ namespace Infrastructure.Migrations
                     b.Navigation("DiasDisponibles");
 
                     b.Navigation("HorarioDisponibleVisitaAutoguiadas");
+                });
+
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaAutoguiadaReprogramada", b =>
+                {
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                        .WithMany()
+                        .HasForeignKey("NuevaVisitaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                        .WithMany()
+                        .HasForeignKey("VisitaReprogramadaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Domain.Common.ValueObjets.TimeSlot", "HorarioReprogrado", b1 =>
+                        {
+                            b1.Property<string>("VisitaAutoguiadaReprogramadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<DateTime>("Fin")
+                                .HasColumnType("datetime")
+                                .HasColumnName("HorarioAnteriorFin");
+
+                            b1.Property<DateTime>("Inicio")
+                                .HasColumnType("datetime")
+                                .HasColumnName("HorarioAnteriorInicio");
+
+                            b1.HasKey("VisitaAutoguiadaReprogramadaId");
+
+                            b1.ToTable("VisitasAutoguiadasReprogramadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaAutoguiadaReprogramadaId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.TimeSlot", "NuevoHorario", b1 =>
+                        {
+                            b1.Property<string>("VisitaAutoguiadaReprogramadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<DateTime>("Fin")
+                                .HasColumnType("datetime")
+                                .HasColumnName("NuevoHorarioFin");
+
+                            b1.Property<DateTime>("Inicio")
+                                .HasColumnType("datetime")
+                                .HasColumnName("NuevoHorarioInicio");
+
+                            b1.HasKey("VisitaAutoguiadaReprogramadaId");
+
+                            b1.ToTable("VisitasAutoguiadasReprogramadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaAutoguiadaReprogramadaId");
+                        });
+
+                    b.Navigation("HorarioReprogrado")
+                        .IsRequired();
+
+                    b.Navigation("NuevoHorario")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.ConfiguracionVisitasGrupalesGuiadas", b =>
@@ -1864,6 +2048,69 @@ namespace Infrastructure.Migrations
                     b.Navigation("Turnos");
                 });
 
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaReprogramada", b =>
+                {
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                        .WithMany()
+                        .HasForeignKey("NuevaVisitaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                        .WithMany()
+                        .HasForeignKey("VisitaReprogramadaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Domain.Common.ValueObjets.TimeSlot", "HorarioReprogrado", b1 =>
+                        {
+                            b1.Property<string>("VisitaReprogramadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<DateTime>("Fin")
+                                .HasColumnType("datetime")
+                                .HasColumnName("HorarioAnteriorFin");
+
+                            b1.Property<DateTime>("Inicio")
+                                .HasColumnType("datetime")
+                                .HasColumnName("HorarioAnteriorInicio");
+
+                            b1.HasKey("VisitaReprogramadaId");
+
+                            b1.ToTable("VisitasReprogramadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaReprogramadaId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.TimeSlot", "NuevoHorario", b1 =>
+                        {
+                            b1.Property<string>("VisitaReprogramadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<DateTime>("Fin")
+                                .HasColumnType("datetime")
+                                .HasColumnName("NuevoHorarioFin");
+
+                            b1.Property<DateTime>("Inicio")
+                                .HasColumnType("datetime")
+                                .HasColumnName("NuevoHorarioInicio");
+
+                            b1.HasKey("VisitaReprogramadaId");
+
+                            b1.ToTable("VisitasReprogramadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaReprogramadaId");
+                        });
+
+                    b.Navigation("HorarioReprogrado")
+                        .IsRequired();
+
+                    b.Navigation("NuevoHorario")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1923,7 +2170,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.VisitasGrupales.Entities.TematicaVisita", null)
+                    b.HasOne("Domain.VisitasGrupales.Entities.GrupalGuiada.TematicaVisita", null)
                         .WithMany()
                         .HasForeignKey("TematicaVisitaId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1932,13 +2179,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("VisitaGrupalAutoguiadaTematicas", b =>
                 {
-                    b.HasOne("Domain.VisitasGrupales.Entities.TematicaVisita", null)
+                    b.HasOne("Domain.VisitasGrupales.Entities.GrupalGuiada.TematicaVisita", null)
                         .WithMany()
                         .HasForeignKey("TematicaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.VisitasGrupales.Entities.VisitaGrupalAutoguiada", null)
+                    b.HasOne("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaGrupalAutoguiada", null)
                         .WithMany()
                         .HasForeignKey("VisitaGrupalAutoguiadaId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1947,7 +2194,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("VisitaGuiadaTematicas", b =>
                 {
-                    b.HasOne("Domain.VisitasGrupales.Entities.TematicaVisita", null)
+                    b.HasOne("Domain.VisitasGrupales.Entities.GrupalGuiada.TematicaVisita", null)
                         .WithMany()
                         .HasForeignKey("TematicaId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2028,6 +2275,78 @@ namespace Infrastructure.Migrations
                     b.Navigation("TelefonoSolicitante");
                 });
 
+            modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaGrupalAutoguiada", b =>
+                {
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaGrupalAutoguiada", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailInstitucion", b1 =>
+                        {
+                            b1.Property<string>("VisitaGrupalAutoguiadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("varchar(200)")
+                                .HasColumnName("EmailInstitucion");
+
+                            b1.HasKey("VisitaGrupalAutoguiadaId");
+
+                            b1.ToTable("VisitasGrupalesAutoguiadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaGrupalAutoguiadaId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailSolicitante", b1 =>
+                        {
+                            b1.Property<string>("VisitaGrupalAutoguiadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("varchar(200)")
+                                .HasColumnName("EmailSolicitante");
+
+                            b1.HasKey("VisitaGrupalAutoguiadaId");
+
+                            b1.ToTable("VisitasGrupalesAutoguiadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaGrupalAutoguiadaId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "TelefonoSolicitante", b1 =>
+                        {
+                            b1.Property<string>("VisitaGrupalAutoguiadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("varchar(50)")
+                                .HasColumnName("TelefonoSolicitante");
+
+                            b1.HasKey("VisitaGrupalAutoguiadaId");
+
+                            b1.ToTable("VisitasGrupalesAutoguiadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaGrupalAutoguiadaId");
+                        });
+
+                    b.Navigation("EmailInstitucion");
+
+                    b.Navigation("EmailSolicitante");
+
+                    b.Navigation("TelefonoSolicitante");
+                });
+
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaGrupalGuiada", b =>
                 {
                     b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
@@ -2046,6 +2365,25 @@ namespace Infrastructure.Migrations
                                 .HasMaxLength(200)
                                 .HasColumnType("varchar(200)")
                                 .HasColumnName("EmailInstitucion");
+
+                            b1.HasKey("VisitaGrupalGuiadaId");
+
+                            b1.ToTable("VisitasGrupalesGuiadas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitaGrupalGuiadaId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailSolicitante", b1 =>
+                        {
+                            b1.Property<string>("VisitaGrupalGuiadaId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("varchar(200)")
+                                .HasColumnName("EmailSolicitante");
 
                             b1.HasKey("VisitaGrupalGuiadaId");
 
@@ -2074,39 +2412,32 @@ namespace Infrastructure.Migrations
                                 .HasForeignKey("VisitaGrupalGuiadaId");
                         });
 
-                    b.Navigation("EmailInstitucion");
-
-                    b.Navigation("TelefonoInstitucion");
-                });
-
-            modelBuilder.Entity("Domain.VisitasGrupales.Entities.VisitaGrupalAutoguiada", b =>
-                {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
-                        .WithOne()
-                        .HasForeignKey("Domain.VisitasGrupales.Entities.VisitaGrupalAutoguiada", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailInstitucion", b1 =>
+                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "TelefonoSolicitante", b1 =>
                         {
-                            b1.Property<string>("VisitaGrupalAutoguiadaId")
+                            b1.Property<string>("VisitaGrupalGuiadaId")
                                 .HasColumnType("varchar(255)");
 
                             b1.Property<string>("Valor")
                                 .IsRequired()
-                                .HasMaxLength(200)
-                                .HasColumnType("varchar(200)")
-                                .HasColumnName("EmailInstitucion");
+                                .HasMaxLength(50)
+                                .HasColumnType("varchar(50)")
+                                .HasColumnName("TelefonoSolicitante");
 
-                            b1.HasKey("VisitaGrupalAutoguiadaId");
+                            b1.HasKey("VisitaGrupalGuiadaId");
 
-                            b1.ToTable("VisitasGrupalesAutoguiadas");
+                            b1.ToTable("VisitasGrupalesGuiadas");
 
                             b1.WithOwner()
-                                .HasForeignKey("VisitaGrupalAutoguiadaId");
+                                .HasForeignKey("VisitaGrupalGuiadaId");
                         });
 
                     b.Navigation("EmailInstitucion");
+
+                    b.Navigation("EmailSolicitante");
+
+                    b.Navigation("TelefonoInstitucion");
+
+                    b.Navigation("TelefonoSolicitante");
                 });
 
             modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadMuseo", b =>

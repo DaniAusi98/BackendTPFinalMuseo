@@ -14,7 +14,6 @@ namespace Domain.Eventos.Entities
         public Email EmailSolicitante { get; private set; }
         public string Institucion { get; private set; }
         public TipoEvento TipoEvento { get; private set; }
-        public string TituloEvento { get; private set; }
         public string DescripcionEvento { get; private set; } = string.Empty;
         public string FundamentacionEvento { get; private set; } = string.Empty;
         public List<TipoPublico> TipoPublico { get; private set; }
@@ -50,15 +49,13 @@ namespace Domain.Eventos.Entities
             string? recurrenceRule = null
             )
              : base(
-            CategoriaActividad.EventoActividadExterna,
-            TipoActividad.Evento,
+            tituloEvento,
+            TipoActividad.EventoActividadExterna,
             concurrenciaEstimada,
             horario,
             salas,
             recursos,
-            recurrenceRule
-
-            )
+            recurrenceRule)
         {
             if (string.IsNullOrWhiteSpace(nombreyApellidoSolicitante))
                 throw new ArgumentException("El nombre y apellido del solicitante no puede estar vacío.", nameof(nombreyApellidoSolicitante));
@@ -76,7 +73,6 @@ namespace Domain.Eventos.Entities
             EmailSolicitante = emailSolicitante;
             Institucion = institucion;
             TipoEvento = tipoEvento;
-            TituloEvento = tituloEvento;
             DescripcionEvento = descripcionEvento?.Trim() ?? string.Empty;
             FundamentacionEvento = fundamentacionEvento?.Trim() ?? string.Empty;
             TipoPublico = [.. tipoPublico];
@@ -87,7 +83,7 @@ namespace Domain.Eventos.Entities
                 .ToList()
                 ?? [];
             SolicitaFlyer = solicitaFlyer;
-         }
+        }
 
         public void Actualizar(
             string nombreyApellidoSolicitante,
@@ -100,10 +96,21 @@ namespace Domain.Eventos.Entities
             string fundamentacionEvento,
             List<TipoPublico> tipoPublico,
             int ConcurrenciaEstimada,
+            IEnumerable<Sala> salas,
             bool requiereDifusion,
             bool solicitaFlyer,
-            IEnumerable<string?>? urlImagenes = null)
+            IEnumerable<RecursoAsignado>? recursos = null,
+            IEnumerable<string?>? urlImagenes = null,
+            string? recurrenceRule = null)
         {
+
+
+
+            ActualizarRecursos(recursos);
+            ActualizarSalas(salas);
+            ActualizarRRule(recurrenceRule);
+            CambiarCantidadAsistentes(ConcurrenciaEstimada);
+
             if (string.IsNullOrWhiteSpace(nombreyApellidoSolicitante))
                 throw new ArgumentException("El nombre y apellido del solicitante no puede estar vacío.", nameof(nombreyApellidoSolicitante));
             if (string.IsNullOrWhiteSpace(institucion))
@@ -119,11 +126,9 @@ namespace Domain.Eventos.Entities
             EmailSolicitante = emailSolicitante;
             Institucion = institucion;
             TipoEvento = tipoEvento;
-            TituloEvento = tituloEvento;
             DescripcionEvento = descripcionEvento?.Trim() ?? string.Empty;
             FundamentacionEvento = fundamentacionEvento?.Trim() ?? string.Empty;
             TipoPublico = tipoPublico.ToList();
-            CantidadEstimada = ConcurrenciaEstimada; // puede ser null
             RequiereDifusion = requiereDifusion;
             SolicitaFlyer = solicitaFlyer;
             UrlImagenes = urlImagenes?
@@ -131,6 +136,7 @@ namespace Domain.Eventos.Entities
                 .Select(x => x!)
                 .ToList()
                 ?? [];
+
         }
 
         public void ActualizarCantidadEstimada(int cantidadEstimada)
@@ -160,7 +166,7 @@ namespace Domain.Eventos.Entities
             if (Estado == EstadoActividad.Cancelada)
                 throw new DomainException(
                     "La actividad ya está cancelada.");
-            MarcarComoActividadReprogramada(); 
+            MarcarComoActividadReprogramada();
         }
-    }   
+    }
 }

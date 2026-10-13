@@ -1,5 +1,4 @@
 using Application.ActividadMuseo.Repositories;
-using Application.Availability;
 using Application.Availability.Factories; // Inyectamos la ubicación del Factory
 using Application.Availability.Models;
 using Application.Eventos.DataTransferObjets;
@@ -145,7 +144,7 @@ namespace Application.Availability.Producers
                 ExistingActivities = existingActivities,
                 Metadata = new Dictionary<string, object>
                 {
-                    { "tipoActividad", TipoActividad.Evento },
+                    { "tipoActividad", TipoActividad.EventoActividadExterna },
                     { "salasIds", salasIds }
                 }
             };
@@ -199,7 +198,7 @@ namespace Application.Availability.Producers
         {
             var salas = await _repositorioSalaMuseo.ObtenerSalasporIdsAsync(salasIds);
             var evento = new Evento(nombreyApellidoSolicitante: "Disponibilidad", telefonoSolicitante: new Telefono("3511234567"), emailSolicitante: new Email("disponibilidad@museo.com"), institucion: "Museo", tipoEvento: TipoEvento.Conferencia, tituloEvento: "Evento ficticio", descripcionEvento: "", fundamentacionEvento: "", tipoPublico: new List<TipoPublico> { TipoPublico.General }, concurrenciaEstimada: 1, horario: timeSlot, salas: salas, requiereDifusion: false, solicitaFlyer: false, recurrenceRule: null); // Se pasa nulo porque el candidato hora por hora evalúa bloques únicos);
-                return evento;
+            return evento;
         }
     }
 }

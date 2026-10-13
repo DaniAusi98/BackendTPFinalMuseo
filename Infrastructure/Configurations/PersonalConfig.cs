@@ -61,7 +61,7 @@ namespace Infrastructure.Configurations
             });
 
             builder.HasMany(x => x.Asignaciones)
-                .WithOne(x => x.Personal)
+                .WithOne()
                 .HasForeignKey(x => x.PersonalId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

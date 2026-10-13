@@ -6,6 +6,7 @@ using Domain.Common.Exceptions;
 using Infrastructure.Adapters;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Identity
 {
     public class IdentityService : IIdentityService
@@ -226,6 +227,18 @@ namespace Infrastructure.Identity
                 token);
 
             return result.Succeeded;
+        }
+        public async Task<RolDto[]> GetAllRolesAsync()
+        {
+
+            return await _roleManager.Roles
+                .Select(r => new RolDto
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    NormalizedName = r.NormalizedName
+                })
+                .ToArrayAsync();
         }
     }
 }

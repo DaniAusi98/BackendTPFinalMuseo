@@ -1,16 +1,18 @@
 using Core.Domain.Entities;
 using Domain.Common.Exceptions;
-using static Domain.ActividadMuseo.Enums.Enums;
-using Domain.RecursoMuseo.Entities;
 using Domain.Common.ValueObjets;
+using Domain.RecursoMuseo.Entities;
+using static Domain.ActividadMuseo.Enums.Enums;
 
 namespace Domain.ActividadMuseo.Entities
 {
     public class ActividadMuseo : DomainEntity<string>
     {
         // --- PROPIEDADES DE NEGOCIO ---
-        public CategoriaActividad CategoriaActividad { get; private set; }
+        public string Titulo { get; private set; }
+
         public TipoActividad TipoActividad { get; private set; }
+
 
         /// <summary>
         /// Almacena el bloque de tiempo base original (contiene DateTime Start y DateTime End).
@@ -38,7 +40,7 @@ namespace Domain.ActividadMuseo.Entities
 
         // --- CONSTRUCTOR DE DOMINIO ---
         public ActividadMuseo(
-            CategoriaActividad categoria,
+            string tituloActividad,
             TipoActividad tipo,
             int? cantidadAsistentes,
             TimeSlot horario,
@@ -47,6 +49,8 @@ namespace Domain.ActividadMuseo.Entities
             string rrule = null
         )
         {
+            if (string.IsNullOrWhiteSpace(tituloActividad))
+                throw new ArgumentException("El titulo de la actividad  debe ser valido.", nameof(tituloActividad));
             if (cantidadAsistentes is not null && cantidadAsistentes <= 0)
                 throw new DomainException("La cantidad de personas debe ser mayor a cero.");
 
@@ -56,14 +60,16 @@ namespace Domain.ActividadMuseo.Entities
             ValidarSalasYRecursos(salas, recursos);
 
             Id = Guid.NewGuid().ToString();
-            CategoriaActividad = categoria;
+            Titulo = tituloActividad;
             TipoActividad = tipo;
             CantidadPersonas = cantidadAsistentes;
             Estado = EstadoActividad.Activa;
             Horario = horario;
 
-            if (salas is not null) Salas.AddRange(salas);
-            if (recursos is not null) Recursos.AddRange(recursos);
+            if (salas is not null)
+                Salas.AddRange(salas);
+            if (recursos is not null)
+                Recursos.AddRange(recursos);
 
             if (!string.IsNullOrWhiteSpace(rrule))
                 RRule = rrule;
@@ -71,6 +77,14 @@ namespace Domain.ActividadMuseo.Entities
 
         // Constructor requerido por Entity Framework Core
         protected ActividadMuseo() { }
+
+        public void ActualizarTitulo(string titulo)
+        {
+            if (string.IsNullOrWhiteSpace(titulo))
+                throw new DomainException("El título no puede estar vacío.");
+
+            Titulo = titulo;
+        }
 
         // --- MÉTODOS DE NEGOCIO PARA RECURRENCIA Y EXCEPCIONES ---
 
@@ -86,39 +100,65 @@ namespace Domain.ActividadMuseo.Entities
 
         private static void ValidarSalasYRecursos(IEnumerable<Sala> salas, IEnumerable<RecursoAsignado> recursos)
         {
+            if (salas is null || !salas.Any())
+                throw new DomainException("La actividad debe tener al menos una sala.");
             if (salas is not null)
             {
-                if (salas.Any(s => s is null)) throw new DomainException("No puede haber salas nulas.");
-                if (salas.GroupBy(s => s.Id).Any(g => g.Count() > 1)) throw new DomainException("No puede haber salas repetidas.");
+                if (salas.Any(s => s is null))
+                    throw new DomainException("No puede haber salas nulas.");
+                if (salas.GroupBy(s => s.Id).Any(g => g.Count() > 1))
+                    throw new DomainException("No puede haber salas repetidas.");
             }
 
             if (recursos is not null)
             {
-                if (recursos.Any(r => r is null)) throw new DomainException("No puede haber recursos nulos.");
-                if (recursos.GroupBy(r => r.RecursoId).Any(g => g.Count() > 1)) throw new DomainException("No puede haber recursos repetidos.");
+                if (recursos.Any(r => r is null))
+                    throw new DomainException("No puede haber recursos nulos.");
+                if (recursos.GroupBy(r => r.RecursoId).Any(g => g.Count() > 1))
+                    throw new DomainException("No puede haber recursos repetidos.");
             }
         }
 
-        public void CambiarCategoria(CategoriaActividad nuevaCategoria) => CategoriaActividad = nuevaCategoria;
         public void CambiarTipoActividad(TipoActividad nuevoTipo) => TipoActividad = nuevoTipo;
 
-        public void AgregarSala(Sala sala)
+        public void ActualizarSalas(IEnumerable<Sala>? salas)
         {
-            ArgumentNullException.ThrowIfNull(sala);
-            if (Salas.Any(s => s.Id == sala.Id)) return;
-            Salas.Add(sala);
+            if (salas is null)
+                throw new DomainException("La actividad debe tener al menos una sala.");
+
+            var listaSalas = salas.ToList();
+
+            if (listaSalas.Count == 0)
+                throw new DomainException("La actividad debe tener al menos una sala.");
+
+            if (listaSalas.Any(s => s is null))
+                throw new DomainException("No puede haber salas nulas.");
+
+            if (listaSalas.GroupBy(s => s.Id).Any(g => g.Count() > 1))
+                throw new DomainException("No puede haber salas repetidas.");
+
+            Salas.Clear();
+            Salas.AddRange(listaSalas);
         }
 
-        public void AgregarRecurso(RecursoAsignado recurso)
+        public void ActualizarRecursos(IEnumerable<RecursoAsignado>? recursos)
         {
-            ArgumentNullException.ThrowIfNull(recurso);
-            if (Recursos.Any(r => r.RecursoId == recurso.RecursoId)) return;
-            Recursos.Add(recurso);
+            if (recursos?.Any(r => r is null) == true)
+                throw new DomainException("No puede haber recursos nulos.");
+
+            if (recursos?.GroupBy(r => r.RecursoId).Any(g => g.Count() > 1) == true)
+                throw new DomainException("No puede haber recursos repetidos.");
+
+            Recursos.Clear();
+
+            if (recursos is not null)
+                Recursos.AddRange(recursos);
         }
 
         public void CancelarActividad()
         {
-            if (Estado == EstadoActividad.Cancelada) throw new DomainException("La actividad ya está cancelada.");
+            if (Estado == EstadoActividad.Cancelada)
+                throw new DomainException("La actividad ya está cancelada.");
             Estado = EstadoActividad.Cancelada;
         }
 
@@ -138,30 +178,35 @@ namespace Domain.ActividadMuseo.Entities
 
         public void CambiarCantidadAsistentes(int? nuevaCantidad)
         {
-            if (nuevaCantidad is not null && nuevaCantidad <= 0) throw new DomainException("La cantidad de personas debe ser mayor a cero.");
+            if (nuevaCantidad is not null && nuevaCantidad <= 0)
+                throw new DomainException("La cantidad de personas debe ser mayor a cero.");
             CantidadPersonas = nuevaCantidad;
         }
 
         public void AsignarSalas(IEnumerable<Sala> salas)
         {
             ArgumentNullException.ThrowIfNull(salas);
-            if (salas.Any(s => s is null)) throw new DomainException("No puede haber salas nulas.");
-            if (salas.GroupBy(s => s.Id).Any(g => g.Count() > 1)) throw new DomainException("No puede haber salas repetidas.");
+            if (salas.Any(s => s is null))
+                throw new DomainException("No puede haber salas nulas.");
+            if (salas.GroupBy(s => s.Id).Any(g => g.Count() > 1))
+                throw new DomainException("No puede haber salas repetidas.");
             Salas.Clear();
             Salas.AddRange(salas);
         }
 
-   
+
 
         public void AsignarRecursos(IEnumerable<RecursoAsignado> recursos)
         {
             ArgumentNullException.ThrowIfNull(recursos);
-            if (recursos.Any(r => r is null)) throw new DomainException("No puede haber recursos nulos.");
-            if (recursos.GroupBy(r => r.RecursoId).Any(g => g.Count() > 1)) throw new DomainException("No puede haber recursos repetidos.");
+            if (recursos.Any(r => r is null))
+                throw new DomainException("No puede haber recursos nulos.");
+            if (recursos.GroupBy(r => r.RecursoId).Any(g => g.Count() > 1))
+                throw new DomainException("No puede haber recursos repetidos.");
             Recursos.Clear();
             Recursos.AddRange(recursos);
         }
-    
+
         public void AsignarTimeSlots(TimeSlot horario)
         {
             ArgumentNullException.ThrowIfNull(horario);
@@ -169,10 +214,16 @@ namespace Domain.ActividadMuseo.Entities
         }
         public void ActualizarRRule(string? nuevaRRule)
         {
-            if (string.IsNullOrWhiteSpace(nuevaRRule))
-                throw new DomainException("La nueva regla de recurrencia no puede ser vacía.");
-            RRule = nuevaRRule;
-            _exceptions.Clear(); // Las excepciones antiguas pierden validez matemática con la nueva regla
+            if (!string.IsNullOrWhiteSpace(nuevaRRule))
+            {
+                RRule = nuevaRRule;
+            }
+            else
+            {
+                RRule = null;
+            }
+
+            _exceptions.Clear();
         }
     }
 }

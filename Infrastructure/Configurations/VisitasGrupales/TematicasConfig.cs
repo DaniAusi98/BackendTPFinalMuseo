@@ -1,9 +1,8 @@
-using Domain.VisitasGrupales.Entities;
-
 using Domain.RecursoMuseo.Entities;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Infrastructure.Configurations.VisitasGrupales
 {

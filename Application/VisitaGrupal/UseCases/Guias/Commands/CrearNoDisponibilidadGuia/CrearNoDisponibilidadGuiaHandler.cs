@@ -2,7 +2,7 @@
 using Application.Exceptions;
 using Application.VisitaGrupal.Repositories;
 using Core.Application;
-using Domain.RecursoMuseo.Entities.Guia;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 
 
 namespace Application.VisitaGrupal.UseCases.Guias.Commands.CrearNoDisponibilidadGuia

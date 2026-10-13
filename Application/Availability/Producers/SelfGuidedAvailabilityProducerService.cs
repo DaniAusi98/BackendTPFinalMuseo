@@ -1,14 +1,13 @@
-
+using Application.ActividadMuseo.Repositories;
 using Application.Availability.Factories;
 using Application.Availability.Models;
-using Application.Exceptions;
 using Application.MuseumResources.Repositories;
 using Application.VisitaGrupal.Repositories;
 using Domain.Common.ValueObjets;
+using Domain.RecursoMuseo.Entities;
 using Domain.VisitasGrupales.DomainServices;
-using Domain.VisitasGrupales.Entities;
-
-using static Domain.VisitasGrupales.Enums.Enums;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Application.Availability.Producers
 {
@@ -28,25 +27,35 @@ namespace Application.Availability.Producers
         AvailabilityEngine engine)
     {
         private readonly IRepositorioVisitaGrupalAutoguiada _repositorioVisitaGrupalAutoguiada = repositorioVisitaGrupalAutoguiada;
-        private readonly ActividadMuseo.Repositories.IRepositorioActividadMuseo _repositorioActividadMuseo = repositorioActividadMuseo;
+        private readonly IRepositorioActividadMuseo _repositorioActividadMuseo = repositorioActividadMuseo;
         private readonly IRepositorioConfiguracionHorarioAutoguiada _repositorioConfiguracionHorarioAutoguiada = repositorioConfiguracionHorarioAutoguiada;
-        private readonly ActividadMuseo.Repositories.IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario;
+        private readonly IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario;
         private readonly IRepositorioSala _repositorioSala = repositorioSala;
         private readonly IServicioDisponibilidadSlotsAutoguiadas _servicioDisponibilidadSlotsAutoguiadas = servicioDisponibilidadSlotsAutoguiadas;
+        private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory;
+        private readonly IRepositorioTematicas _tematicaRepository = tematicaRepository;
         private readonly AvailabilityEngine _engine = engine;
-        private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory;        private readonly IRepositorioTematicas _tematicaRepository = tematicaRepository;
-        
+
         public async Task<List<SlotDisponibleVisitaAutoguiada>> GetHourlyBlocksAsync(
             DateTime desde,
-            DateTime hasta)
+            DateTime hasta,
+            string? visitaId = null,
+            List<string>? tematicasIds = null)
         {
-            // ============================================================
-            // 1) OBTENER DATOS NECESARIOS PARA GENERAR LOS SLOTS
-            // ============================================================
+            // 1. OBTENER VISITAS EXISTENTES
 
             var visitasAutoguiadasExistentes =
                 await _repositorioVisitaGrupalAutoguiada
                     .GetAllGroupVisitAuAsync(desde, hasta);
+
+            // Excluir la visita actual al consultar disponibilidad
+            // para una reprogramación.
+            if (!string.IsNullOrEmpty(visitaId))
+            {
+                visitasAutoguiadasExistentes = visitasAutoguiadasExistentes
+                    .Where(v => v.Id != visitaId)
+                    .ToList();
+            }
 
             var configuracion =
                 await _repositorioConfiguracionHorarioAutoguiada
@@ -59,7 +68,7 @@ namespace Application.Availability.Producers
             if (configuracion == null)
             {
                 throw new InvalidOperationException(
-                    "No hay configuraci�n activa para visitas autoguiadas.");
+                    "No hay configuración activa para visitas autoguiadas.");
             }
 
             if (calendario == null)
@@ -68,9 +77,7 @@ namespace Application.Availability.Producers
                     "No hay calendario activo del museo.");
             }
 
-            // ============================================================
-            // 2) GENERAR SLOTS CANDIDATOS
-            // ============================================================
+            // 2. GENERAR SLOTS CANDIDATOS
 
             var candidatosTurnos =
                 await _servicioDisponibilidadSlotsAutoguiadas
@@ -86,30 +93,11 @@ namespace Application.Availability.Producers
                     turno.EstadoSlot == EstadoTurno.Disponible)
                 .ToList();
 
-            // ============================================================
-            // 3) OBTENER ACTIVIDADES EXISTENTES
-            // ============================================================
+            // 3. OBTENER ACTIVIDADES EXISTENTES
 
             var actividadesExistentes =
                 await _repositorioActividadMuseo
                     .FindAllAsync(desde, hasta);
-
-            // ============================================================
-            // 4) EXPANDIR ACTIVIDADES EXISTENTES
-            //
-            // Sin recurrencia:
-            //      Actividad -> 1 TimeSlot
-            //
-            // Con recurrencia:
-            //      Actividad
-            //          ?
-            //      RecurrenceExpander
-            //          ?
-            //      m�ltiples TimeSlots
-            //
-            // ============================================================
-
-           
 
             var existingActivities =
                 _availabilityFactory.Create(
@@ -117,59 +105,69 @@ namespace Application.Availability.Producers
                     desde,
                     hasta);
 
-            // ============================================================
-            // 5) CREAR CANDIDATOS
-            // ============================================================
+            // 4. OBTENER TEMÁTICAS Y SALAS
 
-            var entries =
-                new List<CandidateEntry>();
+            var tematicas = tematicasIds is { Count: > 0 }
+                ? await _tematicaRepository.GetByIdsAsync(tematicasIds)
+                : [];
 
-            var email =
-                new Email("sistema@localhost.com");
+            List<Sala> salas;
 
-            var telefono =
-                new Telefono("1123456789");
+            if (tematicasIds is { Count: > 0 })
+            {
+                salas = tematicas
+                    .SelectMany(t => t.Salas)
+                    .DistinctBy(s => s.Id)
+                    .ToList();
+            }
+            else
+            {
+                salas = await _repositorioSala
+                    .ObtenerSalasVisitasGrupalesAsync();
+            }
+
+            // 5. CREAR CANDIDATOS
+
+            var entries = new List<CandidateEntry>();
+
+            var email = new Email("sistema@localhost.com");
+            var telefono = new Telefono("1123456789");
 
             foreach (var turno in candidatosTurnos)
             {
-                var timeSlot =
-                    new TimeSlot(
-                        turno.HorarioSlot.Inicio,
-                        turno.HorarioSlot.Fin);
+                var timeSlot = new TimeSlot(
+                    turno.HorarioSlot.Inicio,
+                    turno.HorarioSlot.Fin);
 
-                var candidate =
-                    new VisitaGrupalAutoguiada(
-                        usuarioVisitanteId: "system",
-                        cantidadPersonas: turno.cuposDisponibles,
-                        institucion: "Sistema",
-                        emailInstitucion: email,
-                        paisInstitucion: "Sistema",
-                        provinciaInstitucion: "Sistema",
-                        ciudadInstitucion: "Sistema",
-                        descripcionDiversidad: string.Empty,
-                        observaciones: string.Empty,
-                        horario: timeSlot,
-                        tematicas: [],
-                        salas: []
-                    );
+                var candidate = new VisitaGrupalAutoguiada(
+                    usuarioVisitanteId: "system",
+                    nombreSolicitante: "Sistema",
+                    apellidoSolicitante: "Sistema",
+                    emailSolicitante: email,
+                    telefonoSolicitante: telefono,
+                    cantidadPersonas: turno.cuposDisponibles,
+                    institucion: "Sistema",
+                    emailInstitucion: email,
+                    paisInstitucion: "Sistema",
+                    provinciaInstitucion: "Sistema",
+                    ciudadInstitucion: "Sistema",
+                    descripcionDiversidad: string.Empty,
+                    observaciones: string.Empty,
+                    horario: timeSlot,
+                    tematicas: tematicas,
+                    salas: salas
+                );
 
-                var entry =
-                    new CandidateEntry(
-                        Id: Guid.NewGuid(),
-
-                        Candidate: candidate,
-
-                        // Una autoguiada candidata representa
-                        // solamente este slot.
-                        TimeSlots: new List<TimeSlot>
-                        {
-                            timeSlot
-                        },
-
-                        Original: turno,
-
-                        Source: "SelfGuidedService"
-                    );
+                var entry = new CandidateEntry(
+                    Id: Guid.NewGuid(),
+                    Candidate: candidate,
+                    TimeSlots: new List<TimeSlot>
+                    {
+                        timeSlot
+                    },
+                    Original: turno,
+                    Source: "SelfGuidedService"
+                );
 
                 entries.Add(entry);
             }
@@ -179,44 +177,29 @@ namespace Application.Availability.Producers
                 return new List<SlotDisponibleVisitaAutoguiada>();
             }
 
-            // ============================================================
-            // 6) CONTEXTO BASE
-            // ============================================================
+            // 6. CONTEXTO BASE
 
-            var baseCtx =
-                new AvailabilityContext
-                {
-                    Start = desde,
-                    End = hasta,
+            var baseCtx = new AvailabilityContext
+            {
+                Start = desde,
+                End = hasta,
+                ExistingActivities = existingActivities,
+                Metadata = new Dictionary<string, object>()
+            };
 
-                    ExistingActivities =
-                        existingActivities,
+            // 7. VALIDAR CANDIDATOS
 
-                    Metadata =
-                        new Dictionary<string, object>()
-                };
+            var results = await _engine.CheckManyAsync(
+                baseCtx,
+                entries);
 
-            // ============================================================
-            // 7) VALIDAR CANDIDATOS
-            // ============================================================
+            // 8. RECUPERAR SLOTS APROBADOS
 
-            var results =
-                await _engine.CheckManyAsync(
-                    baseCtx,
-                    entries);
-
-            // ============================================================
-            // 8) RECUPERAR SLOTS APROBADOS
-            // ============================================================
-
-            var approved =
-                new List<SlotDisponibleVisitaAutoguiada>();
+            var approved = new List<SlotDisponibleVisitaAutoguiada>();
 
             foreach (var entry in entries)
             {
-                if (!results.TryGetValue(
-                    entry.Id,
-                    out var result))
+                if (!results.TryGetValue(entry.Id, out var result))
                 {
                     continue;
                 }
@@ -226,8 +209,7 @@ namespace Application.Availability.Producers
                     continue;
                 }
 
-                if (entry.Original
-                    is SlotDisponibleVisitaAutoguiada slot)
+                if (entry.Original is SlotDisponibleVisitaAutoguiada slot)
                 {
                     approved.Add(slot);
                 }
@@ -237,4 +219,3 @@ namespace Application.Availability.Producers
         }
     }
 }
-

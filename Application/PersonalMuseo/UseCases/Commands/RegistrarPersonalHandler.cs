@@ -2,8 +2,6 @@
 using Application.PersonalMuseo.Repositories;
 using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Application;
-using Domain.Common.ValueObjets;
-using Domain.PersonalMuseo.Entities.UsuarioInterno;
 namespace Application.PersonalMuseo.UseCases.Commands;
 
 internal sealed class RegistrarPersonalHandler(
@@ -37,12 +35,9 @@ internal sealed class RegistrarPersonalHandler(
         RegistrarPersonalQuery request,
         CancellationToken cancellationToken)
     {
-        var areaPuesto = await _repositorioAreaPuesto
-            .FindOneAsync(request.AreaPuestoId);
 
-        if (areaPuesto is null)
-            throw new InvalidOperationException(
-                "El área y puesto seleccionado no existe.");
+
+
 
         var userId = await _identityService.RegistrarPersonalAsync(
             request.Nombre,
@@ -53,25 +48,6 @@ internal sealed class RegistrarPersonalHandler(
             request.RolUsuarioId,
             request.Password);
 
-        var email = new Email(request.Email);
-        var telefono = new Telefono(request.Telefono);
-
-        var personal = new Personal(
-            userId,
-            request.Nombre,
-            request.Apellido,
-            request.DNI,
-            request.FechaNacimiento,
-            telefono,
-            email);
-
-        await _repositorioPersonal.AddAsync(personal);
-
-        var asignacion = new AsignacionPersonal(
-            personal.Id,
-            areaPuesto.Id);
-
-        await _repositorioAsignacion.AddAsync(asignacion);
 
         var token = await _identityService
             .GenerateEmailConfirmationTokenAsync(userId);
@@ -86,6 +62,6 @@ internal sealed class RegistrarPersonalHandler(
                 request.Email,
                 confirmationUrl);
 
-        return personal.Id;
+        return userId;
     }
 }

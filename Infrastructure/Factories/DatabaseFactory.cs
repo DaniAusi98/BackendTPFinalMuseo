@@ -101,8 +101,8 @@ namespace Infrastructure.Factories
             // También registrar la interfaz usada por la versión 'MuseumResources' para evitar mismatch de namespaces
             services.AddTransient<IRepositorioGuia, RepositorioGuia>();
             services.AddTransient<IRepositorioConfiguracionVisitasGrupalesGuiadas, RepositorioConfiguracionVisitasGrupalesGuiadas>();
-            services.AddTransient<IRepositorioDiaCierreMuseo, Repositories.Sql.DisponibilidadActividades.RepositorioDiaCierreMuseo>();
-            services.AddTransient<IRepositorioActividadMuseo, Repositories.Sql.DisponibilidadActividades.RepositorioActividadMuseo>();
+            services.AddTransient<IRepositorioDiaCierreMuseo, RepositorioDiaCierreMuseo>();
+            services.AddTransient<IRepositorioActividadMuseo, RepositorioActividadMuseo>();
             services.AddTransient<IRepositorioCalendarioMuseo, RepositorioCalendarioMuseo>();
             services.AddTransient<IRepositorioVisitaGrupalAutoguiada, RepositorioVisitaGrupalAutoguiada>();
             services.AddTransient<IRepositorioSala, RepositorioSalaMuseo>();
@@ -121,7 +121,13 @@ namespace Infrastructure.Factories
             services.AddTransient<IRepositorioAreaPuesto, RepositorioAreaPuesto>();
             services.AddTransient<IRepositorioPuesto, RepositorioPuesto>();
             services.AddTransient<IRepositorioPersonal, RepositorioPersonal>();
+            services.AddTransient<IReporsitorioVisitaReprogramada, RepositorioVisitaReprogramada>();
+            services.AddTransient<IRepositorioAutoguiadaReprogramada, RepositorioVisitaAutoguiadaReprogramada>();
+
+
+
             services.AddTransient<IRepositorioAsignacionPuestoPersonal, RepositorioAsignacionPuestoPersonal>();
+
 
 
 

@@ -1,5 +1,5 @@
-﻿using Domain.RecursoMuseo.Entities.Guia;
-using Domain.RecursoMuseo.ValueObjets;
+﻿using Domain.RecursoMuseo.ValueObjets;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 
 namespace Domain.RecursoMuseo.Factories
 {
@@ -18,7 +18,7 @@ namespace Domain.RecursoMuseo.Factories
 
         private static Guia CrearGuiaManana(
             string nombre,
-            string personalInternoId)
+            string userId)
         {
             var horarios = CrearHorarios(
                 new TimeOnly(9, 0),
@@ -26,7 +26,7 @@ namespace Domain.RecursoMuseo.Factories
 
             return new Guia(
                 nombre,
-                personalInternoId,
+                userId,
                 horarios);
         }
 

@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Application.VisitaGrupal.Repositories;
 using Application.ApplicationMuseo.Constants;
 using Application.Exceptions;
+using Application.VisitaGrupal.Repositories;
 using Core.Application;
 
 namespace Application.VisitaGrupal.UseCases.Guias.Commands.UpdateGuia
@@ -20,7 +16,7 @@ namespace Application.VisitaGrupal.UseCases.Guias.Commands.UpdateGuia
 
             // convert horarios
             var horarios = request.Horarios
-                .Select(h => new Domain.RecursoMuseo.Entities.Guia.HorarioGuia(
+                .Select(h => new Domain.VisitasGrupales.Entities.GrupalGuiada.Guia.HorarioGuia(
                     new Domain.RecursoMuseo.ValueObjets.DiaLaboral(h.DiaAsignado),
                     h.HoraInicio,
                     h.HoraFin))

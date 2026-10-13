@@ -1,6 +1,6 @@
 ﻿using Domain.Common.Entities;
 using Domain.Common.ValueObjets;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 
 namespace Domain.VisitasGrupales.Factories
 {

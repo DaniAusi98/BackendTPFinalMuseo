@@ -5,7 +5,7 @@ using static Domain.ActividadesAreaEducacion.Enums.Enums;
 
 namespace Domain.ActividadesAreaEducacion.Entities
 {
-    public class ActividadEducativa :ActividadMuseo.Entities.ActividadMuseo
+    public class ActividadEducativa : ActividadMuseo.Entities.ActividadMuseo
     {
         public string Titulo { get; set; }
         public TipoActividadEducativa TipoActividadEducativa { get; set; }
@@ -20,7 +20,7 @@ namespace Domain.ActividadesAreaEducacion.Entities
         public string Observaciones { get; private set; } = string.Empty;
         public ActividadEducativa()
         {
-                
+
         }
 
         public ActividadEducativa(
@@ -36,18 +36,18 @@ namespace Domain.ActividadesAreaEducacion.Entities
             bool solicitaFlyer,
             int? cantidadAsistentes = null,
             IEnumerable<string?>? urlImagenes = null,
-            List<RecursoAsignado>? recursos= null ,
+            List<RecursoAsignado>? recursos = null,
             string? rrule = null
             //List<string>? nombres = null
 
             ) : base(
-                categoria: ActividadMuseo.Enums.Enums.CategoriaActividad.ActividadEducativa,
-                tipo: ActividadMuseo.Enums.Enums.TipoActividad.ActividadEducativa,
-                cantidadAsistentes: cantidadAsistentes,
-                horario : horario,
-                salas: salas,
-                recursos: recursos,
-                rrule: rrule
+                titulo,
+                ActividadMuseo.Enums.Enums.TipoActividad.ActividadEducativa,
+                cantidadAsistentes,
+                horario,
+                salas,
+                recursos,
+                rrule
             )
         {
             if (string.IsNullOrWhiteSpace(titulo))
@@ -71,7 +71,7 @@ namespace Domain.ActividadesAreaEducacion.Entities
             ProyectoVinculadaId = proyectoVinculadaId;
             InstitucionVinculada = institucionVinculada;
             PublicoObjetivo = publicoObjetivo;
-            Observaciones =observaciones?.Trim() ?? string.Empty;
+            Observaciones = observaciones?.Trim() ?? string.Empty;
             RequiereDifusion = requiereDifusion;
             UrlImagenes = urlImagenes?
                 .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -130,7 +130,7 @@ namespace Domain.ActividadesAreaEducacion.Entities
             // Update base class properties
 
             CambiarCantidadAsistentes(cantidadAsistentes);
-            AsignarTimeSlots(horario);  
+            AsignarTimeSlots(horario);
             AsignarSalas(salas);
             AsignarRecursos(recursos);
             ActualizarRRule(rrule);

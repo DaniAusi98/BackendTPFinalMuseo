@@ -1,12 +1,17 @@
 
-using System;
+using Domain.Common.ValueObjets;
 
 namespace Application.VisitaGrupal.DataTransferObjets
 {
     public class GuidedTourReservationDto
     {
         public string Id { get; set; }
+        public string Titulo { get; set; }
         public string UsuarioVisitanteId { get; set; } = default!;
+        public string NombreSolicitante { get; set; }
+        public string ApellidoSolicitante { get; set; }
+        public Email EmailSolicitante { get; set; }
+        public Telefono TelefonoSolicitante { get; set; }
         public string Institucion { get; set; } = string.Empty;
         public string EmailInstitucion { get; set; } = string.Empty;
         public string TelefonoInstitucion { get; set; } = string.Empty;

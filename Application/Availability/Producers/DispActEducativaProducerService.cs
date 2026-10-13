@@ -2,18 +2,13 @@
 using Application.ActividadMuseo.Repositories;
 using Application.Availability.Factories;
 using Application.Availability.Models;
-using Application.Eventos.DataTransferObjets;
 using Application.MuseumResources.Repositories;
 using Domain.ActividadesAreaEducacion.Entities;
-using Domain.ActividadMuseo.Entities;
 using Domain.Common.ValueObjets;
-using Domain.Eventos.Entities;
-using Domain.RecursoMuseo.Entities;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using static Domain.ActividadesAreaEducacion.Enums.Enums;
 using static Domain.ActividadMuseo.Enums.Enums;
-using static Domain.Eventos.Enums.Enums;
 using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadMuseo;
 
 
@@ -146,7 +141,7 @@ namespace Application.Availability.Producers
                 ExistingActivities = existingActivities,
                 Metadata = new Dictionary<string, object>
                 {
-                    { "tipoActividad", TipoActividad.Evento },
+                    { "tipoActividad", TipoActividad.EventoActividadExterna },
                     { "salasIds", salasIds }
                 }
             };
@@ -208,10 +203,10 @@ namespace Application.Availability.Producers
                 observaciones: "observaciones",
                 horario: timeSlot,
                 salas: salas,
-                requiereDifusion:false,
-                solicitaFlyer:false,
-                cantidadAsistentes:15,
-                urlImagenes:null,
+                requiereDifusion: false,
+                solicitaFlyer: false,
+                cantidadAsistentes: 15,
+                urlImagenes: null,
                 rrule: null
                 ); // Se pasa nulo porque el candidato hora por hora evalúa bloques únicos);
             return ActEducativa;

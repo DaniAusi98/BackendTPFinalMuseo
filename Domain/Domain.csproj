@@ -37,6 +37,7 @@
     <Folder Include="Eventos\DomainServices\" />
     <Folder Include="Eventos\ValueObjets\" />
     <Folder Include="Eventos\Others\" />
+    <Folder Include="PersonalMuseo\Entities\" />
     <Folder Include="Reportes\DomainServices\VisitaGrupalGuiada\" />
     <Folder Include="Reportes\Enums\" />
     <Folder Include="Reportes\Constants\" />

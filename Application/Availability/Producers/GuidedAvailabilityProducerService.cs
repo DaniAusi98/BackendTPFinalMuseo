@@ -1,12 +1,13 @@
 using Application.Availability.Factories;
 using Application.Availability.Models;
+using Application.MuseumResources.Repositories;
 using Application.VisitaGrupal.Repositories;
 using Domain.Common.ValueObjets;
+using Domain.RecursoMuseo.Entities;
 using Domain.VisitasGrupales.DomainServices;
-using Domain.VisitasGrupales.Entities;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Microsoft.Extensions.Logging;
-using static Domain.VisitasGrupales.Enums.Enums;
+using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Application.Availability.Producers
 {
@@ -17,7 +18,10 @@ namespace Application.Availability.Producers
         ActividadMuseo.Repositories.IRepositorioActividadMuseo repositorioActividadMuseo,
         IRepositorioConfiguracionVisitasGrupalesGuiadas repositorioConfiguracion,
         ActividadMuseo.Repositories.IRepositorioCalendarioMuseo repositorioCalendario,
+        IRepositorioSala repositorioSala,
+        IRepositorioTematicas repositorioTematicas,
         ActivityAvailabilityFactory availabilityFactory, // <--- 2) INYECTAMOS EN EL CONSTRUCTOR
+
 
         AvailabilityEngine engine,
         ILogger<GuidedAvailabilityProducerService> logger)
@@ -30,11 +34,16 @@ namespace Application.Availability.Producers
         private readonly ActividadMuseo.Repositories.IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario;
         private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory; // <--- 1) AGREGAMOS EL CAMPO
         private readonly AvailabilityEngine _engine = engine;
+        private readonly IRepositorioTematicas _repositorioTematicas = repositorioTematicas;
+        private readonly IRepositorioSala _repositorioSala = repositorioSala;
+
         private readonly ILogger<GuidedAvailabilityProducerService> _logger = logger;
 
         public async Task<List<TurnoDisponible>> GetAvailableTurnsAsync(
             DateTime desde,
-            DateTime hasta)
+            DateTime hasta,
+            string? visitaId = null,
+            List<string>? tematicasIds = null)
         {
             _logger.LogInformation(
                 "[GuidedAvailabilityProducer] ===== INICIO =====");
@@ -55,6 +64,13 @@ namespace Application.Availability.Producers
                 await _repositorioVisitaGuiada.GetAllGroupVisitAsync(
                     desde,
                     hasta);
+            //en caso de que se pase un id de visita, se filtra para no tener en cuenta la misma visita cuando se consulta disponiblidad en una reprogramacion 
+            if (!string.IsNullOrEmpty(visitaId))
+            {
+                visitasGuiadasExistentes = visitasGuiadasExistentes
+                    .Where(v => v.Id != visitaId)
+                    .ToList();
+            }
 
             var configuracion =
                 await _repositorioConfiguracion
@@ -157,6 +173,22 @@ namespace Application.Availability.Producers
             // Cada turno tiene UN SOLO TimeSlot.
             // ============================================================
 
+            List<Sala> salas;
+
+            if (tematicasIds is { Count: > 0 })
+            {
+                // Obtener las salas asociadas a las temáticas seleccionadas.
+                List<TematicaVisita> tematicas = await _repositorioTematicas.GetByIdsAsync(tematicasIds);
+                salas = [.. tematicas
+                .SelectMany(t => t.Salas)
+                .DistinctBy(s => s.Id)];
+            }
+            else
+            {
+                // Obtener todas las salas habilitadas para visitas guiadas.
+                salas = await _repositorioSala.ObtenerSalasVisitasGrupalesAsync();
+            }
+
             var entries = new List<CandidateEntry>();
 
             var email = new Email("sistema@localhost.com");
@@ -170,6 +202,10 @@ namespace Application.Availability.Producers
 
                 var candidate = new VisitaGrupalGuiada(
                     usuarioVisitanteId: "system",
+                    nombreSolicitante: "Sistema",
+                    apellidoSolicitante: "Sistema",
+                    emailSolicitante: email,
+                    telefonoSolicitante: telefono,
                     nivelEducativo: null,
                     anioGrado: null,
                     cantidadPersonas: 1,
@@ -184,7 +220,7 @@ namespace Application.Availability.Producers
                     observaciones: string.Empty,
                     horario: timeSlot,
                     tematicas: Array.Empty<TematicaVisita>(),
-                    salas: null
+                    salas: salas
                 );
 
                 var entry = new CandidateEntry(

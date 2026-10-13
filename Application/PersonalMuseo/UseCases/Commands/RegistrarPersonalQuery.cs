@@ -18,9 +18,6 @@ namespace Application.PersonalMuseo.UseCases.Commands
         [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
         public DateOnly FechaNacimiento { get; set; }
         [Required(ErrorMessage = "Al menos un área o puesto es obligatorio")]
-        public string AreaPuestoId { get; set; }
-        [Required(ErrorMessage = "La contraseña es obligatoria")]
-
         public string RolUsuarioId { get; set; }
         public string Password { get; set; }
 

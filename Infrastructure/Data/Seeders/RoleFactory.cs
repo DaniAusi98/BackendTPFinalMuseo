@@ -17,18 +17,18 @@ namespace Infrastructure.Data.Seeders
 
             try
             {
-                logger?.LogInformation("⏳ Verificando la existencia de roles y permisos en el sistema...");
+                logger?.LogInformation("Verificando la existencia de roles y permisos en el sistema...");
 
                 // 1. Verificar si ya existen roles en la Base de Datos para evitar duplicación
                 var rolesExistentes = await roleManager.Roles.ToListAsync();
 
                 if (rolesExistentes != null && rolesExistentes.Any())
                 {
-                    logger?.LogInformation("✅ Los roles del sistema ya se encuentran poblados ({Count} encontrados). Seed omitido.", rolesExistentes.Count());
+                    logger?.LogInformation(" Los roles del sistema ya se encuentran poblados ({Count} encontrados). Seed omitido.", rolesExistentes.Count());
                     return;
                 }
 
-                logger?.LogInformation("🚀 No se encontraron roles. Iniciando el volcado de roles y permisos oficiales del sistema...");
+                logger?.LogInformation(" No se encontraron roles. Iniciando el volcado de roles y permisos oficiales del sistema...");
 
                 // 2. Obtener la configuración validada desde la Factory de Seguridad
                 var rolePermissions = RolePermissionsConfig.RolePermissions;

@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 using Application.VisitaGrupal.Repositories;
 
 using Core.Infraestructure.Repositories.Sql;
-
-using Domain.VisitasGrupales.Entities;
-
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Microsoft.EntityFrameworkCore;
 
 

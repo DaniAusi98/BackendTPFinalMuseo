@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Common.ValueObjets;
 
 namespace Application.VisitaGrupal.DataTransferObjets
 {
     public class VisitaAutoguiadaDto
     {
         public string Id { get; set; }
+        public string Titulo { get; set; }
         public string UsuarioVisitanteId { get; set; } = default!;
         public string Institucion { get; set; } = string.Empty;
+        public string NombreSolicitante { get; set; }
+        public string ApellidoSolicitante { get; set; }
+        public Email EmailSolicitante { get; set; }
+        public Telefono TelefonoSolicitante { get; set; }
         public string EmailInstitucion { get; set; } = string.Empty;
         public string PaisInstitucion { get; set; } = string.Empty;
         public string ProvinciaInstitucion { get; set; } = string.Empty;

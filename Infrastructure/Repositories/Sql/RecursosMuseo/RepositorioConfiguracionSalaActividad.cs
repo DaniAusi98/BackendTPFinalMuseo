@@ -1,5 +1,4 @@
 using Application.MuseumResources.Repositories;
-using Core.Application.Repositories;
 using Core.Infraestructure.Repositories.Sql;
 using Domain.RecursoMuseo.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ namespace Infrastructure.Repositories.Sql.RecursosMuseo
     internal sealed class RepositorioConfiguracionSalaActividad(MuseoDbContext context) : BaseRepository<ConfiguracionSalaActividad>(context), IRepositorioConfiguracionSalaActividad
     {
 
-       
+
         public async Task<List<ConfiguracionSalaActividad>> ObtenerPorSalaAsync(string salaId)
         {
             return await context.ConfiguracionesSalaActividad

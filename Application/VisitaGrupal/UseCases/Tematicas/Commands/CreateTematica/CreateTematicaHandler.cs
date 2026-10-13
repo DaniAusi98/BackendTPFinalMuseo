@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using Application.ApplicationMuseo.Constants;
 using Application.Exceptions;
 using Application.MuseumResources.Repositories;
 using Application.VisitaGrupal.Repositories;
 
 using Core.Application;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Application.VisitaGrupal.UseCases.Tematicas.Commands.CreateTematica
 {
@@ -29,7 +25,7 @@ namespace Application.VisitaGrupal.UseCases.Tematicas.Commands.CreateTematica
                 salas.Add(sala);
             }
 
-            var entity = new Domain.VisitasGrupales.Entities.TematicaVisita(request.Nombre, request.Descripcion, salas);
+            var entity = new TematicaVisita(request.Nombre, request.Descripcion, salas);
 
             try
             {

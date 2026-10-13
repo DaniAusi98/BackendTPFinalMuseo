@@ -1,7 +1,7 @@
 ﻿using Application.VisitaGrupal.Repositories;
 using Core.Application.Repositories;
 using Core.Infraestructure.Repositories.Sql;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Infrastructure.Repositories.Sql;
 using Microsoft.EntityFrameworkCore;
 using System;

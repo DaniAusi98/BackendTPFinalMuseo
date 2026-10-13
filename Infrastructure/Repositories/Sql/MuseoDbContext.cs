@@ -5,10 +5,10 @@ using Domain.Common.Entities.Ubicacion;
 using Domain.Eventos.Entities;
 using Domain.PersonalMuseo.Entities.UsuarioInterno;
 using Domain.RecursoMuseo.Entities;
-using Domain.RecursoMuseo.Entities.Guia;
 using Domain.Reportes.Entities;
-using Domain.VisitasGrupales.Entities;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
+using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Infrastructure.Configurations;
 using Infrastructure.Configurations.Reportes;
 using Infrastructure.Configurations.UbicacionMundial;
@@ -71,6 +71,11 @@ namespace Infrastructure.Repositories.Sql
 
         public DbSet<Personal> PersonalMuseo { get; set; }
         public DbSet<AsignacionPersonal> AsignacionesPersonal { get; set; }
+        public DbSet<VisitaReprogramada> VisitaGuiadaReprogramada { get; set; }
+        public DbSet<VisitaAutoguiadaReprogramada> VisitaAutoguiadaReprogramada { get; set; }
+
+
+
 
 
 
@@ -125,6 +130,10 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new PuestoConfig());
             modelBuilder.ApplyConfiguration(new PersonalConfig());
             modelBuilder.ApplyConfiguration(new AsignacionPersonalConfig());
+            modelBuilder.ApplyConfiguration(new VisitaReprogramadaConfig());
+            modelBuilder.ApplyConfiguration(new VisitaAutoguiadaReprogramadaConfig());
+
+
 
 
 

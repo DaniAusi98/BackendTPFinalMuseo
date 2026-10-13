@@ -120,7 +120,7 @@ namespace Application.Eventos.ApplicationServices
                 ExistingActivities = existingActivities,
                 Metadata = new Dictionary<string, object>
                 {
-                    { "tipoActividad", TipoActividad.Evento },
+                    { "tipoActividad", TipoActividad.EventoActividadExterna },
                     { "salasIds", salasIdsSolicitadas }
                 }
             };

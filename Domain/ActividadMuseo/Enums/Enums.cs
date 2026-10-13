@@ -28,11 +28,10 @@ namespace Domain.ActividadMuseo.Enums
         {
             VisitaGrupalGuiada,
             VisitaGrupalAutoguiada,
-            Evento,
-            ActividadExterna,
-            ActividadEducativa,     
+            EventoActividadExterna,
+            ActividadEducativa,
             MuestraExposicionTemporal,
-            ActividadEspecial
+            EventoEspecial,
         }
         public enum EstadoActividad
         {
@@ -42,14 +41,6 @@ namespace Domain.ActividadMuseo.Enums
             Cancelada
         }
 
-        public enum CategoriaActividad
-        {
-            VisitaGrupal,
-            EventoActividadExterna,
-            ActividadEducativa,
-            EventosEspeciales
-
-        }
         public enum Frecuencia
         {
             Diaria,
