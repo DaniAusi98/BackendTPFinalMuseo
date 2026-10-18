@@ -1,4 +1,4 @@
-﻿using Application.ActividadMuseo.Repositories;
+﻿using Application.ConfiguracionSistema.Repositories;
 using Domain.Common.Others.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,54 +22,51 @@ namespace Infrastructure.Data.Seeders
                 logger?.LogInformation(
                     "Verificando calendario del museo...");
 
-
-                // Verificar si ya existe calendario
-                var existente = await repositorio.ObtenerCalendarioActivoAsync();
+                var existente = await repositorio
+                    .ObtenerCalendarioActivoAsync();
 
                 if (existente != null)
                 {
                     logger?.LogInformation(
-                        "Calendario del museo ya existe (ID: {Id}). Seed omitido.",
+                        "El calendario del museo ya existe (ID: {Id}). Seed omitido.",
                         existente.Id);
 
                     return;
                 }
 
-
                 logger?.LogInformation(
                     "No existe calendario. Creando configuración inicial...");
 
-
-                // Crear calendario usando Factory
                 var calendarioInicial =
                     CalendarioMuseoFactory.CrearCalendarioPorDefecto();
 
-
-                // Guardar
                 await repositorio.AddAsync(calendarioInicial);
 
+                logger?.LogInformation(
+                    "Calendario del museo creado correctamente.");
 
                 logger?.LogInformation(
-                    "Calendario del museo creado correctamente:");
+                    "Cantidad de horarios de apertura: {Cantidad}",
+                    calendarioInicial.HorariosApertura.Count);
+
+                foreach (var horario in calendarioInicial.HorariosApertura)
+                {
+                    logger?.LogInformation(
+                        "Día: {Dia}; horario: {Inicio} - {Fin}",
+                        horario.Dia,
+                        horario.HoraInicio,
+                        horario.HoraFin);
+                }
 
                 logger?.LogInformation(
-                    " - Horario: {Inicio} - {Fin}",
-                    calendarioInicial.HorarioApertura.HoraInicio,
-                    calendarioInicial.HorarioApertura.HoraFin);
-
-                logger?.LogInformation(
-                    " - Días abiertos: {Dias}",
-                    calendarioInicial.DiasApertura.Dias.Count);
-
-                logger?.LogInformation(
-                    " - Días de cierre iniciales: {Cierres}",
+                    "Cantidad de cierres especiales: {Cierres}",
                     calendarioInicial.DiasCierre.Count);
             }
             catch (Exception ex)
             {
                 logger?.LogError(
                     ex,
-                    "Error al crear calendario inicial del museo.");
+                    "Error al crear el calendario inicial del museo.");
 
                 throw;
             }

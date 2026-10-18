@@ -26,5 +26,7 @@ namespace Application.Usuario.ApplicationServices.ApplicationServiceInterfaces
         Task<UserDto?> FindById(string idUser);
         Task<string> FindEmailById(string idUser);
         Task<RolDto[]> GetAllRolesAsync();
+        Task<List<UserDto>> FindByIdsAsync(List<string> ids);
+
     }
 }

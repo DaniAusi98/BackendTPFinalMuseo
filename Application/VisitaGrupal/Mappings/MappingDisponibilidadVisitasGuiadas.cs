@@ -1,4 +1,5 @@
 using Application.VisitaGrupal.DataTransferObjets;
+using Application.VisitaGrupal.DataTransferObjets.Guias;
 using Application.VisitaGrupal.DomainEvents;
 using AutoMapper;
 using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
@@ -94,6 +95,9 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.EstadoConfirmacion, opt => opt.MapFrom(src => src.EstadoConfirmacion))
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado));
 
+            CreateMap<HorarioGuia, GuiaHorarioDto>()
+            .ForMember(dest => dest.DiaAsignado, opt => opt.MapFrom(src => src.DiaAsignado.Dia));
+
             CreateMap<DisponibilidadGuiaFecha, DisponibilidadGuiaFechaDto>()
                 .ForMember(dest => dest.Fecha, opt => opt.MapFrom(src => src.Fecha))
                 .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.HoraInicio))
@@ -102,9 +106,28 @@ namespace Application.VisitaGrupal.Mappings
 
             CreateMap<AusenciaGuia, AusenciaGuiaDto>()
                 .ForMember(dest => dest.GuiaId, opt => opt.MapFrom(src => src.GuiaId))
+                .ForMember(dest => dest.NombreGuia, opt => opt.MapFrom(src => src.Guia.Nombre))
+                .ForMember(dest => dest.ApellidoGuia, opt => opt.MapFrom(src => src.Guia.Apellido))
                 .ForMember(dest => dest.FechaDesde, opt => opt.MapFrom(src => src.FechaDesde))
                 .ForMember(dest => dest.FechaHasta, opt => opt.MapFrom(src => src.FechaHasta))
                 .ForMember(dest => dest.Motivo, opt => opt.MapFrom(src => src.Motivo));
+
+
+
+            CreateMap<HorarioGuia, GuiaHorarioDto>()
+                .ForMember(dest => dest.DiaAsignado, opt => opt.MapFrom(src => src.DiaAsignado.Dia))
+                .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.HoraInicio))
+                .ForMember(dest => dest.HoraFin, opt => opt.MapFrom(src => src.HoraFin));
+
+            CreateMap<Guia, GuiaDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+                .ForMember(dest => dest.Apellido, opt => opt.MapFrom(src => src.Apellido))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.Telefono))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => src.Activo))
+                .ForMember(dest => dest.Horarios, opt => opt.MapFrom(src => src.HorariosGuia));
 
 
 

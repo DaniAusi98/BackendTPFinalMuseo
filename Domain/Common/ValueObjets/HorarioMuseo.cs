@@ -1,31 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Common.ValueObjets
+﻿namespace Domain.Common.ValueObjets
 {
 
 
-    public sealed class Horario
+    public sealed class HorarioApertura
     {
+        public DayOfWeek Dia { get; private set; }
         public TimeOnly HoraInicio { get; private set; }
         public TimeOnly HoraFin { get; private set; }
 
-        private Horario() { }
-        
+        private HorarioApertura() { }
 
-     
-        public Horario(TimeOnly inicio, TimeOnly fin)
+
+
+        public HorarioApertura(DayOfWeek dia, TimeOnly inicio, TimeOnly fin)
         {
+
             if (fin <= inicio)
                 throw new ArgumentException(
                     "El horario de fin debe ser posterior al inicio");
-
+            Dia = dia;
             HoraInicio = inicio;
             HoraFin = fin;
         }
+
+
     }
 
 }

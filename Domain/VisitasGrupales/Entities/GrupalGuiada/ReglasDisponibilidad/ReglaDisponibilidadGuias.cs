@@ -1,5 +1,4 @@
-﻿using Domain.VisitasGrupales.Entities.GrupalGuiada;
-
+﻿
 namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
 
 public class ReglaDisponibilidadGuias

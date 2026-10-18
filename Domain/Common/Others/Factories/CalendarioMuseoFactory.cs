@@ -5,29 +5,25 @@ namespace Domain.Common.Others.Factories
 {
     public static class CalendarioMuseoFactory
     {
-        public static CalendarioMuseo CrearCalendarioPorDefecto()
+        public static HorarioAperturaMuseo CrearCalendarioPorDefecto()
         {
-            var horario = new Horario(
-               inicio: new TimeOnly(9, 0),
-                fin: new TimeOnly(20, 0)
-            );
+            TimeOnly desde = new(9, 0);
+            TimeOnly hasta = new(20, 0);
 
-            var diasLaborales = new DiasLaboralesMuseo(
-                new[]
-                {
-                    DayOfWeek.Monday,
-                    DayOfWeek.Tuesday,
-                    DayOfWeek.Wednesday,
-                    DayOfWeek.Thursday,
-                    DayOfWeek.Friday,
-                    
-                });
+            // C# infiere el tipo automáticamente usando la inicialización de colecciones
+            List<HorarioApertura> horariosApertura =
+            [
+                new(DayOfWeek.Monday, desde, hasta),
+                new(DayOfWeek.Tuesday, desde, hasta),
+                new(DayOfWeek.Wednesday, desde, hasta),
+                new(DayOfWeek.Thursday, desde, hasta),
+                new(DayOfWeek.Friday, desde, hasta)
+            ];
 
             var diasCierre = new List<DiaCierreMuseo>();
 
-            return new CalendarioMuseo(
-                horario,
-                diasLaborales,
+            return new HorarioAperturaMuseo(
+                horariosApertura,
                 diasCierre
             );
         }

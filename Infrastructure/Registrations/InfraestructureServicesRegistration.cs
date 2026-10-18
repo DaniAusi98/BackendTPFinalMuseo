@@ -234,26 +234,6 @@ namespace Infrastructure.Registrations
                 .GetAwaiter()
                 .GetResult();
         }
-        public static void SeedAreasMuseo(this IApplicationBuilder app)
-        {
-            AreasSeeder
-                .SeedAsync(app.ApplicationServices)
-                .GetAwaiter()
-                .GetResult();
-        }
-        public static void SeedPuestosMuseo(this IApplicationBuilder app)
-        {
-            PuestoSeeder
-                .SeedAsync(app.ApplicationServices)
-                .GetAwaiter()
-                .GetResult();
-        }
-        public static void SeedAreaPuestoMuseo(this IApplicationBuilder app)
-        {
-            AreaPuestoSeeder
-                .SeedAsync(app.ApplicationServices)
-                .GetAwaiter()
-                .GetResult();
-        }
+
     }
 }

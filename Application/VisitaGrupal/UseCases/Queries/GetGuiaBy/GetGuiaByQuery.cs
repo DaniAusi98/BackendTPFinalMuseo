@@ -1,9 +1,10 @@
+using Application.VisitaGrupal.DataTransferObjets.Guias;
 using Core.Application;
 
 namespace Application.VisitaGrupal.UseCases.Queries.GetGuiaBy
 {
-    public class GetGuiaByQuery : QueryRequest<DataTransferObjets.GuiaDto>
+    public class GetGuiaByQuery : QueryRequest<GuiaDto>
     {
-        public int GuiaId { get; set; }
+        public string GuiaId { get; set; }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Text.Json;
 
 namespace Infrastructure.Configurations.VisitasGrupales
 {
@@ -33,62 +32,52 @@ namespace Infrastructure.Configurations.VisitasGrupales
                     v => v.Ticks,
                     v => TimeSpan.FromTicks(v));
 
-            builder.OwnsOne(
-                c => c.HorarioDisponibleVisitaAutoguiadas,
-                horario =>
-                {
-                    horario.Property(h => h.HoraInicio)
-                        .HasColumnName("HoraInicio")
-                        .IsRequired();
+            // Horarios disponibles: un registro por value object.
+            builder.OwnsMany(c => c.DiasDisponibles, horario =>
+            {
+                horario.ToTable("HorariosDisponiblesAutoguiadas");
 
-                    horario.Property(h => h.HoraFin)
-                        .HasColumnName("HoraFin")
-                        .IsRequired();
-                });
+                horario.WithOwner()
+                    .HasForeignKey("ConfiguracionHorarioAutoguiadaId");
 
-            builder.OwnsOne(
-                c => c.DiasDisponibles,
-                dias =>
-                {
-                    dias.Property(d => d.Dias)
-                        .HasColumnName("DiasDisponibles")
-                        .HasConversion(
-                            v => JsonSerializer.Serialize(
-                                v,
-                                (JsonSerializerOptions)null),
-                            v => JsonSerializer.Deserialize<List<DayOfWeek>>(
-                                v,
-                                (JsonSerializerOptions)null)
-                                ?? new List<DayOfWeek>())
-                        .IsRequired();
-                });
+                horario.Property<int>("Id");
+                horario.HasKey("Id");
 
-            builder.OwnsMany(
-                c => c.Bloqueos,
-                bloqueo =>
-                {
-                    bloqueo.ToTable("BloqueosVisitasAutoguiadas");
+                horario.Property(h => h.Dia)
+                    .IsRequired();
 
-                    bloqueo.WithOwner()
-                        .HasForeignKey("ConfiguracionHorarioAutoguiadaId");
+                horario.Property(h => h.Desde)
+                    .HasColumnName("Desde")
+                    .IsRequired();
 
-                    bloqueo.Property<int>("Id");
+                horario.Property(h => h.Hasta)
+                    .HasColumnName("Hasta")
+                    .IsRequired();
+            });
 
-                    bloqueo.HasKey("Id");
+            builder.OwnsMany(c => c.Bloqueos, bloqueo =>
+            {
+                bloqueo.ToTable("BloqueosVisitasAutoguiadas");
 
-                    bloqueo.Property(b => b.FechaDesde)
-                        .HasColumnName("FechaDesde")
-                        .IsRequired();
+                bloqueo.WithOwner()
+                    .HasForeignKey("ConfiguracionHorarioAutoguiadaId");
 
-                    bloqueo.Property(b => b.FechaHasta)
-                        .HasColumnName("FechaHasta")
-                        .IsRequired();
+                bloqueo.Property<int>("Id");
+                bloqueo.HasKey("Id");
 
-                    bloqueo.Property(b => b.Motivo)
-                        .HasColumnName("Motivo")
-                        .HasMaxLength(500)
-                        .IsRequired();
-                });
+                bloqueo.Property(b => b.FechaDesde)
+                    .HasColumnName("FechaDesde")
+                    .IsRequired();
+
+                bloqueo.Property(b => b.FechaHasta)
+                    .HasColumnName("FechaHasta")
+                    .IsRequired();
+
+                bloqueo.Property(b => b.Motivo)
+                    .HasColumnName("Motivo")
+                    .HasMaxLength(500)
+                    .IsRequired();
+            });
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Domain.VisitasGrupales.DomainServices
             IReadOnlyCollection<Guia> guias,
             IReadOnlyCollection<VisitaGrupalGuiada> visitasguiadas,
             ConfiguracionVisitasGrupalesGuiadas configuracion,
-            CalendarioMuseo calendario
+            HorarioAperturaMuseo calendario
            );
     }
 }

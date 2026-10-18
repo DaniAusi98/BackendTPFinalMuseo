@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Application.Exceptions;
-using Application.VisitaGrupal.DataTransferObjets;
+using Application.VisitaGrupal.DataTransferObjets.Guias;
 using Application.VisitaGrupal.Repositories;
 using Core.Application;
 using Core.Application.Mapping;

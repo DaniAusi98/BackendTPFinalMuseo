@@ -240,5 +240,18 @@ namespace Infrastructure.Identity
                 })
                 .ToArrayAsync();
         }
+        public async Task<List<UserDto>> FindByIdsAsync(List<string> ids)
+        {
+            return await _userManager.Users
+                .Where(u => ids.Contains(u.Id))
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    Nombre = u.FirstName,
+                    Apellido = u.LastName
+                })
+                .ToListAsync();
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
 {
     internal sealed class RepositorioAusenciaGuia(MuseoDbContext context) : BaseRepository<AusenciaGuia>(context), IRepositorioAusenciaGuia
     {
-        public async Task<List<AusenciaGuia>> GetAllAsync(string guiaId, DateTime fechaDesde, DateTime fechaHasta)
+        public async Task<List<AusenciaGuia>> GetAllAsyncByGuideId(string guiaId, DateTime fechaDesde, DateTime fechaHasta)
         {
             return await Repository // O la propiedad/campo que exponga tu BaseRepository (ej. Repository)
                 .Where(x => x.GuiaId == guiaId &&
@@ -15,5 +15,19 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
                             x.FechaHasta > fechaDesde)
                 .ToListAsync();
         }
+        public async Task<List<AusenciaGuia>> GetAllAsync()
+        {
+            return await Repository
+                .OrderBy(x => x.FechaDesde)
+                .ToListAsync();
+        }
+        public async Task<List<AusenciaGuia>> GetAllWithGuiaAsync()
+        {
+            return await Repository
+                .Include(a => a.Guia)
+                .OrderBy(a => a.FechaDesde)
+                .ToListAsync();
+        }
     }
+
 }

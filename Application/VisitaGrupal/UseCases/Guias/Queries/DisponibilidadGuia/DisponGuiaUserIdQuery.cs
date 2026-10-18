@@ -1,4 +1,4 @@
-﻿using Application.VisitaGrupal.DataTransferObjets;
+﻿using Application.VisitaGrupal.DataTransferObjets.Guias;
 using Core.Application;
 
 namespace Application.VisitaGrupal.UseCases.Guias.Queries.DisponibilidadGuia

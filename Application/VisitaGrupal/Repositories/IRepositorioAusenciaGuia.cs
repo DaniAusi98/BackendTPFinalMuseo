@@ -5,6 +5,11 @@ namespace Application.VisitaGrupal.Repositories
 {
     public interface IRepositorioAusenciaGuia : IRepository<AusenciaGuia>
     {
-        public Task<List<AusenciaGuia>> GetAllAsync(string guiaId, DateTime fechaDesde, DateTime fechaHasta);
+        public Task<List<AusenciaGuia>> GetAllAsyncByGuideId(string guiaId, DateTime fechaDesde, DateTime fechaHasta);
+        public Task<List<AusenciaGuia>> GetAllAsync();
+        Task<List<AusenciaGuia>> GetAllWithGuiaAsync();
+
+
+
     }
 }

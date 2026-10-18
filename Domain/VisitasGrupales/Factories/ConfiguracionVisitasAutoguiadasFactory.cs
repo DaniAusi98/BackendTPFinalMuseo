@@ -1,77 +1,54 @@
 ﻿using Domain.Common.Entities;
-using Domain.Common.ValueObjets;
 using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
+using Domain.VisitasGrupales.ValueObjects;
 
 namespace Domain.VisitasGrupales.Factories
 {
     public static class ConfiguracionVisitasAutoguiadasFactory
     {
         /// <summary>
-        /// Crea una configuración por defecto para visitas autoguiadas.
-        /// 
-        /// Configuración predeterminada:
-        /// - Horario: 9:00 - 18:00
-        /// - Duración de visita: 1 hora (tiempo que el grupo permanece en el museo)
-        /// - Intervalo entre reservas: 30 minutos (nueva entrada cada 30 min)
-        /// - Capacidad por grupo: 25 personas
-        /// - Visitas simultáneas: 2 grupos
-        /// - Capacidad total simultánea: 50 personas (25 × 2)
-        /// - Días: Lunes a viernes
-        /// 
-        /// Ejemplo de slots generados:
-        /// 09:00-10:00, 09:30-10:30, 10:00-11:00, 10:30-11:30, etc.
+        /// Crea una configuración por defecto para visitas autoguiadas (Lunes a Viernes de 9:00 a 18:00).
         /// </summary>
-        public static ConfiguracionHorarioAutoguiada CrearConfiguracionPorDefecto(CalendarioMuseo calendario)
+        public static ConfiguracionHorarioAutoguiada CrearConfiguracionPorDefecto(HorarioAperturaMuseo calendario)
         {
             if (calendario == null)
                 throw new ArgumentNullException(nameof(calendario));
 
-            var horario = new Horario(
-                inicio: new TimeOnly(9, 0),
-                fin: new TimeOnly(18, 0)
-            );
+            TimeOnly desde = new(9, 0);
+            TimeOnly hasta = new(18, 0);
 
-            var diasLaborales = new DiasLaboralesMuseo(
-                new[]
-                {
-                    DayOfWeek.Monday,
-                    DayOfWeek.Tuesday,
-                    DayOfWeek.Wednesday,
-                    DayOfWeek.Thursday,
-                    DayOfWeek.Friday
-                });
+            // CORREGIDO: Mapeamos los días de Lunes a Viernes usando el nuevo HorarioDisponible
+            var diasDisponibles = new List<HorarioDisponible>
+            {
+                new(DayOfWeek.Monday, desde, hasta),
+                new(DayOfWeek.Tuesday, desde, hasta),
+                new(DayOfWeek.Wednesday, desde, hasta),
+                new(DayOfWeek.Thursday, desde, hasta),
+                new(DayOfWeek.Friday, desde, hasta)
+            };
 
-            var duracionVisita = TimeSpan.FromHours(1);      // Cada grupo permanece 1 hora
-            var intervaloReservas = TimeSpan.FromMinutes(30); // Nueva entrada cada 30 min
+            var duracionVisita = TimeSpan.FromHours(1);
+            var intervaloReservas = TimeSpan.FromMinutes(30);
 
-            var configuracion = new ConfiguracionHorarioAutoguiada(
+            // CORREGIDO: Firma adaptada a la entidad refactorizada
+            return new ConfiguracionHorarioAutoguiada(
                 capacidadMaximaPorGrupo: 25,
-                diasDisponibles: diasLaborales,
-                horarioDisponibleVisitaAutoguiadas: horario,
+                diasDisponibles: diasDisponibles,
                 calendario: calendario,
                 duracionVisita: duracionVisita,
                 intervaloReservas: intervaloReservas,
                 visitasSimultaneasMaximas: 2,
-                bloqueos: null // Sin bloqueos iniciales
+                bloqueos: null
             );
-
-            // Validar que los días disponibles coincidan con los días de apertura del museo
-            var diasDisponiblesDelMuseo = new DiasLaboralesMuseo(
-                calendario.DiasApertura.Dias.ToArray());
-
-            configuracion.ActualizarDiasDisponibles(diasDisponiblesDelMuseo, calendario);
-
-            return configuracion;
         }
 
         /// <summary>
-        /// Crea una configuración personalizada para visitas autoguiadas.
+        /// Crea una configuración personalizada para visitas autoguiadas utilizando el nuevo modelo de listas.
         /// </summary>
         public static ConfiguracionHorarioAutoguiada CrearConfiguracionPersonalizada(
             int capacidadMaximaPorGrupo,
-            DiasLaboralesMuseo diasDisponibles,
-            Horario horario,
-            CalendarioMuseo calendario,
+            IEnumerable<HorarioDisponible> diasDisponibles,
+            HorarioAperturaMuseo calendario,
             TimeSpan duracionVisita,
             TimeSpan intervaloReservas,
             int visitasSimultaneasMaximas)
@@ -82,7 +59,6 @@ namespace Domain.VisitasGrupales.Factories
             return new ConfiguracionHorarioAutoguiada(
                 capacidadMaximaPorGrupo: capacidadMaximaPorGrupo,
                 diasDisponibles: diasDisponibles,
-                horarioDisponibleVisitaAutoguiadas: horario,
                 calendario: calendario,
                 duracionVisita: duracionVisita,
                 intervaloReservas: intervaloReservas,
@@ -92,34 +68,25 @@ namespace Domain.VisitasGrupales.Factories
         }
 
         /// <summary>
-        /// Crea una configuración con slots sin solapamiento.
-        /// (Intervalo = Duración, grupos no se solapan en el tiempo)
-        /// 
-        /// Ejemplo:
-        /// - Duración: 1 hora
-        /// - Intervalo: 1 hora
-        /// Slots: 09:00-10:00, 10:00-11:00, 11:00-12:00
+        /// Crea una configuración con slots sin solapamiento (Intervalo = Duración).
+        /// Toma los horarios de apertura del museo como base para rellenar los días disponibles de forma automática.
         /// </summary>
         public static ConfiguracionHorarioAutoguiada CrearConfiguracionSinSolapamiento(
-            CalendarioMuseo calendario,
+            HorarioAperturaMuseo calendario,
             TimeSpan duracionVisita,
             int capacidadMaximaPorGrupo = 25)
         {
             if (calendario == null)
                 throw new ArgumentNullException(nameof(calendario));
 
-            var horario = new Horario(
-                inicio: new TimeOnly(9, 0),
-                fin: new TimeOnly(18, 0)
-            );
-
-            var diasLaborales = new DiasLaboralesMuseo(
-                calendario.DiasApertura.Dias.ToArray());
+            // CORREGIDO: Mapeamos dinámicamente basándonos en los días en que el museo sí opera
+            var diasDisponibles = calendario.HorariosApertura
+                .Select(h => new HorarioDisponible(h.Dia, h.HoraInicio, h.HoraFin))
+                .ToList();
 
             return new ConfiguracionHorarioAutoguiada(
                 capacidadMaximaPorGrupo: capacidadMaximaPorGrupo,
-                diasDisponibles: diasLaborales,
-                horarioDisponibleVisitaAutoguiadas: horario,
+                diasDisponibles: diasDisponibles,
                 calendario: calendario,
                 duracionVisita: duracionVisita,
                 intervaloReservas: duracionVisita, // Mismo valor = sin solapamiento

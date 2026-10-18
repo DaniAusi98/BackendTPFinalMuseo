@@ -11,6 +11,6 @@ namespace Domain.VisitasGrupales.DomainServices
             DateTime fechaHasta,
             Guia guia,
             ConfiguracionVisitasGrupalesGuiadas configuracion,
-            CalendarioMuseo calendario);
+            HorarioAperturaMuseo calendario);
     }
 }

@@ -11,30 +11,48 @@ namespace Infrastructure.Configurations.VisitasGrupales
             builder.ToTable("Guias");
 
             builder.HasKey(g => g.Id);
-            builder.Property(g => g.NombreCompleto)
-                .HasMaxLength(150)
+
+            builder.Property(g => g.Nombre)
+                .HasMaxLength(100)
                 .IsRequired();
+
+            builder.Property(g => g.Apellido)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            // Value Object Email
+            builder.OwnsOne(g => g.Email, email =>
+            {
+                email.Property(e => e.Valor)
+                     .HasColumnName("Email")
+                     .HasMaxLength(200)
+                     .IsRequired();
+            });
+
+            // Value Object Telefono
+            builder.OwnsOne(g => g.Telefono, telefono =>
+            {
+                telefono.Property(t => t.Valor)
+                        .HasColumnName("Telefono")
+                        .HasMaxLength(30)
+                        .IsRequired();
+            });
 
             builder.Property(g => g.Activo)
                 .IsRequired();
 
             builder.Property(g => g.UserId)
-                .IsRequired();
+                .IsRequired(false);
 
-            // HorariosGuia como entidad separada (HasMany)
             builder.HasMany(g => g.HorariosGuia)
-                   .WithOne(h => h.Guia)
-                   .HasForeignKey(h => h.GuiaId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                .WithOne(h => h.Guia)
+                .HasForeignKey(h => h.GuiaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // AusenciasProgramadas
             builder.HasMany(g => g.AusenciasProgramadas)
                 .WithOne(a => a.Guia)
                 .HasForeignKey(a => a.GuiaId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-
         }
     }
 }
-

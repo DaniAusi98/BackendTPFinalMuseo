@@ -1,4 +1,4 @@
-﻿namespace Domain.VisitasGrupales.Services.Disponibilidad;
+﻿namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
 
 public class ResultadoDisponibilidad
 {

@@ -1,19 +1,20 @@
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Text.Json;
 
 namespace Infrastructure.Configurations.VisitasGrupales
 {
-    internal sealed class ConfiguracionVisitasGrupalesGuiadaConfig : IEntityTypeConfiguration<ConfiguracionVisitasGrupalesGuiadas>
+    internal sealed class ConfiguracionVisitasGrupalesGuiadaConfig
+        : IEntityTypeConfiguration<ConfiguracionVisitasGrupalesGuiadas>
     {
-        public void Configure(EntityTypeBuilder<ConfiguracionVisitasGrupalesGuiadas> builder)
+        public void Configure(
+            EntityTypeBuilder<ConfiguracionVisitasGrupalesGuiadas> builder)
         {
             builder.ToTable("ConfiguracionVisitasGrupalesGuiadas");
 
             builder.HasKey(c => c.Id);
 
-            builder.Property(c => c.MaximoVisitasSimultaneas)                
+            builder.Property(c => c.MaximoVisitasSimultaneas)
                 .IsRequired();
 
             builder.Property(c => c.CapacidadPorGuia)
@@ -22,54 +23,48 @@ namespace Infrastructure.Configurations.VisitasGrupales
             builder.Property(c => c.CapacidadMaximaPorTurno)
                 .IsRequired();
 
-            // Configurar DiasDisponibles como owned type
-            builder.OwnsOne(c => c.DiasDisponibles, diasNav =>
+            builder.OwnsMany(c => c.DiasDisponibles, horarios =>
             {
-                diasNav.Property(d => d.Dias)
-                    .HasColumnName("DiasDisponibles")
-                    .HasConversion(
-                        v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                        v => JsonSerializer.Deserialize<List<DayOfWeek>>(v, (JsonSerializerOptions)null) ?? new List<DayOfWeek>()
-                    )
+                horarios.ToTable("HorariosDisponiblesVisitasGuiadas");
+
+                horarios.WithOwner()
+                    .HasForeignKey("ConfiguracionVisitasGrupalesGuiadasId");
+
+                horarios.Property<int>("Id");
+                horarios.HasKey("Id");
+
+                horarios.Property(h => h.Dia)
+                    .IsRequired();
+
+                horarios.Property(h => h.Desde)
+                    .HasColumnName("Desde")
+                    .IsRequired();
+
+                horarios.Property(h => h.Hasta)
+                    .HasColumnName("Hasta")
                     .IsRequired();
             });
 
-            // Configurar Turnos como owned collection
-            builder.OwnsMany(c => c.Turnos, turnosNav =>
-            {
-                turnosNav.ToTable("TurnosVisitasGuiadas");
+            builder.Navigation(c => c.DiasDisponibles)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-                turnosNav.WithOwner()
+            builder.OwnsMany(c => c.Bloqueos, bloqueos =>
+            {
+                bloqueos.ToTable("BloqueosVisitasGuiadas");
+
+                bloqueos.WithOwner()
                     .HasForeignKey("ConfiguracionVisitasGrupalesGuiadasId");
 
-                turnosNav.Property<int>("Id");
-                turnosNav.HasKey("Id");
+                bloqueos.Property<int>("Id");
+                bloqueos.HasKey("Id");
 
-                turnosNav.Property(t => t.HoraInicio)
-                    .HasColumnName("HoraInicio")
+                bloqueos.Property(b => b.FechaDesde)
                     .IsRequired();
 
-                turnosNav.Property(t => t.HoraFin)
-                    .HasColumnName("HoraFin")
-                    .IsRequired();
-            });
-            builder.OwnsMany(c => c.Bloqueos, bloqueosNav =>
-            {
-                bloqueosNav.ToTable("BloqueosVisitasGuiadas");
-
-                bloqueosNav.WithOwner()
-                    .HasForeignKey("ConfiguracionVisitasGrupalesGuiadasId");
-
-                bloqueosNav.Property<int>("Id");
-                bloqueosNav.HasKey("Id");
-
-                bloqueosNav.Property(b => b.FechaDesde)
+                bloqueos.Property(b => b.FechaHasta)
                     .IsRequired();
 
-                bloqueosNav.Property(b => b.FechaHasta)
-                    .IsRequired();
-
-                bloqueosNav.Property(b => b.Motivo)
+                bloqueos.Property(b => b.Motivo)
                     .HasMaxLength(500)
                     .IsRequired();
             });

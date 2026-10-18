@@ -1,5 +1,6 @@
 using Application.Availability.Factories;
 using Application.Availability.Models;
+using Application.ConfiguracionSistema.Repositories;
 using Application.MuseumResources.Repositories;
 using Application.VisitaGrupal.Repositories;
 using Domain.Common.ValueObjets;
@@ -17,7 +18,7 @@ namespace Application.Availability.Producers
         IRepositorioVisitaGuiada repositorioVisitaGuiada,
         ActividadMuseo.Repositories.IRepositorioActividadMuseo repositorioActividadMuseo,
         IRepositorioConfiguracionVisitasGrupalesGuiadas repositorioConfiguracion,
-        ActividadMuseo.Repositories.IRepositorioCalendarioMuseo repositorioCalendario,
+        IRepositorioCalendarioMuseo repositorioCalendario,
         IRepositorioSala repositorioSala,
         IRepositorioTematicas repositorioTematicas,
         ActivityAvailabilityFactory availabilityFactory, // <--- 2) INYECTAMOS EN EL CONSTRUCTOR
@@ -31,7 +32,7 @@ namespace Application.Availability.Producers
         private readonly IRepositorioVisitaGuiada _repositorioVisitaGuiada = repositorioVisitaGuiada;
         private readonly ActividadMuseo.Repositories.IRepositorioActividadMuseo _repositorioActividadMuseo = repositorioActividadMuseo;
         private readonly IRepositorioConfiguracionVisitasGrupalesGuiadas _repositorioConfiguracion = repositorioConfiguracion;
-        private readonly ActividadMuseo.Repositories.IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario;
+        private readonly IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario;
         private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory; // <--- 1) AGREGAMOS EL CAMPO
         private readonly AvailabilityEngine _engine = engine;
         private readonly IRepositorioTematicas _repositorioTematicas = repositorioTematicas;

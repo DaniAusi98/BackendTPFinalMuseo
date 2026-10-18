@@ -3,7 +3,6 @@ using Domain.ActividadMuseo.Entities;
 using Domain.Common.Entities;
 using Domain.Common.Entities.Ubicacion;
 using Domain.Eventos.Entities;
-using Domain.PersonalMuseo.Entities.UsuarioInterno;
 using Domain.RecursoMuseo.Entities;
 using Domain.Reportes.Entities;
 using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
@@ -49,7 +48,7 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<Provincia> Provincias { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
         public DbSet<LocalidadArg> Localidades { get; set; }
-        public DbSet<CalendarioMuseo> CalendarioMuseo { get; set; }
+        public DbSet<HorarioAperturaMuseo> CalendarioMuseo { get; set; }
         public DbSet<ConfiguracionHorarioAutoguiada> ConfiguracionHorarioVisitaAutoguiada { get; set; }
         public DbSet<ReporteVisitasGuiadas> ReporteVisitasGuiadas { get; set; }
         public DbSet<ReporteVisitasAutoguiadas> ReporteVisitasAutoguiadas { get; set; }
@@ -64,13 +63,6 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<ProyectosAreaEducacion> ProyectosAreaEducacion { get; set; }
         public DbSet<EquipoTrabajoResponsable> EquipoTrabajoResponsables { get; set; }
 
-        public DbSet<Area> Areas { get; set; }
-        public DbSet<AreaPuesto> AreaPuestos { get; set; }
-
-        public DbSet<Puesto> Puestos { get; set; }
-
-        public DbSet<Personal> PersonalMuseo { get; set; }
-        public DbSet<AsignacionPersonal> AsignacionesPersonal { get; set; }
         public DbSet<VisitaReprogramada> VisitaGuiadaReprogramada { get; set; }
         public DbSet<VisitaAutoguiadaReprogramada> VisitaAutoguiadaReprogramada { get; set; }
 
@@ -125,11 +117,7 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new ActividadEducativaConfig());
             modelBuilder.ApplyConfiguration(new ProyectosAreaEducacionConfig());
             modelBuilder.ApplyConfiguration(new EquipoTrabajoResponsableConfig());
-            modelBuilder.ApplyConfiguration(new AreaConfig());
-            modelBuilder.ApplyConfiguration(new AreaPuestoConfig());
-            modelBuilder.ApplyConfiguration(new PuestoConfig());
-            modelBuilder.ApplyConfiguration(new PersonalConfig());
-            modelBuilder.ApplyConfiguration(new AsignacionPersonalConfig());
+
             modelBuilder.ApplyConfiguration(new VisitaReprogramadaConfig());
             modelBuilder.ApplyConfiguration(new VisitaAutoguiadaReprogramadaConfig());
 

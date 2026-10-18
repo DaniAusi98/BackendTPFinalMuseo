@@ -1,14 +1,11 @@
 ﻿using Application.PersonalMuseo.ApplicationServices;
-using Application.PersonalMuseo.Repositories;
 using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
 using Core.Application;
 namespace Application.PersonalMuseo.UseCases.Commands;
 
 internal sealed class RegistrarPersonalHandler(
     IIdentityService identityService,
-    IRepositorioPersonal repositorioPersonal,
-    IRepositorioAreaPuesto repositorioAreaPuesto,
-    IRepositorioAsignacionPuestoPersonal repositorioAsignacion,
+
     IConfirmUserUrlDashboard confirmUserUrlDashboard,
     IUserConfirmationEmailService userConfirmationEmailService)
     : IRequestCommandHandler<RegistrarPersonalQuery, string>
@@ -16,14 +13,7 @@ internal sealed class RegistrarPersonalHandler(
     private readonly IIdentityService _identityService =
         identityService ?? throw new ArgumentNullException(nameof(identityService));
 
-    private readonly IRepositorioPersonal _repositorioPersonal =
-        repositorioPersonal ?? throw new ArgumentNullException(nameof(repositorioPersonal));
 
-    private readonly IRepositorioAreaPuesto _repositorioAreaPuesto =
-        repositorioAreaPuesto ?? throw new ArgumentNullException(nameof(repositorioAreaPuesto));
-
-    private readonly IRepositorioAsignacionPuestoPersonal _repositorioAsignacion =
-        repositorioAsignacion ?? throw new ArgumentNullException(nameof(repositorioAsignacion));
 
     private readonly IConfirmUserUrlDashboard _confirmUserUrlDashboard =
         confirmUserUrlDashboard ?? throw new ArgumentNullException(nameof(confirmUserUrlDashboard));

@@ -122,9 +122,7 @@ namespace API
             app.SeedConfiguracionUsoSalas();
             app.SeedRecursosMuseo();
             app.SeedProyectoEducativo();
-            app.SeedAreasMuseo();
-            app.SeedPuestosMuseo();
-            app.SeedAreaPuestoMuseo();
+
 
 
 

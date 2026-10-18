@@ -3,6 +3,7 @@ using Application.Availability;
 using Application.Availability.ApplicationServices;
 using Application.Availability.Factories;
 using Application.Availability.Models;
+using Application.ConfiguracionSistema.Repositories;
 using Application.Eventos.DataTransferObjets;
 using Application.MuseumResources.Repositories;
 using Domain.Common.ValueObjets;

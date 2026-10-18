@@ -1,4 +1,5 @@
-﻿using Domain.VisitasGrupales.ValueObjects;
+﻿
+using Domain.VisitasGrupales.ValueObjects;
 
 namespace Domain.VisitasGrupales.Entities.GrupalGuiada;
 
@@ -6,7 +7,7 @@ public class ContextoDisponibilidadVisitaGuiada
 {
     public ConfiguracionVisitasGrupalesGuiadas Configuracion { get; }
 
-    public TurnoVisitaGuiada Turno { get; }
+    public HorarioDisponible Horario { get; }
 
     public IReadOnlyCollection<VisitaGrupalGuiada> VisitasExistentes { get; }
 
@@ -14,13 +15,22 @@ public class ContextoDisponibilidadVisitaGuiada
 
     public ContextoDisponibilidadVisitaGuiada(
         ConfiguracionVisitasGrupalesGuiadas configuracion,
-        TurnoVisitaGuiada turno,
+        HorarioDisponible horario,
         IReadOnlyCollection<VisitaGrupalGuiada> visitasExistentes,
         int guiasDisponibles)
     {
-        Configuracion = configuracion;
-        Turno = turno;
-        VisitasExistentes = visitasExistentes;
+        Configuracion = configuracion
+            ?? throw new ArgumentNullException(nameof(configuracion));
+
+        Horario = horario
+            ?? throw new ArgumentNullException(nameof(horario));
+
+        VisitasExistentes = visitasExistentes
+            ?? throw new ArgumentNullException(nameof(visitasExistentes));
+
+        if (guiasDisponibles < 0)
+            throw new ArgumentOutOfRangeException(nameof(guiasDisponibles));
+
         GuiasDisponibles = guiasDisponibles;
     }
 }

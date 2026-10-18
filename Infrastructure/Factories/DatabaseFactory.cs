@@ -1,9 +1,9 @@
 using Application.ActividadesEducativas.Repositories;
 using Application.ActividadMuseo.Repositories;
 using Application.Common.Repositories;
+using Application.ConfiguracionSistema.Repositories;
 using Application.Eventos.Repositories;
 using Application.MuseumResources.Repositories;
-using Application.PersonalMuseo.Repositories;
 using Application.Repositories;
 using Application.VisitaGrupal.Repositories;
 using Domain.Common.Others.Utils;
@@ -11,7 +11,6 @@ using Infrastructure.Constants;
 using Infrastructure.Repositories.Sql.ActividadEducativa;
 using Infrastructure.Repositories.Sql.ActividadMuseo;
 using Infrastructure.Repositories.Sql.Eventos;
-using Infrastructure.Repositories.Sql.PersonalMuseo;
 using Infrastructure.Repositories.Sql.RecursosMuseo;
 using Infrastructure.Repositories.Sql.Ubicacion;
 using Infrastructure.Repositories.Sql.VisitaGrupal;
@@ -117,16 +116,12 @@ namespace Infrastructure.Factories
             services.AddTransient<IRepositorioActividadEducativa, RepositorioActividadEducativa>();
             services.AddTransient<IRepositorioAusenciaGuia, RepositorioAusenciaGuia>();
             services.AddTransient<IRepositorioSala, RepositorioSalaMuseo>();
-            services.AddTransient<IRepositorioArea, RepositorioArea>();
-            services.AddTransient<IRepositorioAreaPuesto, RepositorioAreaPuesto>();
-            services.AddTransient<IRepositorioPuesto, RepositorioPuesto>();
-            services.AddTransient<IRepositorioPersonal, RepositorioPersonal>();
+
             services.AddTransient<IReporsitorioVisitaReprogramada, RepositorioVisitaReprogramada>();
             services.AddTransient<IRepositorioAutoguiadaReprogramada, RepositorioVisitaAutoguiadaReprogramada>();
 
 
 
-            services.AddTransient<IRepositorioAsignacionPuestoPersonal, RepositorioAsignacionPuestoPersonal>();
 
 
 

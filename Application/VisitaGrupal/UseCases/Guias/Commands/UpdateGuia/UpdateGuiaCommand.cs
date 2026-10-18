@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+using Application.VisitaGrupal.DataTransferObjets.Guias;
 using Core.Application;
-using Application.VisitaGrupal.DataTransferObjets;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.VisitaGrupal.UseCases.Guias.Commands.UpdateGuia
 {
@@ -8,12 +8,23 @@ namespace Application.VisitaGrupal.UseCases.Guias.Commands.UpdateGuia
     {
         [Required]
         public string Id { get; set; }
+
         [Required]
-        public string NombreCompleto { get; set; }
+        public string Nombre { get; set; }
+
         [Required]
-        public string PersonalInternoId { get; set; }
+        public string Apellido { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public string Telefono { get; set; }
+
         [Required]
         public List<GuiaHorarioDto> Horarios { get; set; } = new();
+
         public bool Activo { get; set; } = true;
     }
 }

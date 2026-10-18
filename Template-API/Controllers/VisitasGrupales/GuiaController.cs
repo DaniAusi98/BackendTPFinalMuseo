@@ -1,9 +1,12 @@
+using Application.VisitaGrupal.UseCases.Guias.Commands.CrearAusenciaGuia;
 using Application.VisitaGrupal.UseCases.Guias.Commands.CrearNoDisponibilidadGuia;
 using Application.VisitaGrupal.UseCases.Guias.Commands.CreateGuia;
 using Application.VisitaGrupal.UseCases.Guias.Commands.DeleteGuia;
 using Application.VisitaGrupal.UseCases.Guias.Commands.UpdateGuia;
 using Application.VisitaGrupal.UseCases.Guias.Queries.DisponibilidadGuia;
+using Application.VisitaGrupal.UseCases.Guias.Queries.DisponibilidadGuias;
 using Application.VisitaGrupal.UseCases.Queries.GetAllGuias;
+using Application.VisitaGrupal.UseCases.Queries.GetAusenciasGuias;
 using Application.VisitaGrupal.UseCases.Queries.GetGuiaBy;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,26 +22,56 @@ namespace Controllers.VisitasGrupales
     {
         private readonly ICommandQueryBus _commandQueryBus = commandQueryBus ?? throw new ArgumentNullException(nameof(commandQueryBus));
 
-        [HttpGet("api/v1/[Controller]")]
+        [HttpGet("getGuidesActives")]
         public async Task<IActionResult> GetAll(uint pageIndex = 1, uint pageSize = 10)
+        {
+            var entities = await _commandQueryBus.Send(new GetAllGuiasActivesQuery());
+
+            return Ok(entities);
+        }
+        [HttpGet("getGuides")]
+        public async Task<IActionResult> GetAllGuidesActives(uint pageIndex = 1, uint pageSize = 10)
         {
             var entities = await _commandQueryBus.Send(new GetAllGuiasQuery() { PageIndex = pageIndex, PageSize = pageSize });
 
             return Ok(entities);
         }
-
-        [HttpGet("api/v1/[Controller]/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("getabsences")]
+        public async Task<IActionResult> ObtenerAusencias(uint pageIndex = 1, uint pageSize = 10)
         {
-            if (id < 0 || id > int.MaxValue) return BadRequest();
+            var entities = await _commandQueryBus.Send(new GetAllAusenciasGuiasQuery() { PageIndex = pageIndex, PageSize = pageSize });
 
-            var entity = await _commandQueryBus.Send(new GetGuiaByQuery { GuiaId = id });
+            return Ok(entities);
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return BadRequest();
+
+            var entity = await _commandQueryBus.Send(
+                new GetGuiaByQuery { GuiaId = id }
+            );
 
             return Ok(entity);
         }
 
-        [HttpPost("api/v1/[Controller]")]
-        public async Task<IActionResult> Create(CreateGuiaCommand command)
+        [HttpPost("Crear")]
+        public async Task<IActionResult> Create([FromBody] CreateGuiaCommand command)
+        {
+            if (command is null)
+                return BadRequest();
+
+            var id = await _commandQueryBus.Send(command);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id },
+                new { Id = id }
+            );
+        }
+        [HttpPost("ausenciasGuias")]
+        public async Task<IActionResult> CrearAusencia(CrearAusenciaCommand command)
         {
             if (command is null) return BadRequest();
 
@@ -46,7 +79,6 @@ namespace Controllers.VisitasGrupales
 
             return Created($"api/[Controller]/{id}", new { Id = id });
         }
-
         [HttpPut("api/v1/[Controller]")]
         public async Task<IActionResult> Update(UpdateGuiaCommand command)
         {
@@ -69,15 +101,28 @@ namespace Controllers.VisitasGrupales
 
 
 
-        [HttpGet("DisponibilidadGuias")]
-        public async Task<IActionResult> DisponibilidadGuias(
+        [HttpGet("DisponibilidadGuia")]
+        public async Task<IActionResult> DisponibilidadGuia(
             [FromQuery] string guiaId,
             [FromQuery] DateTime fechaDesde,
             [FromQuery] DateTime fechaHasta
           )
         {
             var guias = await _commandQueryBus.Send(
-                new Application.VisitaGrupal.UseCases.Guias.Queries.DisponibilidadGuiaQuery(fechaDesde, fechaHasta, guiaId)
+                new DisponibilidadGuiaQuery(fechaDesde, fechaHasta, guiaId)
+                {
+                });
+
+            return Ok(guias);
+        }
+        [HttpGet("DisponibilidadGuias")]
+        public async Task<IActionResult> DisponibilidadGuias(
+            [FromQuery] DateTime fechaDesde,
+            [FromQuery] DateTime fechaHasta
+          )
+        {
+            var guias = await _commandQueryBus.Send(
+                new DisponibilidadGuiasCalendarQuery(fechaDesde, fechaHasta)
                 {
                 });
 

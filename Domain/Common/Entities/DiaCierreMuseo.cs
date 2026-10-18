@@ -1,10 +1,5 @@
 using Core.Domain.Entities;
-
-using Domain.RecursoMuseo.Entities;
 using Domain.Common.Exceptions;
-using Domain.RecursoMuseo.Enums;
-
-using static Domain.ActividadMuseo.Enums.Enums;
 using static Domain.Common.Enums.Enums;
 
 namespace Domain.Common.Entities

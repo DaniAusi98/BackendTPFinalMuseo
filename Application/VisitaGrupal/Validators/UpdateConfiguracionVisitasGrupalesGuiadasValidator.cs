@@ -3,14 +3,11 @@ using FluentValidation;
 
 namespace Application.VisitaGrupal.Validators
 {
-    public class UpdateConfiguracionVisitasGrupalesGuiadasValidator : AbstractValidator<UpdateConfiguracionVisitasGrupalesGuiadasCommand>
+    public class UpdateConfiguracionVisitasGrupalesGuiadasValidator
+        : AbstractValidator<UpdateConfiguracionVisitasGrupalesGuiadasCommand>
     {
         public UpdateConfiguracionVisitasGrupalesGuiadasValidator()
         {
-            RuleFor(x => x.MinGuiasParaCapacidadCompleta)
-                .GreaterThan(0)
-                .WithMessage("El número mínimo de guías debe ser mayor a 0.");
-
             RuleFor(x => x.CapacidadPorGuia)
                 .GreaterThan(0)
                 .WithMessage("La capacidad por guía debe ser mayor a 0.");
@@ -19,65 +16,67 @@ namespace Application.VisitaGrupal.Validators
                 .GreaterThan(0)
                 .WithMessage("La capacidad máxima por turno debe ser mayor a 0.")
                 .GreaterThanOrEqualTo(x => x.CapacidadPorGuia)
-                .WithMessage("La capacidad máxima no puede ser menor a la capacidad por guía.");
+                .WithMessage(
+                    "La capacidad máxima no puede ser menor a la capacidad por guía.");
+
+            RuleFor(x => x.MaximoVisitasSimultaneas)
+                .GreaterThan(0)
+                .WithMessage("El máximo de visitas simultáneas debe ser mayor a 0.");
 
             RuleFor(x => x.DiasDisponibles)
                 .NotNull()
-                .WithMessage("Debe especificar los días disponibles.")
+                .WithMessage("Debe especificar los horarios disponibles.")
                 .Must(dias => dias != null && dias.Any())
-                .WithMessage("Debe existir al menos un día disponible.");
+                .WithMessage("Debe existir al menos un horario disponible.");
 
-            RuleFor(x => x.Turnos)
-                .NotNull()
-                .WithMessage("Debe especificar los turnos.")
-                .Must(turnos => turnos != null && turnos.Any())
-                .WithMessage("Debe existir al menos un turno disponible.");
-
-            RuleForEach(x => x.Turnos)
-                .ChildRules(turno =>
+            RuleForEach(x => x.DiasDisponibles)
+                .ChildRules(horario =>
                 {
-                    turno.RuleFor(t => t.HoraFin)
-                        .GreaterThan(t => t.HoraInicio)
-                        .WithMessage("La hora de fin debe ser posterior a la hora de inicio.");
+                    horario.RuleFor(h => h.Hasta)
+                        .GreaterThan(h => h.Desde)
+                        .WithMessage(
+                            "La hora de fin debe ser posterior a la hora de inicio.");
 
-                    turno.RuleFor(t => t)
-                        .Must(t =>
+                    horario.RuleFor(h => h)
+                        .Must(h =>
                         {
-                            var duracion = t.HoraFin.ToTimeSpan() - t.HoraInicio.ToTimeSpan();
+                            var duracion = h.Hasta.ToTimeSpan()
+                                - h.Desde.ToTimeSpan();
+
                             return duracion.TotalMinutes >= 30;
                         })
-                        .WithMessage("Un turno debe durar al menos 30 minutos.");
-
-                    turno.RuleFor(t => t)
-                        .Must(t =>
-                        {
-                            var duracion = t.HoraFin.ToTimeSpan() - t.HoraInicio.ToTimeSpan();
-                            return duracion.TotalHours <= 3;
-                        })
-                        .WithMessage("Un turno no puede durar más de 3 horas.");
+                        .WithMessage(
+                            "Un horario debe durar al menos 30 minutos.");
                 });
 
-            RuleFor(x => x.Turnos)
-                .Must(turnos =>
+            RuleFor(x => x.DiasDisponibles)
+                .Must(horarios =>
                 {
-                    if (turnos == null || turnos.Count <= 1) return true;
+                    if (horarios == null || horarios.Count <= 1)
+                        return true;
 
-                    for (int i = 0; i < turnos.Count; i++)
+                    for (int i = 0; i < horarios.Count; i++)
                     {
-                        for (int j = i + 1; j < turnos.Count; j++)
+                        for (int j = i + 1; j < horarios.Count; j++)
                         {
-                            var turno1 = turnos[i];
-                            var turno2 = turnos[j];
+                            var h1 = horarios[i];
+                            var h2 = horarios[j];
 
-                            if (turno1.HoraInicio < turno2.HoraFin && turno1.HoraFin > turno2.HoraInicio)
+                            // Solo pueden solaparse si corresponden
+                            // al mismo día de la semana.
+                            if (h1.Dia == h2.Dia &&
+                                h1.Desde < h2.Hasta &&
+                                h1.Hasta > h2.Desde)
                             {
                                 return false;
                             }
                         }
                     }
+
                     return true;
                 })
-                .WithMessage("Los turnos no deben solaparse entre sí.");
+                .WithMessage(
+                    "Los horarios disponibles no deben solaparse en un mismo día.");
         }
     }
 }

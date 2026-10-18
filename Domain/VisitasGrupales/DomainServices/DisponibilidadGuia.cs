@@ -13,7 +13,7 @@ namespace Domain.VisitasGrupales.DomainServices
             DateTime fechaHasta,
             Guia guia,
             ConfiguracionVisitasGrupalesGuiadas configuracion,
-            CalendarioMuseo calendario)
+            HorarioAperturaMuseo calendario)
         {
             ArgumentNullException.ThrowIfNull(guia);
             ArgumentNullException.ThrowIfNull(configuracion);
@@ -21,80 +21,109 @@ namespace Domain.VisitasGrupales.DomainServices
 
             var resultado = new List<DisponibilidadGuiaFecha>();
 
-            for (DateTime fecha = fechaDesde.Date; fecha <= fechaHasta.Date; fecha = fecha.AddDays(1))
+            for (DateTime fecha = fechaDesde.Date;
+                 fecha <= fechaHasta.Date;
+                 fecha = fecha.AddDays(1))
             {
-                // 1. Verificar si el día de la semana está habilitado en la configuración general
-                if (!configuracion.EsDiaDisponible(fecha.DayOfWeek))
+                // 1. Obtener solamente los horarios configurados
+                // para el día de la semana correspondiente.
+                var horariosDelDia = configuracion.DiasDisponibles
+                    .Where(h => h.Dia == fecha.DayOfWeek)
+                    .ToList();
+
+                if (horariosDelDia.Count == 0)
                     continue;
 
-                // 2. Verificar si la fecha específica está bloqueada globalmente
+                // 2. Filtrar los horarios que el guía puede cubrir
+                // según su jornada laboral.
+                var horariosDelGuia = horariosDelDia
+                    .Where(h =>
+                        ValidarDisponibilidadGuia.EstaDentroDelHorarioLaboral(
+                            guia,
+                            CrearTimeSlot(fecha, h)))
+                    .ToList();
+
+                if (horariosDelGuia.Count == 0)
+                    continue;
+
+                // 3. Si existe un bloqueo global de visitas guiadas,
+                // informar estos horarios como no disponibles.
                 if (!configuracion.EstaDisponibleEnFecha(fecha))
                 {
-                    AgregarTurnosComoNoDisponibles(resultado, fecha, configuracion.Turnos);
+                    AgregarTurnosComoNoDisponibles(
+                        resultado,
+                        fecha,
+                        horariosDelGuia);
+
                     continue;
                 }
 
-                // 3. Procesar cada turno configurado para el día
-                foreach (var turno in configuracion.Turnos)
+                // 4. Evaluar cada horario del guía.
+                foreach (var turno in horariosDelGuia)
                 {
                     var horario = CrearTimeSlot(fecha, turno);
 
-                    var puede = ValidarDisponibilidadGuia
-                        .GuiaPuedeCubrirTurno(guia, horario);
+                    // El museo debe estar operativo durante
+                    // todo el intervalo de la visita.
+                    if (!calendario.EstaAbierto(
+                        horario.Inicio,
+                        horario.Fin))
+                    {
+                        resultado.Add(
+                            CrearDisponibilidad(horario, false));
+
+                        continue;
+                    }
+
+                    // Verificar estado del guía y sus ausencias.
+                    bool disponible =
+                        ValidarDisponibilidadGuia.GuiaPuedeCubrirTurno(
+                            guia,
+                            horario);
 
                     resultado.Add(
-                        CrearDisponibilidad(horario, puede)
-                    );
-                    /*var horario = CrearTimeSlot(fecha, turno);
-
-                    // 4. Validar que el museo esté abierto en este horario específico
-                    if (!calendario.EstaAbierto(horario.Inicio, horario.Fin))
-                    {
-                        resultado.Add(CrearDisponibilidad(horario, disponible: false));
-                        continue;
-                    }
-
-                    // 5. Validar restricciones contractuales o de agenda propias del guía
-                    if (!ValidarDisponibilidadGuia.GuiaPuedeCubrirTurno(guia, horario))
-                    {
-                        resultado.Add(CrearDisponibilidad(horario, disponible: false));
-                        continue;
-                    }
-                    resultado.Add(CrearDisponibilidad(horario, disponible: true));*/
-
-
+                        CrearDisponibilidad(horario, disponible));
                 }
             }
 
             return Task.FromResult(resultado);
         }
 
-        private static TimeSlot CrearTimeSlot(DateTime fecha, TurnoVisitaGuiada turno)
+        private static TimeSlot CrearTimeSlot(
+            DateTime fecha,
+            HorarioDisponible horario)
         {
-            var inicio = fecha.Date.Add(turno.HoraInicio.ToTimeSpan());
-            var fin = fecha.Date.Add(turno.HoraFin.ToTimeSpan());
+            var inicio = fecha.Date.Add(
+                horario.Desde.ToTimeSpan());
+
+            var fin = fecha.Date.Add(
+                horario.Hasta.ToTimeSpan());
+
             return new TimeSlot(inicio, fin);
         }
 
-        private static DisponibilidadGuiaFecha CrearDisponibilidad(TimeSlot horario, bool disponible)
+        private static DisponibilidadGuiaFecha CrearDisponibilidad(
+            TimeSlot horario,
+            bool disponible)
         {
             return new DisponibilidadGuiaFecha(
                 DateOnly.FromDateTime(horario.Inicio),
                 TimeOnly.FromDateTime(horario.Inicio),
                 TimeOnly.FromDateTime(horario.Fin),
-                disponible
-            );
+                disponible);
         }
 
         private static void AgregarTurnosComoNoDisponibles(
             List<DisponibilidadGuiaFecha> resultado,
             DateTime fecha,
-            IEnumerable<TurnoVisitaGuiada> turnos)
+            IEnumerable<HorarioDisponible> horarios)
         {
-            foreach (var turno in turnos)
+            foreach (var horario in horarios)
             {
-                var horario = CrearTimeSlot(fecha, turno);
-                resultado.Add(CrearDisponibilidad(horario, disponible: false));
+                var timeSlot = CrearTimeSlot(fecha, horario);
+
+                resultado.Add(
+                    CrearDisponibilidad(timeSlot, false));
             }
         }
     }

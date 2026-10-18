@@ -1,7 +1,5 @@
-﻿using Application.ActividadMuseo.Repositories;
+﻿using Application.ConfiguracionSistema.Repositories;
 using Application.VisitaGrupal.Repositories;
-using Domain.Common.ValueObjets;
-using Domain.VisitasGrupales.Entities;
 using Domain.VisitasGrupales.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,96 +24,122 @@ namespace Infrastructure.Data.Seeders
             try
             {
                 logger?.LogInformation(
-                    "🔍 Verificando configuración de visitas grupales autoguiadas...");
+                    "Verificando configuración de visitas autoguiadas...");
 
-                // Verificar si ya existe configuración
                 var existente = await repositorio.ObtenerConfiguracionActivaAsync();
 
                 if (existente != null)
                 {
                     logger?.LogInformation(
-                        "✅ Configuración de visitas grupales autoguiadas ya existe (ID: {Id}). Seed omitido.",
+                        "La configuración autoguiada ya existe. ID: {Id}",
                         existente.Id);
+
                     return;
                 }
 
-                // Obtener el calendario del museo
-                var calendario = await repositorioCalendario.ObtenerCalendarioActivoAsync();
+                var calendario = await repositorioCalendario
+                    .ObtenerCalendarioActivoAsync();
 
                 if (calendario == null)
                 {
                     logger?.LogWarning(
-                        "⚠️ No se encontró el calendario del museo. No se puede crear configuración de visitas autoguiadas.");
+                        "No se encontró un calendario activo del museo. " +
+                        "No se puede crear la configuración autoguiada.");
+
                     return;
                 }
 
-                logger?.LogInformation(
-                    "📅 Horario calendario: {Inicio} - {Fin}",
-                    calendario.HorarioApertura.HoraInicio,
-                    calendario.HorarioApertura.HoraFin);
-
-                // Crear configuración por defecto
+                // Crear configuración usando el calendario actual del museo.
                 var configuracionInicial =
-                    ConfiguracionVisitasAutoguiadasFactory.CrearConfiguracionPorDefecto(calendario);
+                    ConfiguracionVisitasAutoguiadasFactory
+                        .CrearConfiguracionPorDefecto(calendario);
 
                 await repositorio.AddAsync(configuracionInicial);
 
-                logger?.LogInformation("✅ Configuración de visitas grupales autoguiadas creada correctamente:");
-                logger?.LogInformation("   📊 Capacidad máxima por grupo: {CapacidadMaximaPorGrupo} personas",
+                logger?.LogInformation(
+                    "Configuración autoguiada creada correctamente.");
+
+                logger?.LogInformation(
+                    "Capacidad máxima por grupo: {Capacidad}",
                     configuracionInicial.CapacidadMaximaPorGrupo);
-                logger?.LogInformation("   ⏱️ Duración de visita: {DuracionVisita}",
+
+                logger?.LogInformation(
+                    "Duración de visita: {Duracion}",
                     configuracionInicial.DuracionVisita);
-                logger?.LogInformation("   🔄 Intervalo entre reservas: {IntervaloReservas}",
+
+                logger?.LogInformation(
+                    "Intervalo entre reservas: {Intervalo}",
                     configuracionInicial.IntervaloReservas);
-                logger?.LogInformation("   👥 Visitas simultáneas máximas: {VisitasSimultaneas} grupos",
+
+                logger?.LogInformation(
+                    "Máximo de grupos simultáneos: {Simultaneas}",
                     configuracionInicial.VisitasSimultaneasMaximas);
-                logger?.LogInformation("   🏢 Capacidad total simultánea: {CapacidadTotal} personas",
+
+                logger?.LogInformation(
+                    "Capacidad total simultánea: {CapacidadTotal}",
                     configuracionInicial.CalcularCapacidadMaximaSimultanea());
-                logger?.LogInformation("   📆 Días disponibles: {DiasCount} de {DiasMuseo}",
-                    configuracionInicial.DiasDisponibles.Dias.Count,
-                    calendario.DiasApertura.Dias.Count);
-                logger?.LogInformation("   🕒 Horario: {Inicio} - {Fin}",
-                    configuracionInicial.HorarioDisponibleVisitaAutoguiadas.HoraInicio,
-                    configuracionInicial.HorarioDisponibleVisitaAutoguiadas.HoraFin);
 
-                // Calcular cantidad aproximada de slots por día
-                var slotsEstimados = CalcularSlotsEstimadosPorDia(
-                    configuracionInicial.HorarioDisponibleVisitaAutoguiadas,
-                    configuracionInicial.DuracionVisita,
-                    configuracionInicial.IntervaloReservas);
+                logger?.LogInformation(
+                    "Cantidad de horarios configurados: {Cantidad}",
+                    configuracionInicial.DiasDisponibles.Count);
 
-                logger?.LogInformation("   🎯 Slots aproximados por día: {SlotsEstimados}",
-                    slotsEstimados);
+                foreach (var horario in configuracionInicial.DiasDisponibles)
+                {
+                    logger?.LogInformation(
+                        "Día: {Dia}; horario: {Desde} - {Hasta}",
+                        horario.Dia,
+                        horario.Desde,
+                        horario.Hasta);
+                }
+
+                // Estimar los turnos para cada día configurado.
+                var slotsPorDia = configuracionInicial.DiasDisponibles
+                    .GroupBy(h => h.Dia)
+                    .Select(grupo => new
+                    {
+                        Dia = grupo.Key,
+                        Slots = grupo.Sum(h =>
+                            CalcularSlotsEstimadosPorHorario(
+                                h.Desde,
+                                h.Hasta,
+                                configuracionInicial.DuracionVisita,
+                                configuracionInicial.IntervaloReservas))
+                    });
+
+                foreach (var item in slotsPorDia)
+                {
+                    logger?.LogInformation(
+                        "Día: {Dia}; slots estimados: {Slots}",
+                        item.Dia,
+                        item.Slots);
+                }
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex,
-                    "❌ Error al sembrar la configuración de visitas grupales autoguiadas.");
+                logger?.LogError(
+                    ex,
+                    "Error al sembrar la configuración autoguiada.");
             }
         }
 
-        /// <summary>
-        /// Calcula la cantidad aproximada de slots que se generarán por día.
-        /// </summary>
-        private static int CalcularSlotsEstimadosPorDia(
-            Horario horario,
+        private static int CalcularSlotsEstimadosPorHorario(
+            TimeOnly desde,
+            TimeOnly hasta,
             TimeSpan duracionVisita,
             TimeSpan intervaloReservas)
         {
-            var horaInicio = horario.HoraInicio.ToTimeSpan();
-            var horaFin = horario.HoraFin.ToTimeSpan();
-            var tiempoDisponible = horaFin - horaInicio;
+            var tiempoDisponible = hasta.ToTimeSpan() - desde.ToTimeSpan();
 
-            // Si duracionVisita > tiempoDisponible, no hay slots
-            if (duracionVisita > tiempoDisponible)
+            if (duracionVisita <= TimeSpan.Zero ||
+                intervaloReservas <= TimeSpan.Zero ||
+                duracionVisita > tiempoDisponible)
+            {
                 return 0;
+            }
 
-            // Cantidad de slots = (Tiempo disponible - Duración) / Intervalo + 1
-            var slots = (int)Math.Floor(
+            return (int)Math.Floor(
                 (tiempoDisponible - duracionVisita).TotalMinutes /
                 intervaloReservas.TotalMinutes) + 1;
-
-            return Math.Max(0, slots);
         }
     }
 }

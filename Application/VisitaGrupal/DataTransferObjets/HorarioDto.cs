@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Application.VisitaGrupal.DataTransferObjets
 {
-    public class HorarioDto
+    public class HorarioDisponibleDto
     {
-        public DateTime HoraInicio { get; set; }
-        public DateTime HoraFin { get; set; }
+        public DayOfWeek Dia { get; set; }
+
+        public TimeOnly Desde { get; set; }
+
+        public TimeOnly Hasta { get; set; }
     }
 }

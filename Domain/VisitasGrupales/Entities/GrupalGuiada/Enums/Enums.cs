@@ -30,7 +30,7 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada.Enums
         {
             PendienteConfirmar,
             Confirmada,
-            
+
 
         }
         public enum EstadoTurno
@@ -40,6 +40,14 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada.Enums
             Completo,
             Cancelado,
             Bloqueado
+        }
+
+        public enum EstadoGuia
+        {
+            Activa,
+            Incactiva,
+            Finalizada
+
         }
 
 

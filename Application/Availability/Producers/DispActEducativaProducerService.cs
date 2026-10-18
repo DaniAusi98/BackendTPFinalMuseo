@@ -1,16 +1,16 @@
-﻿using Application.ActividadesEducativas.DataTransferObjets;
+﻿
+using Application.ActividadesEducativas.DataTransferObjets;
 using Application.ActividadMuseo.Repositories;
 using Application.Availability.Factories;
 using Application.Availability.Models;
+using Application.ConfiguracionSistema.Repositories;
 using Application.MuseumResources.Repositories;
 using Domain.ActividadesAreaEducacion.Entities;
 using Domain.Common.ValueObjets;
 using Microsoft.Extensions.Logging;
-using System.Data;
 using static Domain.ActividadesAreaEducacion.Enums.Enums;
 using static Domain.ActividadMuseo.Enums.Enums;
 using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadMuseo;
-
 
 namespace Application.Availability.Producers
 {
@@ -20,7 +20,7 @@ namespace Application.Availability.Producers
         private readonly IRepositorioCalendarioMuseo _repositorioCalendario;
         private readonly IRepositorioSala _repositorioSalaMuseo;
         private readonly AvailabilityEngine _engine;
-        private readonly ActivityAvailabilityFactory _availabilityFactory; // <--- 1) AGREGAMOS EL CAMPO
+        private readonly ActivityAvailabilityFactory _availabilityFactory;
         private readonly ILogger<DispActEducativaProducerService> _logger;
 
         public DispActEducativaProducerService(
@@ -28,112 +28,119 @@ namespace Application.Availability.Producers
             IRepositorioCalendarioMuseo repositorioCalendario,
             IRepositorioSala repositorioSalaMuseo,
             AvailabilityEngine engine,
-            ActivityAvailabilityFactory availabilityFactory, // <--- 2) INYECTAMOS EN EL CONSTRUCTOR
+            ActivityAvailabilityFactory availabilityFactory,
             ILogger<DispActEducativaProducerService> logger)
         {
-            _repositorioActividadMuseo = repositorioActividadMuseo;
-            _repositorioCalendario = repositorioCalendario;
-            _repositorioSalaMuseo = repositorioSalaMuseo;
-            _engine = engine;
-            _availabilityFactory = availabilityFactory; // <--- 3) ASIGNAMOS LA INSTANCIA DI
-            _logger = logger;
+            _repositorioActividadMuseo = repositorioActividadMuseo
+                ?? throw new ArgumentNullException(nameof(repositorioActividadMuseo));
+
+            _repositorioCalendario = repositorioCalendario
+                ?? throw new ArgumentNullException(nameof(repositorioCalendario));
+
+            _repositorioSalaMuseo = repositorioSalaMuseo
+                ?? throw new ArgumentNullException(nameof(repositorioSalaMuseo));
+
+            _engine = engine
+                ?? throw new ArgumentNullException(nameof(engine));
+
+            _availabilityFactory = availabilityFactory
+                ?? throw new ArgumentNullException(nameof(availabilityFactory));
+
+            _logger = logger
+                ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Calcula la disponibilidad hora por hora para eventos en un rango de fechas.
-        /// </summary>
         public async Task<DispActividadEducativaDto> GetActEducativaAvailabilityAsync(
             DateTime desde,
             DateTime hasta,
             List<string> salasIds)
         {
+            if (desde.Date > hasta.Date)
+                throw new ArgumentException(
+                    "La fecha desde no puede ser posterior a la fecha hasta.");
+
+            ArgumentNullException.ThrowIfNull(salasIds);
+
             _logger.LogInformation(
-                "[EventAvailabilityProducer] Calculando disponibilidad para período: {Desde} - {Hasta}, " +
-                "salas: {SalasCount}",
+                "Calculando disponibilidad de actividades educativas. " +
+                "Desde: {Desde}, Hasta: {Hasta}, Salas: {Cantidad}",
                 desde.Date,
                 hasta.Date,
                 salasIds.Count);
 
-            // ============================================================
-            // 1) OBTENER CONFIGURACIÓN DEL MUSEO
-            // ============================================================
-            var calendario = await _repositorioCalendario.ObtenerCalendarioActivoAsync();
-            if (calendario == null)
-            {
-                throw new InvalidOperationException("No hay calendario activo del museo.");
-            }
+            // 1. Obtener el calendario activo.
+            var calendario = await _repositorioCalendario
+                .ObtenerCalendarioActivoAsync()
+                ?? throw new InvalidOperationException(
+                    "No hay calendario activo del museo.");
 
-            _logger.LogInformation(
-                "[EventAvailabilityProducer] Horario museo: {Inicio} - {Fin}",
-                calendario.HorarioApertura.HoraInicio,
-                calendario.HorarioApertura.HoraFin);
+            // 2. Obtener las actividades existentes que pueden generar conflictos.
+            var actividadesEnRango =
+                await ObtenerActividadesConConflictoPotencial(desde, hasta);
 
-            // ============================================================
-            // 2) OBTENER ACTIVIDADES EXISTENTES EN EL RANGO
-            // ============================================================
-            var actividadesEnRango = await ObtenerActividadesConConflictoPotencial(desde, hasta);
-
-            _logger.LogInformation(
-                "[EventAvailabilityProducer] Actividades existentes en rango: {Cantidad}",
-                actividadesEnRango.Count);
-
-            // ============================================================
-            // 4) PREPARAR ACTIVIDADES EXISTENTES PARA EL ENGINE (CORREGIDO)
-            // ============================================================
-            // Usamos la instancia inyectada '_availabilityFactory' en vez de la llamada estática vieja
+            // 3. Preparar las actividades existentes para el motor.
             var existingActivities = _availabilityFactory.Create(
                 actividadesEnRango.Cast<ActividadMuseoEntity>().ToList(),
                 desde,
-                hasta
-            );
+                hasta);
 
             _logger.LogInformation(
-                "[DispActEducativaProducerService] Actividades existentes preparadas: {Cantidad}",
+                "Actividades existentes preparadas: {Cantidad}",
                 existingActivities.Count);
 
-            // ============================================================
-            // 5) GENERAR CANDIDATOS HORA POR HORA
-            // ============================================================
+            // 4. Generar candidatos de 30 minutos usando las franjas
+            // operativas reales del calendario.
             var candidatosEventos = new List<CandidateEntry>();
 
-            for (var fecha = desde.Date; fecha.Date <= hasta.Date; fecha = fecha.AddDays(1))
+            for (var fecha = desde.Date;
+                 fecha <= hasta.Date;
+                 fecha = fecha.AddDays(1))
             {
-                if (!calendario.EsDiaOperativo(fecha))
+                var franjasOperativas = calendario
+                    .ObtenerFranjasOperativas(
+                        DateOnly.FromDateTime(fecha))
+                    .ToList();
+
+                if (franjasOperativas.Count == 0)
                 {
-                    _logger.LogDebug("[DispActEducativaProducerService] Día no operativo: {Fecha}", fecha.Date);
+                    _logger.LogDebug(
+                        "No hay franjas operativas para {Fecha}",
+                        fecha.Date);
+
                     continue;
                 }
 
-                var horaInicio = calendario.HorarioApertura.HoraInicio;
-                var horaFin = calendario.HorarioApertura.HoraFin;
-
-                for (var hora = horaInicio; hora < horaFin; hora = hora.AddMinutes(30))
+                foreach (var franja in franjasOperativas)
                 {
-                    var inicioSlot = new DateTime(fecha.Year, fecha.Month, fecha.Day, hora.Hour, hora.Minute, hora.Second);
-                    var finSlot = inicioSlot.AddMinutes(30);
+                    for (var inicioSlot = franja.Inicio;
+                         inicioSlot.AddMinutes(30) <= franja.Fin;
+                         inicioSlot = inicioSlot.AddMinutes(30))
+                    {
+                        var timeSlot = new TimeSlot(
+                            inicioSlot,
+                            inicioSlot.AddMinutes(30));
 
-                    if (finSlot > hasta.AddDays(1))
-                        break;
+                        var eventoFicticio = await CrearEventoFicticio(
+                            timeSlot,
+                            salasIds);
 
-                    var timeSlot = new TimeSlot(inicioSlot, finSlot);
-                    var eventoFicticio = CrearEventoFicticio(timeSlot, salasIds);
+                        var candidato = new CandidateEntry(
+                            Guid.NewGuid(),
+                            eventoFicticio,
+                            new List<TimeSlot> { timeSlot }.AsReadOnly(),
+                            null,
+                            "EventoCandidate");
 
-                    var candidato = new CandidateEntry(
-                        Guid.NewGuid(),
-                        await eventoFicticio,
-                        new[] { timeSlot }.ToList().AsReadOnly(),
-                        null,
-                        "EventoCandidate");
-
-                    candidatosEventos.Add(candidato);
+                        candidatosEventos.Add(candidato);
+                    }
                 }
             }
 
-            _logger.LogInformation("[DispActEducativaProducerService] Candidatos generados: {Cantidad}", candidatosEventos.Count);
+            _logger.LogInformation(
+                "Candidatos generados: {Cantidad}",
+                candidatosEventos.Count);
 
-            // ============================================================
-            // 6) VALIDAR DISPONIBILIDAD CON EL ENGINE
-            // ============================================================
+            // 5. Validar candidatos con el motor de disponibilidad.
             var contexto = new AvailabilityContext
             {
                 Start = desde,
@@ -146,55 +153,63 @@ namespace Application.Availability.Producers
                 }
             };
 
-            var resultados = await _engine.CheckManyAsync(contexto, candidatosEventos);
+            var resultados = await _engine.CheckManyAsync(
+                contexto,
+                candidatosEventos);
 
-            _logger.LogInformation("[DispActEducativaProducerService] Validación completada. Resultados: {Cantidad}", resultados.Count);
+            _logger.LogInformation(
+                "Validación completada. Resultados: {Cantidad}",
+                resultados.Count);
 
-            // ============================================================
-            // 7) PROCESAR RESULTADOS DEL ENGINE
-            // ============================================================
-            var horariosDisponibles = new List<ActividadesEducativas.DataTransferObjets.HorarioDisponibleDto>();
+            // 6. Convertir los resultados al DTO de salida.
+            var horariosDisponibles = new List<HorarioDisponibleDto>();
 
-            foreach (var kvp in resultados)
+            foreach (var candidato in candidatosEventos)
             {
-                var candidatoId = kvp.Key;
-                var resultado = kvp.Value;
-
-                var candidato = candidatosEventos.FirstOrDefault(c => c.Id == candidatoId);
-                if (candidato == null) continue;
+                if (!resultados.TryGetValue(candidato.Id, out var resultado))
+                    continue;
 
                 var horario = candidato.TimeSlots.FirstOrDefault();
-                if (horario == null) continue;
 
-                var disponibilidad = new ActividadesEducativas.DataTransferObjets.HorarioDisponibleDto
+                if (horario == null)
+                    continue;
+
+                horariosDisponibles.Add(new HorarioDisponibleDto
                 {
-                    // Ajustado a las propiedades de tu objeto TimeSlot corregido (Inicio/Fin)
                     Inicio = horario.Inicio,
                     Fin = horario.Fin,
                     Disponible = resultado.IsOk,
-                    Mensaje = resultado.IsOk ? string.Empty : resultado.Message
-                };
-
-                horariosDisponibles.Add(disponibilidad);
+                    Mensaje = resultado.IsOk
+                        ? string.Empty
+                        : resultado.Message
+                });
             }
 
-            var resultadoFinal = new DispActividadEducativaDto
+            return new DispActividadEducativaDto
             {
                 Periodo = desde.ToString("yyyy-MM"),
                 HorariosDisponibles = horariosDisponibles
             };
-
-            return resultadoFinal;
         }
 
-        private async Task<List<ActividadMuseoEntity>> ObtenerActividadesConConflictoPotencial(DateTime desde, DateTime hasta)
+        private async Task<List<ActividadMuseoEntity>>
+            ObtenerActividadesConConflictoPotencial(
+                DateTime desde,
+                DateTime hasta)
         {
-            var actividadesDirectas = await _repositorioActividadMuseo.FindAllAsync(desde, hasta); return actividadesDirectas;
+            return await _repositorioActividadMuseo.FindAllAsync(
+                desde,
+                hasta);
         }
-        private async Task<ActividadEducativa> CrearEventoFicticio(TimeSlot timeSlot, List<string> salasIds)
+
+        private async Task<ActividadEducativa> CrearEventoFicticio(
+            TimeSlot timeSlot,
+            List<string> salasIds)
         {
-            var salas = await _repositorioSalaMuseo.ObtenerSalasporIdsAsync(salasIds);
-            var ActEducativa = new ActividadEducativa(
+            var salas = await _repositorioSalaMuseo
+                .ObtenerSalasporIdsAsync(salasIds);
+
+            return new ActividadEducativa(
                 titulo: "TituloFicticio",
                 tipoActividadEducativa: TipoActividadEducativa.Otros,
                 proyectoVinculadaId: "proyectoficticio",
@@ -207,9 +222,7 @@ namespace Application.Availability.Producers
                 solicitaFlyer: false,
                 cantidadAsistentes: 15,
                 urlImagenes: null,
-                rrule: null
-                ); // Se pasa nulo porque el candidato hora por hora evalúa bloques únicos);
-            return ActEducativa;
+                rrule: null);
         }
     }
 }

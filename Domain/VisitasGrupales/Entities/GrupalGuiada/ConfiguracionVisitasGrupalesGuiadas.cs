@@ -1,15 +1,16 @@
+
 using Core.Domain.Entities;
+using Domain.Common.Entities;
 using Domain.Common.Exceptions;
 using Domain.VisitasGrupales.ValueObjects;
-using Domain.Common.Entities;
-using Domain.Common.ValueObjets;
 
 namespace Domain.VisitasGrupales.Entities.GrupalGuiada
 {
     public class ConfiguracionVisitasGrupalesGuiadas : DomainEntity<string>
     {
-        private readonly List<TurnoVisitaGuiada> _turnos;
         private readonly List<BloqueoVisitasGuiadas> _bloqueos;
+
+        public List<HorarioDisponible> DiasDisponibles { get; private set; }
 
         public int CapacidadPorGuia { get; private set; }
 
@@ -17,29 +18,27 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
 
         public int MaximoVisitasSimultaneas { get; private set; }
 
-        public DiasLaboralesMuseo DiasDisponibles { get; private set; }
-
-        public IReadOnlyCollection<TurnoVisitaGuiada> Turnos =>
-            _turnos.AsReadOnly();
-
-        public IReadOnlyCollection<BloqueoVisitasGuiadas> Bloqueos =>
-            _bloqueos.AsReadOnly();
+        public IReadOnlyCollection<BloqueoVisitasGuiadas> Bloqueos
+            => _bloqueos.AsReadOnly();
 
         protected ConfiguracionVisitasGrupalesGuiadas()
         {
-            _turnos = new List<TurnoVisitaGuiada>();
             _bloqueos = new List<BloqueoVisitasGuiadas>();
+            DiasDisponibles = new List<HorarioDisponible>();
         }
 
         public ConfiguracionVisitasGrupalesGuiadas(
             int capacidadPorGuia,
             int capacidadMaxima,
             int maximoVisitasSimultaneas,
-            DiasLaboralesMuseo diasDisponibles,
-            IReadOnlyCollection<TurnoVisitaGuiada> turnos,
+            IEnumerable<HorarioDisponible> diasDisponibles,
+            HorarioAperturaMuseo calendario,
             IReadOnlyCollection<BloqueoVisitasGuiadas>? bloqueos = null)
         {
             Id = Guid.NewGuid().ToString();
+
+            if (calendario == null)
+                throw new ArgumentNullException(nameof(calendario));
 
             if (capacidadPorGuia <= 0)
                 throw new DomainException(
@@ -57,20 +56,50 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
                 throw new DomainException(
                     "El máximo de visitas simultáneas debe ser mayor a 0.");
 
+            if (diasDisponibles == null)
+                throw new ArgumentNullException(nameof(diasDisponibles));
+
+            var listaDias = diasDisponibles.ToList();
+
+            if (!listaDias.Any())
+                throw new DomainException(
+                    "Debe existir al menos un horario disponible.");
+
+            ValidarHorariosDentroDelCalendario(listaDias, calendario);
+            ValidarHorariosNoSeSolapen(listaDias);
+
             CapacidadPorGuia = capacidadPorGuia;
             CapacidadMaximaPorTurno = capacidadMaxima;
             MaximoVisitasSimultaneas = maximoVisitasSimultaneas;
-
-            DiasDisponibles = diasDisponibles
-                ?? throw new ArgumentNullException(nameof(diasDisponibles));
-
-            _turnos = turnos?.ToList()
-                ?? throw new ArgumentNullException(nameof(turnos));
+            DiasDisponibles = listaDias;
 
             _bloqueos = bloqueos?.ToList()
                 ?? new List<BloqueoVisitasGuiadas>();
+        }
 
-            ValidarTurnosNoSeSolapen();
+        public void ActualizarDiasDisponibles(
+            IEnumerable<HorarioDisponible> nuevosDias,
+            HorarioAperturaMuseo calendario)
+        {
+            if (nuevosDias == null)
+                throw new ArgumentNullException(nameof(nuevosDias));
+
+            if (calendario == null)
+                throw new ArgumentNullException(nameof(calendario));
+
+            var listaNuevosDias = nuevosDias.ToList();
+
+            if (!listaNuevosDias.Any())
+                throw new DomainException(
+                    "Debe existir al menos un horario disponible.");
+
+            ValidarHorariosDentroDelCalendario(
+                listaNuevosDias,
+                calendario);
+
+            ValidarHorariosNoSeSolapen(listaNuevosDias);
+
+            DiasDisponibles = listaNuevosDias;
         }
 
         public void ActualizarCapacidad(
@@ -97,68 +126,6 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
             CapacidadPorGuia = capacidadPorGuia;
             CapacidadMaximaPorTurno = capacidadMaxima;
             MaximoVisitasSimultaneas = maximoVisitasSimultaneas;
-        }
-
-        public void ActualizarDiasDisponibles(
-            DiasLaboralesMuseo diasDisponibles,
-            CalendarioMuseo calendarioMuseo)
-        {
-            if (diasDisponibles == null)
-                throw new ArgumentNullException(nameof(diasDisponibles));
-
-            if (calendarioMuseo == null)
-                throw new ArgumentNullException(nameof(calendarioMuseo));
-
-            var diasNoLaborales = diasDisponibles.Dias
-                .Where(d => !calendarioMuseo.DiasApertura.Dias.Contains(d))
-                .ToList();
-
-            if (diasNoLaborales.Any())
-            {
-                throw new DomainException(
-                    $"Los días {string.Join(", ", diasNoLaborales)} " +
-                    $"no son días laborales del museo. " +
-                    $"Solo se pueden configurar visitas en: " +
-                    $"{string.Join(", ", calendarioMuseo.DiasApertura.Dias)}");
-            }
-
-            DiasDisponibles = diasDisponibles;
-        }
-
-        public void AgregarTurno(TurnoVisitaGuiada turno)
-        {
-            if (turno == null)
-                throw new ArgumentNullException(nameof(turno));
-
-            if (_turnos.Any(t => t.SeSolapaCon(turno)))
-                throw new DomainException(
-                    "El turno se solapa con un turno existente.");
-
-            _turnos.Add(turno);
-        }
-
-        public void RemoverTurno(TurnoVisitaGuiada turno)
-        {
-            if (turno == null)
-                throw new ArgumentNullException(nameof(turno));
-
-            _turnos.Remove(turno);
-        }
-
-        public void ActualizarTurnos(
-            IReadOnlyCollection<TurnoVisitaGuiada> nuevosTurnos)
-        {
-            if (nuevosTurnos == null)
-                throw new ArgumentNullException(nameof(nuevosTurnos));
-
-            if (!nuevosTurnos.Any())
-                throw new DomainException(
-                    "Debe existir al menos un turno disponible.");
-
-            _turnos.Clear();
-            _turnos.AddRange(nuevosTurnos);
-
-            ValidarTurnosNoSeSolapen();
         }
 
         public void AgregarBloqueo(BloqueoVisitasGuiadas bloqueo)
@@ -188,15 +155,13 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
 
         public bool EstaDisponibleEnFecha(DateTime fecha)
         {
-            if (!EsDiaDisponible(fecha.DayOfWeek))
+            bool tieneHorarioEseDia = DiasDisponibles.Any(
+                d => d.Dia == fecha.DayOfWeek);
+
+            if (!tieneHorarioEseDia)
                 return false;
 
             return !_bloqueos.Any(b => b.SolapaConFecha(fecha));
-        }
-
-        public bool EsDiaDisponible(DayOfWeek dia)
-        {
-            return DiasDisponibles.EsDiaLaboral(dia);
         }
 
         public int CalcularCapacidadDisponible(int guiasDisponibles)
@@ -209,20 +174,59 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
                 CapacidadMaximaPorTurno);
         }
 
-        private void ValidarTurnosNoSeSolapen()
+        private void ValidarHorariosNoSeSolapen(
+            List<HorarioDisponible> horarios)
         {
-            for (int i = 0; i < _turnos.Count; i++)
+            var horariosPorDia = horarios.GroupBy(h => h.Dia);
+
+            foreach (var grupoDia in horariosPorDia)
             {
-                for (int j = i + 1; j < _turnos.Count; j++)
+                var lista = grupoDia.ToList();
+
+                for (int i = 0; i < lista.Count; i++)
                 {
-                    if (_turnos[i].SeSolapaCon(_turnos[j]))
+                    for (int j = i + 1; j < lista.Count; j++)
                     {
-                        throw new DomainException(
-                            $"Los turnos {_turnos[i].HoraInicio}-" +
-                            $"{_turnos[i].HoraFin} y " +
-                            $"{_turnos[j].HoraInicio}-" +
-                            $"{_turnos[j].HoraFin} se solapan.");
+                        bool seSolapan =
+                            lista[i].Desde < lista[j].Hasta &&
+                            lista[j].Desde < lista[i].Hasta;
+
+                        if (seSolapan)
+                        {
+                            throw new DomainException(
+                                $"Conflicto de horarios para el día {grupoDia.Key}: " +
+                                $"{lista[i].Desde}-{lista[i].Hasta} se solapa con " +
+                                $"{lista[j].Desde}-{lista[j].Hasta}.");
+                        }
                     }
+                }
+            }
+        }
+
+        private void ValidarHorariosDentroDelCalendario(
+            IEnumerable<HorarioDisponible> horariosAValidar,
+            HorarioAperturaMuseo calendario)
+        {
+            foreach (var horarioVisita in horariosAValidar)
+            {
+                var horarioMuseo = calendario.HorariosApertura
+                    .FirstOrDefault(h => h.Dia == horarioVisita.Dia);
+
+                if (horarioMuseo == null)
+                {
+                    throw new DomainException(
+                        $"El museo no abre los días {horarioVisita.Dia}. " +
+                        "No se pueden configurar visitas guiadas.");
+                }
+
+                if (horarioVisita.Desde < horarioMuseo.HoraInicio ||
+                    horarioVisita.Hasta > horarioMuseo.HoraFin)
+                {
+                    throw new DomainException(
+                        $"El horario configurado para el día {horarioVisita.Dia} " +
+                        $"({horarioVisita.Desde} - {horarioVisita.Hasta}) excede " +
+                        $"el horario de apertura del museo " +
+                        $"({horarioMuseo.HoraInicio} - {horarioMuseo.HoraFin}).");
                 }
             }
         }

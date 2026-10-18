@@ -1,6 +1,4 @@
-﻿using Domain.VisitasGrupales.Entities.GrupalGuiada;
-
-namespace Domain.VisitasGrupales.Services.Disponibilidad.Reglas;
+﻿namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
 
 public class ReglaMaximoVisitasSimultaneas
     : IReglaDisponibilidadVisitaGuiada

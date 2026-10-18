@@ -1,7 +1,4 @@
-﻿using Domain.VisitasGrupales.Entities.GrupalGuiada;
-using Domain.VisitasGrupales.Services.Disponibilidad;
-
-namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
+﻿namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
 
 public class MotorDisponibilidadVisitasGuiadas
 {

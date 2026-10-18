@@ -7,7 +7,8 @@ namespace Application.VisitaGrupal.UseCases.Queries.GetGuiaBy
         public GetGuiaByValidator()
         {
             RuleFor(x => x.GuiaId)
-                .GreaterThan(0);
+                .NotEmpty()
+                .WithMessage("El identificador del guía es obligatorio.");
         }
     }
 }

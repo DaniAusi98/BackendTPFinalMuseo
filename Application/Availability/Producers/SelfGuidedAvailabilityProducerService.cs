@@ -1,6 +1,7 @@
 using Application.ActividadMuseo.Repositories;
 using Application.Availability.Factories;
 using Application.Availability.Models;
+using Application.ConfiguracionSistema.Repositories;
 using Application.MuseumResources.Repositories;
 using Application.VisitaGrupal.Repositories;
 using Domain.Common.ValueObjets;
@@ -18,8 +19,8 @@ namespace Application.Availability.Producers
     public class SelfGuidedAvailabilityProducerService(
         IRepositorioVisitaGrupalAutoguiada repositorioVisitaGrupalAutoguiada,
         IRepositorioConfiguracionHorarioAutoguiada repositorioConfiguracionHorarioAutoguiada,
-        ActividadMuseo.Repositories.IRepositorioCalendarioMuseo repositorioCalendario,
-        ActividadMuseo.Repositories.IRepositorioActividadMuseo repositorioActividadMuseo,
+        IRepositorioCalendarioMuseo repositorioCalendario,
+        IRepositorioActividadMuseo repositorioActividadMuseo,
         IServicioDisponibilidadSlotsAutoguiadas servicioDisponibilidadSlotsAutoguiadas,
         IRepositorioSala repositorioSala,
         ActivityAvailabilityFactory availabilityFactory,

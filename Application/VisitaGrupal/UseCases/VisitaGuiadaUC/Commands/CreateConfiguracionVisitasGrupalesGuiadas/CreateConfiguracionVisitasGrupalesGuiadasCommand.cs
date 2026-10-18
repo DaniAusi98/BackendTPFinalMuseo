@@ -1,21 +1,24 @@
-using MediatR;
-
 using Core.Application;
 
 namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateConfiguracionVisitasGrupalesGuiadas
 {
     public class CreateConfiguracionVisitasGrupalesGuiadasCommand : IRequestCommand<string>
     {
-        public int MinGuiasParaCapacidadCompleta { get; set; }
-        public int CapacidadPorGuia { get; set; }
-        public int CapacidadMaximaPorTurno { get; set; }
-        public List<DayOfWeek> DiasDisponibles { get; set; } = new();
-        public List<TurnoCommandDto> Turnos { get; set; } = new();
+        public int CapacidadPorGuia { get; set; } = 25;
+
+        public int CapacidadMaximaPorTurno { get; set; } = 50;
+
+        public int MaximoVisitasSimultaneas { get; set; } = 1;
+
+        public List<HorarioDisponibleCommandDto> DiasDisponibles { get; set; } = new();
     }
 
-    public class TurnoCommandDto
+    public class HorarioDisponibleCommandDto
     {
-        public TimeOnly HoraInicio { get; set; }
-        public TimeOnly HoraFin { get; set; }
+        public DayOfWeek Dia { get; set; }
+
+        public TimeOnly Desde { get; set; }
+
+        public TimeOnly Hasta { get; set; }
     }
 }

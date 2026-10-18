@@ -1,6 +1,4 @@
-using System;
-using System.Threading.Tasks;
-using Application.VisitaGrupal.DataTransferObjets;
+using Application.VisitaGrupal.DataTransferObjets.Guias;
 using Application.VisitaGrupal.Repositories;
 using Core.Application;
 using Core.Application.Mapping;
@@ -13,7 +11,9 @@ namespace Application.VisitaGrupal.UseCases.Queries.GetAllGuias
         private readonly IRepositorioGuia _repositorioGuia = repositorioGuia ?? throw new ArgumentNullException(nameof(repositorioGuia));
         public async Task<QueryResult<GuiaDto>> Handle(GetAllGuiasQuery request, CancellationToken cancellationToken)
         {
-            IList<Guia> entities = await _repositorioGuia.FindAllAsync();
+            IList<Guia> entities = await _repositorioGuia.ObtenerGuiasConDisponibilidadAsync();
+
+
             return new QueryResult<GuiaDto>(entities.To<GuiaDto>(), entities.Count, request.PageIndex, request.PageSize);
         }
     }

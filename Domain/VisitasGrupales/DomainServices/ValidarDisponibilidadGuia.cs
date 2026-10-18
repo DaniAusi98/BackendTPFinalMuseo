@@ -31,5 +31,17 @@ namespace Domain.VisitasGrupales.DomainServices
 
             return !tieneAusencia;
         }
+        public static bool EstaDentroDelHorarioLaboral(Guia guia, TimeSlot horario)
+        {
+            DayOfWeek dia = horario.Inicio.DayOfWeek;
+            TimeOnly horaInicio = TimeOnly.FromDateTime(horario.Inicio);
+            TimeOnly horaFin = TimeOnly.FromDateTime(horario.Fin);
+
+            return guia.HorariosGuia.Any(h =>
+                h.DiaAsignado.Dia == dia &&
+                horaInicio >= h.HoraInicio &&
+                horaFin <= h.HoraFin
+            );
+        }
     }
 }

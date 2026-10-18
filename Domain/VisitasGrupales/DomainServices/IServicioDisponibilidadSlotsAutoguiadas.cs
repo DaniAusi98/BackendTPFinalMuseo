@@ -10,6 +10,6 @@ namespace Domain.VisitasGrupales.DomainServices
             DateTime fechaHasta,
             IReadOnlyCollection<VisitaGrupalAutoguiada> visitasAutoguiadas,
             ConfiguracionHorarioAutoguiada configuracion,
-            CalendarioMuseo calendario);
+            HorarioAperturaMuseo calendario);
     }
 }
