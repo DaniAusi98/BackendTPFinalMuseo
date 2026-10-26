@@ -48,6 +48,7 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="Repositories\Sql\PersonalMuseo\" />
+    <Folder Include="Repositories\Sql\Ubicacion\" />
     <Folder Include="Security\" />
   </ItemGroup>
 

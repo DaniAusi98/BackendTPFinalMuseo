@@ -1,4 +1,5 @@
 
+using Application.ApplicationMuseo.Constants;
 using Application.ConfiguracionSistema.Repositories;
 using Application.Exceptions;
 using Application.VisitaGrupal.Repositories;
@@ -8,22 +9,15 @@ using Domain.VisitasGrupales.ValueObjects;
 
 namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateConfiguracionVisitasGrupalesGuiadas
 {
-    internal sealed class CreateConfiguracionVisitasGrupalesGuiadasHandler
-        : IRequestCommandHandler<CreateConfiguracionVisitasGrupalesGuiadasCommand, string>
+    internal sealed class CreateConfiguracionVisitasGrupalesGuiadasHandler(
+        IRepositorioConfiguracionVisitasGrupalesGuiadas repositorio,
+        IRepositorioCalendarioMuseo repositorioCalendario)
+                : IRequestCommandHandler<CreateConfiguracionVisitasGrupalesGuiadasCommand, string>
     {
-        private readonly IRepositorioConfiguracionVisitasGrupalesGuiadas _repositorio;
-        private readonly IRepositorioCalendarioMuseo _repositorioCalendario;
-
-        public CreateConfiguracionVisitasGrupalesGuiadasHandler(
-            IRepositorioConfiguracionVisitasGrupalesGuiadas repositorio,
-            IRepositorioCalendarioMuseo repositorioCalendario)
-        {
-            _repositorio = repositorio
+        private readonly IRepositorioConfiguracionVisitasGrupalesGuiadas _repositorio = repositorio
                 ?? throw new ArgumentNullException(nameof(repositorio));
-
-            _repositorioCalendario = repositorioCalendario
+        private readonly IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario
                 ?? throw new ArgumentNullException(nameof(repositorioCalendario));
-        }
 
         public async Task<string> Handle(
             CreateConfiguracionVisitasGrupalesGuiadasCommand request,
@@ -42,7 +36,58 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateConfig
                     h.Desde,
                     h.Hasta))
                 .ToList();
+            var configuracionActiva = await _repositorio.ObtenerConfiguracionActivaAsync();
 
+
+            try
+            {
+
+                if (configuracionActiva is null)
+                {
+                    var configuracion = new ConfiguracionVisitasGrupalesGuiadas(
+                    capacidadPorGuia: request.CapacidadPorGuia,
+                    capacidadMaxima: request.CapacidadMaximaPorTurno,
+                    maximoVisitasSimultaneas: request.MaximoVisitasSimultaneas,
+                    diasDisponibles: diasDisponibles,
+                    calendario: calendario);
+
+                    await _repositorio.AddAsync(configuracion);
+
+                    return configuracion.Id;
+                }
+                else
+                {
+                    configuracionActiva.ActualizarConfiguracion(request.CapacidadPorGuia, request.CapacidadMaximaPorTurno, request.MaximoVisitasSimultaneas, diasDisponibles, calendario);
+
+                    _repositorio.Update(configuracionActiva.Id, configuracionActiva);
+
+                    return configuracionActiva.Id;
+                }
+
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new BussinessException(ApplicationConstants.PROCESS_EXECUTION_EXCEPTION, ex.InnerException);
+            }
+
+
+
+
+
+
+
+
+
+        }
+    }
+}
+
+
+/*
             var configuracion = new ConfiguracionVisitasGrupalesGuiadas(
                 capacidadPorGuia: request.CapacidadPorGuia,
                 capacidadMaxima: request.CapacidadMaximaPorTurno,
@@ -52,7 +97,4 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateConfig
 
             await _repositorio.AddAsync(configuracion);
 
-            return configuracion.Id;
-        }
-    }
-}
+            return configuracion.Id;*/

@@ -12,7 +12,6 @@ using Infrastructure.Repositories.Sql.ActividadEducativa;
 using Infrastructure.Repositories.Sql.ActividadMuseo;
 using Infrastructure.Repositories.Sql.Eventos;
 using Infrastructure.Repositories.Sql.RecursosMuseo;
-using Infrastructure.Repositories.Sql.Ubicacion;
 using Infrastructure.Repositories.Sql.VisitaGrupal;
 
 using Microsoft.EntityFrameworkCore;
@@ -107,11 +106,8 @@ namespace Infrastructure.Factories
             services.AddTransient<IRepositorioSala, RepositorioSalaMuseo>();
             services.AddTransient<IRepositorioConfiguracionSalaActividad, RepositorioConfiguracionSalaActividad>();
             services.AddTransient<IRepositorioRecurso, RepositorioRecursoMuseo>();
-            services.AddTransient<IDepartamentoRepository, DepartamentoRepository>();
-            services.AddTransient<ILocalidadRepository, LocalidadRepository>();
             services.AddTransient<IRepositorioConfiguracionHorarioAutoguiada, RepositorioConfiguracionHorarioAutoguiada>();
             services.AddTransient<IRepositorioEvento, RepositorioEvento>();
-            services.AddTransient<IProvinciaRepository, ProvinciaRepository>();
             services.AddTransient<IRepositorioProyectoAreaEducacion, RepositorioProyectoEducativo>();
             services.AddTransient<IRepositorioActividadEducativa, RepositorioActividadEducativa>();
             services.AddTransient<IRepositorioAusenciaGuia, RepositorioAusenciaGuia>();

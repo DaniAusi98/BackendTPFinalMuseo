@@ -24,9 +24,7 @@ namespace Application.ApplicationMuseo.Mappings
                .ForMember(dest => dest.Inicio, opt => opt.MapFrom(src => src.Inicio))
                .ForMember(dest => dest.Fin, opt => opt.MapFrom(src => src.Fin));
 
-            CreateMap<Provincia, ProvinciaDto>().ReverseMap();
-            CreateMap<Departamento, DepartamentoDto>().ReverseMap();
-            CreateMap<LocalidadArg, LocalidadDto>().ReverseMap();
+
 
         }
     }

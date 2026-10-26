@@ -113,9 +113,7 @@ namespace API
             app.SeedRolesPermissions();  // 🔽 Nueva línea
             app.SeedConfiguracionVisitas();
             app.SeedConfiguracionHorarioAutoguiadas();
-            app.SeedProvinciasArgentina();
-            app.SeedDepartamentosArgentina();
-            app.SeedLocalidadesArgentina();
+
             app.SeedSalasMuseo();
             app.SeedTematicasVisitas();
             app.SeedGuiasMuseo();

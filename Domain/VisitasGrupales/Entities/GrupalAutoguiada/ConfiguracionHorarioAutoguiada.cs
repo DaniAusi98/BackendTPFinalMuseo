@@ -1,4 +1,5 @@
-﻿using Core.Domain.Entities;
+﻿
+using Core.Domain.Entities;
 using Domain.Common.Entities;
 using Domain.Common.Exceptions;
 using Domain.Common.ValueObjets;
@@ -10,11 +11,14 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
     {
         private readonly List<BloqueoAutoguiada> _bloqueos;
 
-        // Propiedades de la entidad alineadas con tu modelo de listas [1, 2, 3]
         public List<HorarioDisponible> DiasDisponibles { get; private set; }
+
         public int CapacidadMaximaPorGrupo { get; private set; }
+
         public TimeSpan DuracionVisita { get; private set; }
+
         public TimeSpan IntervaloReservas { get; private set; }
+
         public int VisitasSimultaneasMaximas { get; private set; }
 
         public IReadOnlyCollection<BloqueoAutoguiada> Bloqueos
@@ -40,116 +44,143 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
             if (calendario == null)
                 throw new ArgumentNullException(nameof(calendario));
 
-            if (capacidadMaximaPorGrupo <= 0)
-                throw new DomainException("La capacidad máxima por grupo debe ser mayor a 0.");
-
-            if (duracionVisita <= TimeSpan.Zero)
-                throw new DomainException("La duración de la visita debe ser mayor a 0.");
-
-            if (intervaloReservas <= TimeSpan.Zero)
-                throw new DomainException("El intervalo entre reservas debe ser mayor a 0.");
-
-            if (intervaloReservas > duracionVisita)
-                throw new DomainException("El intervalo entre reservas no puede ser mayor que la duración de la visita.");
-
-            if (visitasSimultaneasMaximas <= 0)
-                throw new DomainException("La cantidad de visitas simultáneas debe ser mayor a 0.");
+            ValidarConfiguracion(
+                capacidadMaximaPorGrupo,
+                duracionVisita,
+                intervaloReservas,
+                visitasSimultaneasMaximas);
 
             if (diasDisponibles == null)
                 throw new ArgumentNullException(nameof(diasDisponibles));
 
             var listaDias = diasDisponibles.ToList();
 
-            // Validación cruzada inicial contra las listas del museo
+            if (!listaDias.Any())
+                throw new DomainException(
+                    "Debe existir al menos un horario disponible.");
+
             ValidarHorariosDentroDelCalendario(listaDias, calendario);
+            ValidarHorariosNoSeSolapen(listaDias);
 
             CapacidadMaximaPorGrupo = capacidadMaximaPorGrupo;
-            DiasDisponibles = listaDias;
             DuracionVisita = duracionVisita;
             IntervaloReservas = intervaloReservas;
             VisitasSimultaneasMaximas = visitasSimultaneasMaximas;
-            _bloqueos = bloqueos?.ToList() ?? new List<BloqueoAutoguiada>();
+            DiasDisponibles = listaDias;
+
+            _bloqueos = bloqueos?.ToList()
+                ?? new List<BloqueoAutoguiada>();
         }
 
-        public void ActualizarDiasDisponibles(
+        public void ActualizarConfiguracion(
+            int capacidadMaximaPorGrupo,
+            TimeSpan duracionVisita,
+            TimeSpan intervaloReservas,
+            int visitasSimultaneasMaximas,
             IEnumerable<HorarioDisponible> nuevosDias,
             HorarioAperturaMuseo calendario)
         {
-            if (nuevosDias == null) throw new ArgumentNullException(nameof(nuevosDias));
-            if (calendario == null) throw new ArgumentNullException(nameof(calendario));
+            if (calendario == null)
+                throw new ArgumentNullException(nameof(calendario));
 
-            var listaNuevosDias = nuevosDias.ToList();
-            ValidarHorariosDentroDelCalendario(listaNuevosDias, calendario);
+            if (nuevosDias == null)
+                throw new ArgumentNullException(nameof(nuevosDias));
 
-            DiasDisponibles = listaNuevosDias;
-        }
+            ValidarConfiguracion(
+                capacidadMaximaPorGrupo,
+                duracionVisita,
+                intervaloReservas,
+                visitasSimultaneasMaximas);
 
-        public void ActualizarCapacidadMaxima(int capacidadMaximaPorGrupo)
-        {
-            if (capacidadMaximaPorGrupo <= 0)
-                throw new DomainException("La capacidad máxima por grupo debe ser mayor a 0.");
+            var listaDias = nuevosDias.ToList();
+
+            if (!listaDias.Any())
+                throw new DomainException(
+                    "Debe existir al menos un horario disponible.");
+
+            ValidarHorariosDentroDelCalendario(
+                listaDias,
+                calendario);
+
+            ValidarHorariosNoSeSolapen(listaDias);
 
             CapacidadMaximaPorGrupo = capacidadMaximaPorGrupo;
-        }
-
-        public void ActualizarDuracionVisita(TimeSpan duracionVisita)
-        {
-            if (duracionVisita <= TimeSpan.Zero)
-                throw new DomainException("La duración de la visita debe ser mayor a 0.");
-
-            if (IntervaloReservas > duracionVisita)
-                throw new DomainException("La duración de la visita no puede ser menor que el intervalo entre reservas.");
-
             DuracionVisita = duracionVisita;
-        }
-
-        public void ActualizarIntervaloReservas(TimeSpan intervaloReservas)
-        {
-            if (intervaloReservas <= TimeSpan.Zero)
-                throw new DomainException("El intervalo entre reservas debe ser mayor a 0.");
-
-            if (intervaloReservas > DuracionVisita)
-                throw new DomainException("El intervalo entre reservas no puede ser mayor que la duración de la visita.");
-
             IntervaloReservas = intervaloReservas;
+            VisitasSimultaneasMaximas = visitasSimultaneasMaximas;
+
+            // Reemplaza los horarios anteriores por los nuevos.
+            DiasDisponibles = listaDias;
         }
 
-        public void ActualizarVisitasSimultaneas(int visitasSimultaneasMaximas)
+        private void ValidarConfiguracion(
+            int capacidadMaximaPorGrupo,
+            TimeSpan duracionVisita,
+            TimeSpan intervaloReservas,
+            int visitasSimultaneasMaximas)
         {
-            if (visitasSimultaneasMaximas <= 0)
-                throw new DomainException("La cantidad de visitas simultáneas debe ser mayor a 0.");
+            if (capacidadMaximaPorGrupo <= 0)
+                throw new DomainException(
+                    "La capacidad máxima por grupo debe ser mayor a 0.");
 
-            VisitasSimultaneasMaximas = visitasSimultaneasMaximas;
+            if (duracionVisita <= TimeSpan.Zero)
+                throw new DomainException(
+                    "La duración de la visita debe ser mayor a 0.");
+
+            if (intervaloReservas <= TimeSpan.Zero)
+                throw new DomainException(
+                    "El intervalo entre reservas debe ser mayor a 0.");
+
+            if (intervaloReservas > duracionVisita)
+                throw new DomainException(
+                    "El intervalo entre reservas no puede ser mayor " +
+                    "que la duración de la visita.");
+
+            if (visitasSimultaneasMaximas <= 0)
+                throw new DomainException(
+                    "La cantidad de visitas simultáneas debe ser mayor a 0.");
         }
 
         public void AgregarBloqueo(BloqueoAutoguiada bloqueo)
         {
-            if (bloqueo == null) throw new ArgumentNullException(nameof(bloqueo));
+            if (bloqueo == null)
+                throw new ArgumentNullException(nameof(bloqueo));
 
-            if (_bloqueos.Any(b => b.SolapaConPeriodo(bloqueo.FechaDesde, bloqueo.FechaHasta)))
-                throw new DomainException("El bloqueo se solapa con un bloqueo existente.");
+            if (_bloqueos.Any(b =>
+                b.SolapaConPeriodo(
+                    bloqueo.FechaDesde,
+                    bloqueo.FechaHasta)))
+            {
+                throw new DomainException(
+                    "El bloqueo se solapa con un bloqueo existente.");
+            }
 
             _bloqueos.Add(bloqueo);
         }
 
         public void RemoverBloqueo(BloqueoAutoguiada bloqueo)
         {
-            if (bloqueo == null) throw new ArgumentNullException(nameof(bloqueo));
+            if (bloqueo == null)
+                throw new ArgumentNullException(nameof(bloqueo));
+
             _bloqueos.Remove(bloqueo);
         }
 
         public bool EstaDisponibleEnFecha(DateTime fecha)
         {
-            // Verifica si el día de la semana está habilitado en las listas
-            bool esDiaHabilitado = DiasDisponibles.Any(d => d.Dia == fecha.DayOfWeek);
-            if (!esDiaHabilitado) return false;
+            bool esDiaHabilitado = DiasDisponibles.Any(
+                d => d.Dia == fecha.DayOfWeek);
+
+            if (!esDiaHabilitado)
+                return false;
 
             return !_bloqueos.Any(b => b.SolapaConFecha(fecha));
         }
 
         public int CalcularCapacidadMaximaSimultanea()
         {
-            return CapacidadMaximaPorGrupo * VisitasSimultaneasMaximas;
+            return CapacidadMaximaPorGrupo *
+                   VisitasSimultaneasMaximas;
         }
 
         public IEnumerable<TimeSlot> GenerarSlotsDisponibles(DateOnly fecha)
@@ -160,7 +191,10 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
                 return Enumerable.Empty<TimeSlot>();
 
             var slots = new List<TimeSlot>();
-            var horariosDelDia = DiasDisponibles.Where(d => d.Dia == fecha.DayOfWeek).ToList();
+
+            var horariosDelDia = DiasDisponibles
+                .Where(d => d.Dia == fecha.DayOfWeek)
+                .ToList();
 
             foreach (var horario in horariosDelDia)
             {
@@ -171,12 +205,14 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
                 {
                     var finVisita = horaActual.Add(DuracionVisita);
 
-                    // Verifica que la franja generada no choque con ningún bloqueo activo
-                    bool estaBloqueado = _bloqueos.Any(b => b.SolapaConPeriodo(horaActual, finVisita));
+                    bool estaBloqueado = _bloqueos.Any(b =>
+                        b.SolapaConPeriodo(horaActual, finVisita));
 
                     if (!estaBloqueado)
                     {
-                        slots.Add(new TimeSlot(horaActual, finVisita));
+                        slots.Add(new TimeSlot(
+                            horaActual,
+                            finVisita));
                     }
 
                     horaActual = horaActual.Add(IntervaloReservas);
@@ -186,28 +222,61 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
             return slots;
         }
 
+        private void ValidarHorariosNoSeSolapen(
+            List<HorarioDisponible> horarios)
+        {
+            var horariosPorDia = horarios.GroupBy(h => h.Dia);
+
+            foreach (var grupoDia in horariosPorDia)
+            {
+                var lista = grupoDia.ToList();
+
+                for (int i = 0; i < lista.Count; i++)
+                {
+                    for (int j = i + 1; j < lista.Count; j++)
+                    {
+                        bool seSolapan =
+                            lista[i].Desde < lista[j].Hasta &&
+                            lista[j].Desde < lista[i].Hasta;
+
+                        if (seSolapan)
+                        {
+                            throw new DomainException(
+                                $"Conflicto de horarios para el día " +
+                                $"{grupoDia.Key}: " +
+                                $"{lista[i].Desde}-{lista[i].Hasta} se solapa con " +
+                                $"{lista[j].Desde}-{lista[j].Hasta}.");
+                        }
+                    }
+                }
+            }
+        }
+
         private void ValidarHorariosDentroDelCalendario(
             IEnumerable<HorarioDisponible> horariosAValidar,
             HorarioAperturaMuseo calendario)
         {
             foreach (var horarioVisita in horariosAValidar)
             {
-                // Buscamos el turno del museo equivalente al mismo día de la semana
                 var horarioMuseo = calendario.HorariosApertura
                     .FirstOrDefault(h => h.Dia == horarioVisita.Dia);
 
                 if (horarioMuseo == null)
                 {
                     throw new DomainException(
-                        $"El museo no abre los días {horarioVisita.Dia}. No se puede configurar este horario de visitas.");
+                        $"El museo no abre los días {horarioVisita.Dia}. " +
+                        "No se pueden configurar visitas autoguiadas.");
                 }
 
-                // Validación lógica de franjas horarias encapsuladas en las listas
-                if (horarioVisita.Desde < horarioMuseo.HoraInicio || horarioVisita.Hasta > horarioMuseo.HoraFin)
+                if (horarioVisita.Desde < horarioMuseo.Desde ||
+                    horarioVisita.Hasta > horarioMuseo.Hasta)
                 {
                     throw new DomainException(
-                        $"El horario configurado para el día {horarioVisita.Dia} ({horarioVisita.Desde} - {horarioVisita.Hasta}) " +
-                        $"excede el horario de apertura del museo ({horarioMuseo.HoraInicio} - {horarioMuseo.HoraFin}).");
+                        $"El horario configurado para el día " +
+                        $"{horarioVisita.Dia} " +
+                        $"({horarioVisita.Desde} - {horarioVisita.Hasta}) " +
+                        $"excede el horario de apertura del museo " +
+                        $"({horarioMuseo.Desde} - {horarioMuseo.Hasta}).");
                 }
             }
         }

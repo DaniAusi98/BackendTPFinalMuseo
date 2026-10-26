@@ -7,7 +7,7 @@ namespace Domain.ActividadMuseo.Entities
     public class RecursoAsignado:DomainEntity<string>
     {
         public string ActividadId { get; private set; }
-        public ActividadMuseo Actividad { get; private set; }
+        public ActividadBase Actividad { get; private set; }
 
         public string RecursoId { get; private set; }
         public Recurso Recurso { get; private set; }

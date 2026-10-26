@@ -5,8 +5,8 @@
     public sealed class HorarioApertura
     {
         public DayOfWeek Dia { get; private set; }
-        public TimeOnly HoraInicio { get; private set; }
-        public TimeOnly HoraFin { get; private set; }
+        public TimeOnly Desde { get; private set; }
+        public TimeOnly Hasta { get; private set; }
 
         private HorarioApertura() { }
 
@@ -19,8 +19,8 @@
                 throw new ArgumentException(
                     "El horario de fin debe ser posterior al inicio");
             Dia = dia;
-            HoraInicio = inicio;
-            HoraFin = fin;
+            Desde = inicio;
+            Hasta = fin;
         }
 
 

@@ -1,6 +1,8 @@
 using Application.ApplicationMuseo.ApplicationServices;
 using Application.Availability.ApplicationServices;
 using Application.Common.ApplicationServices;
+using Application.ConfiguracionSistema.Repositories;
+using Application.Eventos.ApplicationServices;
 using Application.PersonalMuseo.ApplicationServices;
 using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
 using Application.VisitaGrupal.ApplicationServices;
@@ -13,6 +15,9 @@ using Infrastructure.Adapters;
 using Infrastructure.Adapters.EmailSender.ResendEmailService;
 using Infrastructure.Adapters.EmailSender.ResendEmailService.ConfirmarVisitaUrl;
 using Infrastructure.Adapters.EmailSender.ResendEmailService.User;
+using Infrastructure.Adapters.Feriados;
+using Infrastructure.Adapters.UrlGenerator;
+using Infrastructure.BackgroundServices;
 using Infrastructure.Constants;
 using Infrastructure.Data.Seeders;
 using Infrastructure.Data.Seeders.Ubicacion;
@@ -84,6 +89,9 @@ namespace Infrastructure.Registrations
             services.AddTransient<IResend, ResendClient>();
             services.AddScoped<IConfirmUserUrl, ConfirmUserUrl>();
             services.AddScoped<IConfirmUserUrlDashboard, ConfirmUserUrlDashboard>();
+            services.AddScoped<IGenerarUrlFormularioEvento, UrlFormularioEvento>();
+
+
 
 
             services.AddScoped<IURLConfirmacionVisitaGrupal, UrlConfirmacionVisitaGrupal>();
@@ -98,21 +106,16 @@ namespace Infrastructure.Registrations
             services.AddScoped<IClock, ArgentinaClock>();
             services.AddSingleton<IRecurrenceEvaluator, IcalRecurrenceEvaluator>();
 
-            services.AddHttpClient<IConsultarProvinciasArgetina, ObtenerProvinciasArgentinaGeoRef>(client =>
-            {
-                // Aquí es donde va la base del Curl. Tiene que terminar siempre con una barra diagonal '/'
-                client.BaseAddress = new Uri("https://apis.datos.gob.ar/");
-            });
-            services.AddHttpClient<IConsultaDepartamentos, ObtenerDepartamentosArg>(client =>
-            {
-                // Aquí es donde va la base del Curl. Tiene que terminar siempre con una barra diagonal '/'
-                client.BaseAddress = new Uri("https://apis.datos.gob.ar/");
-            });
-            services.AddHttpClient<IConsultarLocalidades, ObtenerLocalidadesArg>(client =>
-            {
-                // Aquí es donde va la base del Curl. Tiene que terminar siempre con una barra diagonal '/'
-                client.BaseAddress = new Uri("https://apis.datos.gob.ar/");
-            });
+
+            services.AddHostedService<SynchronizeHolidaysBackgroundService>();
+
+
+            services.AddHttpClient<IFeriadosProvider, ArgentinaDatosFeriadosAdapter>(
+                client =>
+                {
+                    client.BaseAddress = new Uri("https://api.argentinadatos.com/");
+                    client.Timeout = TimeSpan.FromSeconds(15);
+                });
 
 
             return services;
@@ -160,28 +163,7 @@ namespace Infrastructure.Registrations
                 .GetAwaiter()
                 .GetResult();
         }
-        public static void SeedProvinciasArgentina(this IApplicationBuilder app)
-        {
-            Data.Seeders.Ubicacion.ProvinciaSeeder
-                .SeedAsync(app.ApplicationServices)
-                .GetAwaiter()
-                .GetResult();
-        }
-        public static void SeedDepartamentosArgentina(this IApplicationBuilder app)
-        {
-            Data.Seeders.Ubicacion.SeederDepartamentos
-                .SeedAsync(app.ApplicationServices)
-                .GetAwaiter()
-                .GetResult();
 
-        }
-        public static void SeedLocalidadesArgentina(this IApplicationBuilder app)
-        {
-            Data.Seeders.Ubicacion.SeederLocalidades
-                .SeedAsync(app.ApplicationServices)
-                .GetAwaiter()
-                .GetResult();
-        }
         public static void SeedSalasMuseo(this IApplicationBuilder app)
         {
             SalaSeeder

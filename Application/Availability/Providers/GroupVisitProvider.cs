@@ -29,7 +29,7 @@ namespace Application.Availability.Providers
             // _exhibitRule = exhibitRule;
         }
 
-        public bool CanHandle(Domain.ActividadMuseo.Entities.ActividadMuseo candidate)
+        public bool CanHandle(Domain.ActividadMuseo.Entities.ActividadBase candidate)
         {
             // Aplicable a cualquier visita grupal
             return candidate is VisitaGrupalGuiada
@@ -37,7 +37,7 @@ namespace Application.Availability.Providers
         }
 
         public IEnumerable<IAvailabilityRule> CreateRules(
-            Domain.ActividadMuseo.Entities.ActividadMuseo candidate)
+            Domain.ActividadMuseo.Entities.ActividadBase candidate)
         {
             yield return _noConcurrentRule;
             yield return noActividadConEventoEnHall;

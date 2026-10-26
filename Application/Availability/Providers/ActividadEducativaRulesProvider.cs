@@ -10,12 +10,12 @@ namespace Application.Availability.Providers
         private readonly NoConflictoSala noConflictoSala = noConflictoSala;
         private readonly NoActividadConEventoEnHall noActividadConEventoEnHall = actSolapaEventoHall;
 
-        public bool CanHandle(Domain.ActividadMuseo.Entities.ActividadMuseo candidate)
+        public bool CanHandle(Domain.ActividadMuseo.Entities.ActividadBase candidate)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IAvailabilityRule> CreateRules(Domain.ActividadMuseo.Entities.ActividadMuseo candidate)
+        public IEnumerable<IAvailabilityRule> CreateRules(Domain.ActividadMuseo.Entities.ActividadBase candidate)
         {
             throw new NotImplementedException();
         }

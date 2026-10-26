@@ -13,7 +13,7 @@ namespace Infrastructure.Configurations.VisitasGrupales
             builder.ToTable("VisitasGrupalesGuiadas");
 
             // TPT
-            builder.HasBaseType<ActividadMuseo>();
+            builder.HasBaseType<ActividadBase>();
 
 
             builder.Property(x => x.UsuarioVisitanteId)

@@ -1,4 +1,4 @@
-﻿using Application.Eventos.UseCases.Commands;
+﻿using Application.Eventos.UseCases.Commands.CrearEvento;
 using Application.Eventos.UseCases.Queries;
 using Application.Eventos.UseCases.Queries.ReporteEventos;
 using Application.Eventos.UseCases.Queries.SalasDisponibles;
@@ -6,7 +6,6 @@ using Application.MuseumResources.UseCases.Commands.ConfigurarSalaActividades;
 
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Controllers.Evento
 {
@@ -60,7 +59,7 @@ namespace Controllers.Evento
             return Created($"api/v1/eventos/{id}", new { Id = id });
         }
 
-     
+
 
         [HttpGet("disponibilidad")]
         public async Task<IActionResult> ObtenerDisponibilidadEvento(
@@ -106,49 +105,49 @@ namespace Controllers.Evento
             var resultado = await _commandQueryBus.Send(command);
             return Ok(new { exito = resultado });
         }
-    [HttpGet("reporteEventos")]
-    public async Task<IActionResult> GetReporteVisitaGuiada(
-        [FromQuery] DateTime desde,
-        [FromQuery] DateTime hasta)
-    {
-        if (desde == default || hasta == default)
+        [HttpGet("reporteEventos")]
+        public async Task<IActionResult> GetReporteVisitaGuiada(
+            [FromQuery] DateTime desde,
+            [FromQuery] DateTime hasta)
         {
-            return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+            if (desde == default || hasta == default)
+            {
+                return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+            }
+
+            var reporte = await _commandQueryBus.Send(new EventsReportTableQuery(desde, hasta));
+
+            return Ok(reporte);
+        }
+        [HttpGet("reporteEventoPorSala")]
+        public async Task<IActionResult> GetReporteEventoPorSala(
+            [FromQuery] DateTime desde,
+            [FromQuery] DateTime hasta)
+        {
+            if (desde == default || hasta == default)
+            {
+                return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+            }
+
+            var reporte = await _commandQueryBus.Send(new ReporteEventosPorSalaQuery(desde, hasta));
+
+            return Ok(reporte);
         }
 
-        var reporte = await _commandQueryBus.Send(new EventsReportTableQuery(desde, hasta));
-      
-        return Ok(reporte);
-    }
-    [HttpGet("reporteEventoPorSala")]
-    public async Task<IActionResult> GetReporteEventoPorSala(
-        [FromQuery] DateTime desde,
-        [FromQuery] DateTime hasta)
-    {
-        if (desde == default || hasta == default)
+        [HttpGet("reporteEventoPorTipo")]
+        public async Task<IActionResult> GetReporteEventoPorTipo(
+            [FromQuery] DateTime desde,
+            [FromQuery] DateTime hasta)
         {
-            return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+            if (desde == default || hasta == default)
+            {
+                return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+            }
+
+            var reporte = await _commandQueryBus.Send(new ReporteEventosPorTipoQuery(desde, hasta));
+
+            return Ok(reporte);
         }
-
-        var reporte = await _commandQueryBus.Send(new ReporteEventosPorSalaQuery(desde, hasta));
-      
-        return Ok(reporte);
-    }
-
-    [HttpGet("reporteEventoPorTipo")]
-    public async Task<IActionResult> GetReporteEventoPorTipo(
-        [FromQuery] DateTime desde,
-        [FromQuery] DateTime hasta)
-    {
-        if (desde == default || hasta == default)
-        {
-            return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
-        }
-
-        var reporte = await _commandQueryBus.Send(new ReporteEventosPorTipoQuery(desde, hasta));
-      
-        return Ok(reporte);
-    }
         [HttpGet("salas-disponibles-eventos")]
         public async Task<IActionResult> ObtenerSalasDisponiblesParaEvento()
         {

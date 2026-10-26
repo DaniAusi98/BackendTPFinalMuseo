@@ -1,3 +1,4 @@
+
 using Core.Domain.Entities;
 using Domain.Common.Exceptions;
 using Domain.Common.ValueObjets;
@@ -9,75 +10,137 @@ namespace Domain.Common.Entities
         public List<HorarioApertura> HorariosApertura { get; private set; }
 
         private readonly List<DiaCierreMuseo> _diasCierre;
+
         public IReadOnlyCollection<DiaCierreMuseo> DiasCierre
             => _diasCierre.AsReadOnly();
+
         protected HorarioAperturaMuseo()
         {
+            HorariosApertura = new List<HorarioApertura>();
             _diasCierre = new List<DiaCierreMuseo>();
         }
 
         public HorarioAperturaMuseo(
             IEnumerable<HorarioApertura> horarios,
-            IReadOnlyCollection<DiaCierreMuseo> diasCierre)
+            IEnumerable<DiaCierreMuseo>? diasCierre = null)
         {
             Id = Guid.NewGuid().ToString();
 
-            HorariosApertura = horarios.ToList() ?? throw new ArgumentNullException(nameof(horarios));
-
-
+            HorariosApertura = horarios?.ToList()
+                ?? throw new ArgumentNullException(nameof(horarios));
 
             _diasCierre = diasCierre?.ToList()
-                ?? throw new ArgumentNullException(nameof(diasCierre));
+                ?? new List<DiaCierreMuseo>();
         }
 
-        public void ActualizarHorario(IEnumerable<HorarioApertura> nuevosHorario)
+        public void ActualizarHorario(
+            IEnumerable<HorarioApertura> nuevosHorario)
         {
-            HorariosApertura = nuevosHorario.ToList() ?? throw new ArgumentNullException(nameof(nuevosHorario));
-        }
+            ArgumentNullException.ThrowIfNull(nuevosHorario);
 
+            HorariosApertura = nuevosHorario.ToList();
+        }
 
         public void AgregarDiaCierre(DiaCierreMuseo diaCierre)
         {
-            if (diaCierre == null)
-                throw new ArgumentNullException(nameof(diaCierre));
+            ArgumentNullException.ThrowIfNull(diaCierre);
 
-            if (_diasCierre.Any(d => d.Id == diaCierre.Id && d.Id != ""))
-                throw new DomainException("El día de cierre ya existe en el calendario.");
+            ValidarDiaCierre(diaCierre);
+
+            if (_diasCierre.Any(d => d.Id == diaCierre.Id))
+            {
+                throw new DomainException(
+                    "El día de cierre ya existe en el calendario.");
+            }
 
             _diasCierre.Add(diaCierre);
         }
 
+        public void AgregarDiasCierre(
+            IEnumerable<DiaCierreMuseo> diasCierre)
+        {
+            ArgumentNullException.ThrowIfNull(diasCierre);
+
+            var nuevosCierres = diasCierre.ToList();
+
+            if (nuevosCierres.Any(d => d is null))
+            {
+                throw new DomainException(
+                    "La lista de días de cierre no puede contener elementos nulos.");
+            }
+
+            foreach (var diaCierre in nuevosCierres)
+            {
+                ValidarDiaCierre(diaCierre);
+            }
+
+            var ids = nuevosCierres.Select(d => d.Id).ToList();
+
+            if (ids.Any(string.IsNullOrWhiteSpace))
+            {
+                throw new DomainException(
+                    "Todos los días de cierre deben tener un identificador válido.");
+            }
+
+            if (ids.Distinct().Count() != ids.Count)
+            {
+                throw new DomainException(
+                    "La lista contiene días de cierre con identificadores duplicados.");
+            }
+
+            if (ids.Any(id => _diasCierre.Any(d => d.Id == id)))
+            {
+                throw new DomainException(
+                    "Uno o más días de cierre ya existen en el calendario.");
+            }
+
+            _diasCierre.AddRange(nuevosCierres);
+        }
+
+        private static void ValidarDiaCierre(DiaCierreMuseo diaCierre)
+        {
+            if (string.IsNullOrWhiteSpace(diaCierre.Id))
+            {
+                throw new DomainException(
+                    "El día de cierre debe tener un identificador válido.");
+            }
+
+            if (diaCierre.FechaHasta.HasValue &&
+                diaCierre.Fecha >= diaCierre.FechaHasta.Value)
+            {
+                throw new DomainException(
+                    "La fecha de inicio del cierre debe ser anterior a la fecha de fin.");
+            }
+        }
+
         public void RemoverDiaCierre(DiaCierreMuseo diaCierre)
         {
-            if (diaCierre == null)
-                throw new ArgumentNullException(nameof(diaCierre));
+            ArgumentNullException.ThrowIfNull(diaCierre);
 
             _diasCierre.Remove(diaCierre);
         }
+
         public bool EsDiaApertura(DateTime fecha)
         {
             DayOfWeek diaSemana = fecha.DayOfWeek;
-
             TimeOnly hora = TimeOnly.FromDateTime(fecha);
 
-            bool esDiaApertura = HorariosApertura.Any(a =>
+            return HorariosApertura.Any(a =>
                 a.Dia == diaSemana &&
-                hora >= a.HoraInicio &&
-                hora <= a.HoraFin
-            );
-
-
-
-            return esDiaApertura;
+                hora >= a.Desde &&
+                hora <= a.Hasta);
         }
 
         public bool EsDiaOperativo(DateTime fecha)
         {
-            if (!EsDiaApertura(fecha))
+            bool tieneHorarioEseDia = HorariosApertura.Any(
+                a => a.Dia == fecha.DayOfWeek);
+
+            if (!tieneHorarioEseDia)
                 return false;
 
             var inicioDia = fecha.Date;
-            var finDia = fecha.Date.AddDays(1);
+            var finDia = inicioDia.AddDays(1);
 
             return !_diasCierre.Any(d =>
                 d.SolapaConFechas(inicioDia, finDia));
@@ -86,95 +149,114 @@ namespace Domain.Common.Entities
         public bool EstaAbierto(DateTime inicio, DateTime fin)
         {
             if (inicio >= fin)
-                throw new ArgumentException("La fecha de inicio debe ser anterior a la fecha de fin.");
+            {
+                throw new ArgumentException(
+                    "La fecha de inicio debe ser anterior a la fecha de fin.");
+            }
 
-            // Validar tu regla de negocio: inicio y fin deben ser del mismo día
             if (inicio.Date != fin.Date)
-                return false; // O podrías lanzar una excepción según prefieras
-
-            // Validar si el día/rango se solapa con días de cierre especiales (vacaciones, feriados, etc.)
-            if (_diasCierre.Any(d => d.SolapaConFechas(inicio, fin)))
                 return false;
 
-            // Extraemos las variables que necesitamos para comparar con la lista
+            if (_diasCierre.Any(d =>
+                d.SolapaConFechas(inicio, fin)))
+            {
+                return false;
+            }
+
             DayOfWeek diaSemana = inicio.DayOfWeek;
             TimeOnly horaInicio = TimeOnly.FromDateTime(inicio);
             TimeOnly horaFin = TimeOnly.FromDateTime(fin);
 
-            // Buscamos si existe AL MENOS UN horario en la lista que cubra COMPLETAMENTE el intervalo
-            bool horarioAbierto = HorariosApertura.Any(objeto =>
-                objeto.Dia == diaSemana &&
-                horaInicio >= objeto.HoraInicio &&
-                horaFin <= objeto.HoraFin
-            );
-
-            return horarioAbierto;
+            return HorariosApertura.Any(a =>
+                a.Dia == diaSemana &&
+                horaInicio >= a.Desde &&
+                horaFin <= a.Hasta);
         }
-
 
         public IEnumerable<TimeSlot> ObtenerFranjasOperativas(DateOnly fecha)
         {
             DayOfWeek diaSemana = fecha.DayOfWeek;
 
-            // 1. Buscamos todas las franjas teóricas de apertura programadas para este día de la semana
             var horariosDelDia = HorariosApertura
                 .Where(a => a.Dia == diaSemana)
                 .ToList();
 
-            // Si el museo de por sí no abre este día de la semana, devolvemos vacío inmediatamente
-            if (!horariosDelDia.Any())
+            if (horariosDelDia.Count == 0)
                 return Enumerable.Empty<TimeSlot>();
 
             var franjasDisponibles = new List<TimeSlot>();
 
-            // 2. Procesamos CADA turno que tenga el museo configurado para este día
+            var inicioDia = fecha.ToDateTime(TimeOnly.MinValue);
+            var finDia = inicioDia.AddDays(1);
+
+            // Si existe un cierre que cubre el día completo,
+            // no hay franjas operativas para esa fecha.
+            if (_diasCierre.Any(d =>
+                d.SolapaConFechas(inicioDia, finDia) &&
+                d.Fecha <= inicioDia &&
+                (d.FechaHasta == null ||
+                 d.FechaHasta.Value >= finDia)))
+            {
+                return Enumerable.Empty<TimeSlot>();
+            }
+
             foreach (var horario in horariosDelDia)
             {
-                // Combinamos la fecha recibida con las horas "TimeOnly" de este horario operativo
-                var horaInicio = fecha.ToDateTime(horario.HoraInicio);
-                var horaFin = fecha.ToDateTime(horario.HoraFin);
+                var horaInicio = fecha.ToDateTime(horario.Desde);
+                var horaFin = fecha.ToDateTime(horario.Hasta);
 
-                // 3. Buscamos los cierres (DateTime Desde/Hasta) que se solapen con esta franja horaria específica
                 var cierresFranja = _diasCierre
                     .Where(d => d.SolapaConFechas(horaInicio, horaFin))
-                    .OrderBy(d => d.FechaDesde)
+                    .OrderBy(d => d.Fecha)
                     .ToList();
 
-                // Si no hay ningún cierre interfiriendo con este turno, la franja operativa se agrega completa
-                if (!cierresFranja.Any())
+                if (cierresFranja.Count == 0)
                 {
-                    franjasDisponibles.Add(new TimeSlot(horaInicio, horaFin));
+                    franjasDisponibles.Add(
+                        new TimeSlot(horaInicio, horaFin));
+
                     continue;
                 }
 
-                // 4. Algoritmo de sustracción: Recortamos los espacios bloqueados por los cierres
                 var inicioFranja = horaInicio;
 
                 foreach (var cierre in cierresFranja)
                 {
-                    // Acotamos los límites del cierre al espacio de nuestra franja por si el cierre es más largo (ej: dura varios días)
-                    var inicioCierre = cierre.FechaDesde > horaInicio ? cierre.FechaDesde : horaInicio;
-                    var finCierre = cierre.FechaHasta < horaFin ? cierre.FechaHasta : horaFin;
+                    var finCierre = cierre.FechaHasta
+                        ?? cierre.Fecha.Date.AddDays(1);
 
-                    // Si hay un espacio disponible antes de que empiece el cierre, creamos esa franja libre
-                    if (inicioFranja < inicioCierre)
+                    var inicioCierre = cierre.Fecha > horaInicio
+                        ? cierre.Fecha
+                        : horaInicio;
+
+                    // Limitar el cierre a la franja horaria actual.
+                    if (inicioCierre < horaInicio)
+                        inicioCierre = horaInicio;
+
+                    if (finCierre > horaFin)
+                        finCierre = horaFin;
+
+                    if (inicioCierre > inicioFranja)
                     {
-                        franjasDisponibles.Add(new TimeSlot(inicioFranja, inicioCierre));
+                        franjasDisponibles.Add(
+                            new TimeSlot(inicioFranja, inicioCierre));
                     }
 
-                    // El próximo inicio disponible será cuando termine este cierre
-                    inicioFranja = finCierre;
+                    if (finCierre > inicioFranja)
+                        inicioFranja = finCierre;
+
+                    if (inicioFranja >= horaFin)
+                        break;
                 }
 
-                // Si después del último cierre todavía queda tiempo disponible en el turno, agregamos el remanente
                 if (inicioFranja < horaFin)
                 {
-                    franjasDisponibles.Add(new TimeSlot(inicioFranja, horaFin));
+                    franjasDisponibles.Add(
+                        new TimeSlot(inicioFranja, horaFin));
                 }
             }
 
             return franjasDisponibles;
         }
-
     }
 }

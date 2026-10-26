@@ -1,5 +1,4 @@
 using Application.Common.ApplicationServices;
-
 using Resend;
 namespace Infrastructure.Adapters.EmailSender.ResendEmailService
 {

@@ -24,10 +24,10 @@
 	<ItemGroup>
 		<Folder Include="ActividadMuseo\UseCases\ActividadesMuseo\Notifications\" />
 		<Folder Include="Availability\Constants\" />
+		<Folder Include="Common\Mappings\" />
 		<Folder Include="Common\UseCases\Provincia\Commands\" />
 		<Folder Include="Common\UseCases\Provincia\Notifications\" />
-		<Folder Include="ConfiguracionSistema\DataTransferObjets\" />
-		<Folder Include="ConfiguracionSistema\Mappings\" />
+		<Folder Include="Common\UseCases\Provincia\Queries\" />
 		<Folder Include="PersonalMuseo\Repositories\" />
 		<Folder Include="PersonalMuseo\UseCases\Queries\" />
 		<Folder Include="Reportes\Validators\" />

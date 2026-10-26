@@ -7,7 +7,7 @@ namespace Application.Availability
     // and create rule instances that use those dependencies.
     public interface IRuleProvider
     {
-        bool CanHandle(Domain.ActividadMuseo.Entities.ActividadMuseo candidate);
-        IEnumerable<IAvailabilityRule> CreateRules(Domain.ActividadMuseo.Entities.ActividadMuseo candidate);
+        bool CanHandle(Domain.ActividadMuseo.Entities.ActividadBase candidate);
+        IEnumerable<IAvailabilityRule> CreateRules(Domain.ActividadMuseo.Entities.ActividadBase candidate);
     }
 }

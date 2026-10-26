@@ -33,9 +33,9 @@
     <Folder Include="ActividadMuseo\ValueObjets\" />
     <Folder Include="Common\DomainServices\" />
     <Folder Include="Common\Others\Helpers\" />
+    <Folder Include="Common\Others\Utils\Factories\" />
     <Folder Include="Eventos\Constants\" />
     <Folder Include="Eventos\DomainServices\" />
-    <Folder Include="Eventos\ValueObjets\" />
     <Folder Include="Eventos\Others\" />
     <Folder Include="PersonalMuseo\Entities\" />
     <Folder Include="Reportes\DomainServices\VisitaGrupalGuiada\" />

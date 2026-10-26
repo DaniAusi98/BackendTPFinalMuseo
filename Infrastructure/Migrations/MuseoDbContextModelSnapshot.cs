@@ -37,36 +37,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("ActividadSalas", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadException", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("ActividadMuseoId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("ActividadMuseoId");
-
-                    b.Property<DateTime>("FechaExcluir")
-                        .HasColumnType("datetime")
-                        .HasColumnName("FechaExcluir");
-
-                    b.Property<string>("Motivo")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("Motivo");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActividadMuseoId", "FechaExcluir")
-                        .HasDatabaseName("IX_ActividadExceptions_ActividadId_Fecha");
-
-                    b.ToTable("ActividadExceptions", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadMuseo", b =>
+            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadBase", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -99,6 +70,35 @@ namespace Infrastructure.Migrations
                     b.ToTable("ActividadesMuseo", (string)null);
 
                     b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadException", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ActividadMuseoId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("ActividadMuseoId");
+
+                    b.Property<DateTime>("FechaExcluir")
+                        .HasColumnType("datetime")
+                        .HasColumnName("FechaExcluir");
+
+                    b.Property<string>("Motivo")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("Motivo");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActividadMuseoId", "FechaExcluir")
+                        .HasDatabaseName("IX_ActividadExceptions_ActividadId_Fecha");
+
+                    b.ToTable("ActividadExceptions", (string)null);
                 });
 
             modelBuilder.Entity("Domain.ActividadMuseo.Entities.RecursoAsignado", b =>
@@ -244,10 +244,10 @@ namespace Infrastructure.Migrations
                     b.Property<string>("CalendarioMuseoId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("FechaDesde")
+                    b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("FechaHasta")
+                    b.Property<DateTime?>("FechaHasta")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Motivo")
@@ -1125,7 +1125,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.ActividadEducativa", b =>
                 {
-                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
+                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadBase");
 
                     b.Property<string>("InstitucionVinculada")
                         .IsRequired()
@@ -1167,7 +1167,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Eventos.Entities.Evento", b =>
                 {
-                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
+                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadBase");
 
                     b.Property<int?>("CantidadEstimada")
                         .HasColumnType("int");
@@ -1211,9 +1211,55 @@ namespace Infrastructure.Migrations
                     b.ToTable("Eventos", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Eventos.Entities.MuestraTemporal", b =>
+                {
+                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadBase");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<string>("FundamentacionObjetivoMuestra")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<string>("Institucion")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("NombreApellidoResponsable")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Publico")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<bool>("RequiereDifusion")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("SolicitaFlyer")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("TituloPropuesta")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("UrlImagenesMuestra")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.ToTable("MuestrasTemporales", (string)null);
+                });
+
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaGrupalAutoguiada", b =>
                 {
-                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
+                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadBase");
 
                     b.Property<string>("ApellidoSolicitante")
                         .IsRequired()
@@ -1267,7 +1313,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaGrupalGuiada", b =>
                 {
-                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadMuseo");
+                    b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadBase");
 
                     b.Property<string>("AnioGrado")
                         .HasColumnType("longtext");
@@ -1335,7 +1381,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("ActividadSala", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithMany()
                         .HasForeignKey("ActividadMuseoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1348,16 +1394,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadException", b =>
-                {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
-                        .WithMany("Exceptions")
-                        .HasForeignKey("ActividadMuseoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadMuseo", b =>
+            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadBase", b =>
                 {
                     b.OwnsOne("Domain.Common.ValueObjets.TimeSlot", "Horario", b1 =>
                         {
@@ -1391,9 +1428,18 @@ namespace Infrastructure.Migrations
                     b.Navigation("Horario");
                 });
 
+            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadException", b =>
+                {
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
+                        .WithMany("Exceptions")
+                        .HasForeignKey("ActividadMuseoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Domain.ActividadMuseo.Entities.RecursoAsignado", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", "Actividad")
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", "Actividad")
                         .WithMany("Recursos")
                         .HasForeignKey("ActividadId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1460,13 +1506,13 @@ namespace Infrastructure.Migrations
                                 .IsRequired()
                                 .HasColumnType("varchar(255)");
 
+                            b1.Property<TimeOnly>("Desde")
+                                .HasColumnType("time(6)");
+
                             b1.Property<int>("Dia")
                                 .HasColumnType("int");
 
-                            b1.Property<TimeOnly>("HoraFin")
-                                .HasColumnType("time(6)");
-
-                            b1.Property<TimeOnly>("HoraInicio")
+                            b1.Property<TimeOnly>("Hasta")
                                 .HasColumnType("time(6)");
 
                             b1.HasKey("Id");
@@ -1603,13 +1649,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaAutoguiadaReprogramada", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithMany()
                         .HasForeignKey("NuevaVisitaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithMany()
                         .HasForeignKey("VisitaReprogramadaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1825,13 +1871,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaReprogramada", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithMany()
                         .HasForeignKey("NuevaVisitaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithMany()
                         .HasForeignKey("VisitaReprogramadaId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1984,7 +2030,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.ActividadesAreaEducacion.Entities.ActividadEducativa", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithOne()
                         .HasForeignKey("Domain.ActividadesAreaEducacion.Entities.ActividadEducativa", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2001,7 +2047,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Eventos.Entities.Evento", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithOne()
                         .HasForeignKey("Domain.Eventos.Entities.Evento", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2050,9 +2096,108 @@ namespace Infrastructure.Migrations
                     b.Navigation("TelefonoSolicitante");
                 });
 
+            modelBuilder.Entity("Domain.Eventos.Entities.MuestraTemporal", b =>
+                {
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Eventos.Entities.MuestraTemporal", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailInstitucion", b1 =>
+                        {
+                            b1.Property<string>("MuestraTemporalId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("varchar(150)")
+                                .HasColumnName("EmailInstitucion");
+
+                            b1.HasKey("MuestraTemporalId");
+
+                            b1.ToTable("MuestrasTemporales");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MuestraTemporalId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailResponsable", b1 =>
+                        {
+                            b1.Property<string>("MuestraTemporalId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("varchar(150)")
+                                .HasColumnName("EmailResponsable");
+
+                            b1.HasKey("MuestraTemporalId");
+
+                            b1.ToTable("MuestrasTemporales");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MuestraTemporalId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "TelefonoResponsable", b1 =>
+                        {
+                            b1.Property<string>("MuestraTemporalId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(20)")
+                                .HasColumnName("TelefonoResponsable");
+
+                            b1.HasKey("MuestraTemporalId");
+
+                            b1.ToTable("MuestrasTemporales");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MuestraTemporalId");
+                        });
+
+                    b.OwnsOne("Domain.Eventos.ValueObjets.LogisticaMuestraTemporal", "LogisticaMuestraTemporal", b1 =>
+                        {
+                            b1.Property<string>("MuestraTemporalId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<DateTime>("FechaDesmontaje")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<DateTime>("FechaDesmontajeHasta")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<DateTime>("FechaMontaje")
+                                .HasColumnType("datetime(6)");
+
+                            b1.Property<DateTime>("FechaMontajeHasta")
+                                .HasColumnType("datetime(6)");
+
+                            b1.HasKey("MuestraTemporalId");
+
+                            b1.ToTable("MuestrasTemporales");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MuestraTemporalId");
+                        });
+
+                    b.Navigation("EmailInstitucion");
+
+                    b.Navigation("EmailResponsable");
+
+                    b.Navigation("LogisticaMuestraTemporal");
+
+                    b.Navigation("TelefonoResponsable");
+                });
+
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaGrupalAutoguiada", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithOne()
                         .HasForeignKey("Domain.VisitasGrupales.Entities.GrupalAutoguiada.VisitaGrupalAutoguiada", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2124,7 +2269,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaGrupalGuiada", b =>
                 {
-                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadMuseo", null)
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", null)
                         .WithOne()
                         .HasForeignKey("Domain.VisitasGrupales.Entities.GrupalGuiada.VisitaGrupalGuiada", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2215,7 +2360,7 @@ namespace Infrastructure.Migrations
                     b.Navigation("TelefonoSolicitante");
                 });
 
-            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadMuseo", b =>
+            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadBase", b =>
                 {
                     b.Navigation("Exceptions");
 

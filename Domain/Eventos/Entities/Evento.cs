@@ -7,7 +7,7 @@ using static Domain.Eventos.Enums.Enums;
 
 namespace Domain.Eventos.Entities
 {
-    public class Evento : ActividadMuseo.Entities.ActividadMuseo
+    public class Evento : ActividadBase
     {
         public string NombreyApellidoSolicitante { get; private set; }
         public Telefono TelefonoSolicitante { get; private set; }
@@ -51,8 +51,8 @@ namespace Domain.Eventos.Entities
              : base(
             tituloEvento,
             TipoActividad.EventoActividadExterna,
-            concurrenciaEstimada,
             horario,
+            concurrenciaEstimada,
             salas,
             recursos,
             recurrenceRule)

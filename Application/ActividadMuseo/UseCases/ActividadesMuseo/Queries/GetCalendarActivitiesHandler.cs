@@ -23,10 +23,10 @@ namespace Application.ActividadMuseo.UseCases.ActividadesMuseo.Queries
             return new QueryResult<ActividadMuseoDto>(actividadesDtos, ocurrencias.Count, request.PageIndex, request.PageSize);
         }
 
-        private List<(Domain.ActividadMuseo.Entities.ActividadMuseo Actividad, DateTime Inicio, DateTime Fin)> ObtenerOcurrencias(
-            IEnumerable<Domain.ActividadMuseo.Entities.ActividadMuseo> actividades, DateTime desde, DateTime hasta)
+        private List<(Domain.ActividadMuseo.Entities.ActividadBase Actividad, DateTime Inicio, DateTime Fin)> ObtenerOcurrencias(
+            IEnumerable<Domain.ActividadMuseo.Entities.ActividadBase> actividades, DateTime desde, DateTime hasta)
         {
-            var lista = new List<(Domain.ActividadMuseo.Entities.ActividadMuseo, DateTime, DateTime)>();
+            var lista = new List<(Domain.ActividadMuseo.Entities.ActividadBase, DateTime, DateTime)>();
 
             foreach (var actividad in actividades)
             {
@@ -57,7 +57,7 @@ namespace Application.ActividadMuseo.UseCases.ActividadesMuseo.Queries
             return lista;
         }
 
-        private ActividadMuseoDto MapearActividadConHorario((Domain.ActividadMuseo.Entities.ActividadMuseo Actividad, DateTime Inicio, DateTime Fin) ocurrencia)
+        private ActividadMuseoDto MapearActividadConHorario((Domain.ActividadMuseo.Entities.ActividadBase Actividad, DateTime Inicio, DateTime Fin) ocurrencia)
         {
             var dto = ocurrencia.Actividad.To<ActividadMuseoDto>();
             dto.Horario.Inicio = ocurrencia.Inicio;

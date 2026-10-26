@@ -34,26 +34,24 @@ namespace Domain.VisitasGrupales.DomainServices
             ArgumentNullException.ThrowIfNull(visitasGuiadas);
 
             if (fechaDesde.Date > fechaHasta.Date)
+            {
                 throw new ArgumentException(
                     "La fecha desde no puede ser posterior a la fecha hasta.");
+            }
 
             var resultado = new List<TurnoDisponible>();
 
-            for (
-                DateTime fecha = fechaDesde.Date;
-                fecha <= fechaHasta.Date;
-                fecha = fecha.AddDays(1))
+            for (DateTime fecha = fechaDesde.Date;
+                 fecha <= fechaHasta.Date;
+                 fecha = fecha.AddDays(1))
             {
-                // 1. Obtener los horarios configurados para ese día.
                 var horariosDelDia = configuracion.DiasDisponibles
                     .Where(t => t.Dia == fecha.DayOfWeek)
                     .ToList();
 
-                // Si no hay horarios configurados, no se generan turnos.
                 if (!horariosDelDia.Any())
                     continue;
 
-                // 2. Verificar si la fecha está bloqueada.
                 if (!configuracion.EstaDisponibleEnFecha(fecha))
                 {
                     foreach (var horarioDisponible in horariosDelDia)
@@ -72,14 +70,12 @@ namespace Domain.VisitasGrupales.DomainServices
                     continue;
                 }
 
-                // 3. Evaluar cada horario configurado.
                 foreach (var horarioDisponible in horariosDelDia)
                 {
                     var horario = CrearTimeSlot(
                         fecha,
                         horarioDisponible);
 
-                    // 3.1. Verificar que el museo esté abierto.
                     if (!calendario.EstaAbierto(
                         horario.Inicio,
                         horario.Fin))
@@ -93,38 +89,35 @@ namespace Domain.VisitasGrupales.DomainServices
                         continue;
                     }
 
-                    // 3.2. Buscar visitas que se solapan con el horario.
+                    // Reservas que se solapan con este turno.
                     var visitasDelTurno = visitasGuiadas
                         .Where(v => v.Horario.SeSolapaCon(horario))
                         .ToList();
 
-                    // 3.3. Contar guías capaces de cubrir el horario completo.
+                    // Guías que pueden cubrir el turno.
                     int cantidadGuias = guias.Count(g =>
                         ValidarDisponibilidadGuia
                             .GuiaPuedeCubrirTurno(g, horario));
 
-                    // 3.4. Calcular los guías ocupados por las visitas existentes.
+                    // Cada reserva consume los guías necesarios
+                    // según su propia cantidad de personas.
                     int guiasOcupados = visitasDelTurno.Sum(v =>
                         CalcularGuiasNecesarios(
                             (int)v.CantidadPersonas,
                             configuracion.CapacidadPorGuia));
 
-                    // 3.5. Obtener los guías libres.
                     int guiasLibres = Math.Max(
                         0,
                         cantidadGuias - guiasOcupados);
 
-                    // 3.6. Construir el contexto para el motor.
                     var contexto = new ContextoDisponibilidadVisitaGuiada(
                         configuracion,
                         horarioDisponible,
                         visitasDelTurno,
                         guiasLibres);
 
-                    // 3.7. Evaluar las reglas de disponibilidad.
                     var disponibilidad = _motor.Evaluar(contexto);
 
-                    // 3.8. Registrar el resultado.
                     resultado.Add(
                         new TurnoDisponible(
                             horario,

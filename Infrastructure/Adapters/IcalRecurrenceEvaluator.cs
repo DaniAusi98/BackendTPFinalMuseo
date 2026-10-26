@@ -3,7 +3,6 @@ using Domain.Common.ValueObjets;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
-
 using IcalDuration = Ical.Net.DataTypes.Duration;
 
 namespace Infrastructure.Adapters

@@ -1,29 +1,68 @@
-﻿using Core.Application;
+﻿using Application.ConfiguracionSistema.UseCases.Commands.CreateClosyngDay;
+using Application.ConfiguracionSistema.UseCases.Commands.DeleteClosyngDay;
+using Application.ConfiguracionSistema.UseCases.Commands.SetMuseumHours;
+using Application.ConfiguracionSistema.UseCases.Queries.ClosyngDay;
+using Application.ConfiguracionSistema.UseCases.Queries.GetMuseumHours;
+using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Controllers.ConfiguracionGeneral.ConfiguracionSistema
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class ConfiguracionMuseoController(ICommandQueryBus commandQueryBus) : ControllerBase
+    public class ConfiguracionHorarioMuseoController(ICommandQueryBus commandQueryBus) : ControllerBase
     {
         private readonly ICommandQueryBus _commandQueryBus = commandQueryBus;
 
-        /* [HttpPost("set-museum-hours")]
-         public async Task<IActionResult> Create(SetMuseumHoursCommand command)
-         {
-             if (command is null) return BadRequest();
+        [HttpPost("set-museum-hours")]
+        public async Task<IActionResult> Create(SetMuseumHoursCommand command)
+        {
+            if (command is null) return BadRequest();
 
-             var id = await _commandQueryBus.Send(command);
+            var id = await _commandQueryBus.Send(command);
 
-             return Created($"api/[Controller]/{id}", new { Id = id });
-         }*/
+            return Created($"api/[Controller]/{id}", new { Id = id });
+        }
+        [HttpGet("get-museum-hours")]
+        public async Task<IActionResult> GetMuseumHours()
+        {
 
 
+            var entity = await _commandQueryBus.Send(new GetMuseumHoursQuery());
+
+            return Ok(entity);
+        }
+
+        [HttpGet("get-closyng-day")]
+        public async Task<IActionResult> GetClosyngDay()
+        {
 
 
+            var entity = await _commandQueryBus.Send(new GetClosyngDayQuery());
 
+            return Ok(entity);
+        }
 
+        [HttpPost("create-cl-day")]
+        public async Task<IActionResult> CreateClDay(
+              [FromBody] CreateClosyngDayCommand command)
+        {
+            if (command is null) return BadRequest();
+
+            var id = await _commandQueryBus.Send(command);
+
+            return Created($"api/[Controller]/{id}", new { Id = id });
+        }
+
+        [HttpDelete("delete-closyng-day")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            await _commandQueryBus.Send(new DeleteClosyngDayCommand { Id = id });
+
+            return NoContent();
+        }
 
 
     }

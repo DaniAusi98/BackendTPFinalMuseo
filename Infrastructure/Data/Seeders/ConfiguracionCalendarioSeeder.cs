@@ -54,8 +54,8 @@ namespace Infrastructure.Data.Seeders
                     logger?.LogInformation(
                         "Día: {Dia}; horario: {Inicio} - {Fin}",
                         horario.Dia,
-                        horario.HoraInicio,
-                        horario.HoraFin);
+                        horario.Desde,
+                        horario.Hasta);
                 }
 
                 logger?.LogInformation(

@@ -1,6 +1,6 @@
 ﻿namespace Domain.Eventos.Enums
 {
-    public  class Enums
+    public class Enums
     {
         public enum TipoEvento
         {
@@ -16,10 +16,18 @@
             CursoCapacitacion,
             Conversatorio,
             CineDebate,
-            Otros
+            Otros,
+            MuestraTemporal
+        }
+        public enum TipoEventoActividad
+        {
+            EventoActividadExterna,
+            MuestraExposicionTemporal
         }
 
-       
+
+
+
 
         public enum TipoPublico
         {

@@ -81,7 +81,7 @@ namespace Domain.VisitasGrupales.Factories
 
             // CORREGIDO: Mapeamos dinámicamente basándonos en los días en que el museo sí opera
             var diasDisponibles = calendario.HorariosApertura
-                .Select(h => new HorarioDisponible(h.Dia, h.HoraInicio, h.HoraFin))
+                .Select(h => new HorarioDisponible(h.Dia, h.Desde, h.Hasta))
                 .ToList();
 
             return new ConfiguracionHorarioAutoguiada(

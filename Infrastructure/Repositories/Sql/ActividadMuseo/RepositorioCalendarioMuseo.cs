@@ -1,7 +1,6 @@
 using Application.ConfiguracionSistema.Repositories;
 using Core.Infraestructure.Repositories.Sql;
 using Domain.Common.Entities;
-using Infrastructure.Repositories.Sql;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Sql.ActividadMuseo
@@ -14,8 +13,10 @@ namespace Infrastructure.Repositories.Sql.ActividadMuseo
 
         public async Task<HorarioAperturaMuseo?> ObtenerCalendarioActivoAsync()
         {
-            var calendarios = await Repository.ToListAsync();
-            return calendarios.FirstOrDefault();
+            return await Repository
+                .Include(h => h.DiasCierre)
+                .Include(h => h.HorariosApertura)
+                .FirstOrDefaultAsync();
         }
     }
 }

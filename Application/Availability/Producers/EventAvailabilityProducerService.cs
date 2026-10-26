@@ -1,4 +1,3 @@
-
 using Application.ActividadMuseo.Repositories;
 using Application.Availability.Factories;
 using Application.Availability.Models;
@@ -10,45 +9,30 @@ using Domain.Eventos.Entities;
 using Microsoft.Extensions.Logging;
 using static Domain.ActividadMuseo.Enums.Enums;
 using static Domain.Eventos.Enums.Enums;
-using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadMuseo;
+using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadBase;
 
 namespace Application.Availability.Producers
 {
-    public class EventAvailabilityProducerService
+    public class EventAvailabilityProducerService(
+        IRepositorioActividadMuseo repositorioActividadMuseo,
+        IRepositorioCalendarioMuseo repositorioCalendario,
+        IRepositorioSala repositorioSalaMuseo,
+        AvailabilityEngine engine,
+        ActivityAvailabilityFactory availabilityFactory,
+        ILogger<EventAvailabilityProducerService> logger)
     {
-        private readonly IRepositorioActividadMuseo _repositorioActividadMuseo;
-        private readonly IRepositorioCalendarioMuseo _repositorioCalendario;
-        private readonly IRepositorioSala _repositorioSalaMuseo;
-        private readonly AvailabilityEngine _engine;
-        private readonly ActivityAvailabilityFactory _availabilityFactory;
-        private readonly ILogger<EventAvailabilityProducerService> _logger;
-
-        public EventAvailabilityProducerService(
-            IRepositorioActividadMuseo repositorioActividadMuseo,
-            IRepositorioCalendarioMuseo repositorioCalendario,
-            IRepositorioSala repositorioSalaMuseo,
-            AvailabilityEngine engine,
-            ActivityAvailabilityFactory availabilityFactory,
-            ILogger<EventAvailabilityProducerService> logger)
-        {
-            _repositorioActividadMuseo = repositorioActividadMuseo
+        private readonly IRepositorioActividadMuseo _repositorioActividadMuseo = repositorioActividadMuseo
                 ?? throw new ArgumentNullException(nameof(repositorioActividadMuseo));
-
-            _repositorioCalendario = repositorioCalendario
+        private readonly IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario
                 ?? throw new ArgumentNullException(nameof(repositorioCalendario));
-
-            _repositorioSalaMuseo = repositorioSalaMuseo
+        private readonly IRepositorioSala _repositorioSalaMuseo = repositorioSalaMuseo
                 ?? throw new ArgumentNullException(nameof(repositorioSalaMuseo));
-
-            _engine = engine
+        private readonly AvailabilityEngine _engine = engine
                 ?? throw new ArgumentNullException(nameof(engine));
-
-            _availabilityFactory = availabilityFactory
+        private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory
                 ?? throw new ArgumentNullException(nameof(availabilityFactory));
-
-            _logger = logger
+        private readonly ILogger<EventAvailabilityProducerService> _logger = logger
                 ?? throw new ArgumentNullException(nameof(logger));
-        }
 
         public async Task<EventoDisponibilidadDto> GetEventAvailabilityAsync(
             DateTime desde,

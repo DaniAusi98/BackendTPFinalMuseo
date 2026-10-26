@@ -10,7 +10,7 @@ namespace Application.Availability.Factories
         private readonly IRecurrenceEvaluator _recurrenceEvaluator = recurrenceEvaluator;
 
         public IReadOnlyCollection<ActivityAvailabilityEntry> Create(
-            IEnumerable<Domain.ActividadMuseo.Entities.ActividadMuseo> actividades,
+            IEnumerable<Domain.ActividadMuseo.Entities.ActividadBase> actividades,
             DateTime windowStart,
             DateTime windowEnd)
         {

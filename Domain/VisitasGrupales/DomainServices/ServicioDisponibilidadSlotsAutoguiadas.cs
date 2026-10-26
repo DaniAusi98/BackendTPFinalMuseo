@@ -18,9 +18,6 @@ namespace Domain.VisitasGrupales.DomainServices
             _logger = logger;
         }
 
-        /// <summary>
-        /// Calcula la disponibilidad de horarios de entrada para visitas autoguiadas.
-        /// </summary>
         public Task<List<SlotDisponibleVisitaAutoguiada>> CalcularDisponibilidad(
             DateTime fechaDesde,
             DateTime fechaHasta,
@@ -28,47 +25,6 @@ namespace Domain.VisitasGrupales.DomainServices
             ConfiguracionHorarioAutoguiada configuracion,
             HorarioAperturaMuseo calendario)
         {
-            _logger.LogInformation(
-                "Iniciando CalcularDisponibilidad. FechaDesde={FechaDesde}, FechaHasta={FechaHasta}",
-                fechaDesde, fechaHasta);
-
-            _logger.LogInformation(
-                "Parámetros recibidos: VisitasNulas={VisitasNulas}, ConfiguracionNula={ConfiguracionNula}, CalendarioNulo={CalendarioNulo}",
-                visitasAutoguiadas == null,
-                configuracion == null,
-                calendario == null);
-
-            if (visitasAutoguiadas != null)
-            {
-                _logger.LogInformation(
-                    "Cantidad de visitas autoguiadas recibidas: {Cantidad}",
-                    visitasAutoguiadas.Count);
-            }
-
-            if (configuracion != null)
-            {
-                _logger.LogInformation(
-                    "Configuración recibida: Id={Id}, CapacidadMaximaPorGrupo={CapacidadMaximaPorGrupo}, VisitasSimultaneasMaximas={VisitasSimultaneasMaximas}, DuracionVisita={DuracionVisita}, IntervaloReservas={IntervaloReservas}",
-                    configuracion.Id,
-                    configuracion.CapacidadMaximaPorGrupo,
-                    configuracion.VisitasSimultaneasMaximas,
-                    configuracion.DuracionVisita,
-                    configuracion.IntervaloReservas);
-
-                _logger.LogInformation(
-                    "Capacidad máxima simultánea calculada: {Capacidad}",
-                    configuracion.CalcularCapacidadMaximaSimultanea());
-            }
-
-            if (calendario != null)
-            {
-                _logger.LogInformation(
-                    "Calendario recibido: Id={Id}, CantidadHorariosApertura={CantidadHorariosApertura}, CantidadDiasCierre={CantidadDiasCierre}",
-                    calendario.Id,
-                    calendario.HorariosApertura?.Count ?? 0,
-                    calendario.DiasCierre?.Count ?? 0);
-            }
-
             if (configuracion == null)
                 throw new ArgumentNullException(nameof(configuracion));
 
@@ -78,118 +34,66 @@ namespace Domain.VisitasGrupales.DomainServices
             if (visitasAutoguiadas == null)
                 throw new ArgumentNullException(nameof(visitasAutoguiadas));
 
+            if (fechaDesde.Date > fechaHasta.Date)
+                throw new ArgumentException(
+                    "La fecha desde no puede ser posterior a la fecha hasta.");
+
+            _logger.LogInformation(
+                "Calculando disponibilidad de autoguiadas desde {Desde} hasta {Hasta}.",
+                fechaDesde.Date,
+                fechaHasta.Date);
+
             var resultado = new List<SlotDisponibleVisitaAutoguiada>();
 
-            for (DateTime fecha = fechaDesde.Date; fecha <= fechaHasta.Date; fecha = fecha.AddDays(1))
+            for (DateTime fecha = fechaDesde.Date;
+                 fecha <= fechaHasta.Date;
+                 fecha = fecha.AddDays(1))
             {
                 _logger.LogInformation(
                     "Procesando fecha {Fecha}.",
                     fecha.ToString("yyyy-MM-dd"));
 
-                // 1. Verificar si el día está configurado como día laboral para autoguiadas.
+                // 1. Verificar si la fecha está habilitada para autoguiadas.
                 bool diaDisponible = configuracion.EstaDisponibleEnFecha(fecha);
-
-                _logger.LogInformation(
-                    "Fecha {Fecha}: EstaDisponibleEnFecha={Disponible}",
-                    fecha.ToString("yyyy-MM-dd"),
-                    diaDisponible);
 
                 if (!diaDisponible)
                 {
-                    _logger.LogWarning(
-                        "Se omite la fecha {Fecha} porque no está configurada como disponible.",
+                    _logger.LogInformation(
+                        "Fecha {Fecha} no habilitada para autoguiadas.",
                         fecha.ToString("yyyy-MM-dd"));
 
                     continue;
                 }
 
-                // CORREGIDO: Convertimos a DateOnly para pasarlo como argumento requerido
-                var fechaDateOnly = DateOnly.FromDateTime(fecha);
+                // 2. Generar los turnos configurados para ese día.
+                DateOnly fechaDateOnly = DateOnly.FromDateTime(fecha);
 
-                // 2. CORREGIDO: Pasamos fechaDateOnly a GenerarSlotsDisponibles
                 var slots = configuracion
                     .GenerarSlotsDisponibles(fechaDateOnly)
                     .ToList();
 
                 _logger.LogInformation(
-                    "Fecha {Fecha}: se generaron {CantidadSlots} slots.",
+                    "Fecha {Fecha}: se generaron {Cantidad} turnos.",
                     fecha.ToString("yyyy-MM-dd"),
                     slots.Count);
 
-                foreach (var slotGenerado in slots)
-                {
-                    _logger.LogInformation(
-                        "Slot generado: Inicio={Inicio}, Fin={Fin}",
-                        slotGenerado.Inicio,
-                        slotGenerado.Fin);
-                }
-
-                // Si no existen slots, no hay nada que procesar.
-                if (slots.Count == 0)
-                {
-                    _logger.LogWarning(
-                        "No se generaron slots para la fecha {Fecha}.",
-                        fecha.ToString("yyyy-MM-dd"));
-
-                    continue;
-                }
-
-                // 3. Verificar si el museo está operativo a nivel de calendario general.
-                // Como EsDiaOperativo evalúa a las 00:00:00 (medianoche), si no coincide con
-                // tu hora de apertura, los slots individuales se validarán de forma segura en el bucle inferior.
-                bool diaOperativo = calendario.EsDiaOperativo(fecha);
-
-                _logger.LogInformation(
-                    "Fecha {Fecha}: EsDiaOperativo={DiaOperativo}",
-                    fecha.ToString("yyyy-MM-dd"),
-                    diaOperativo);
-
-                if (!diaOperativo)
-                {
-                    _logger.LogWarning(
-                        "El calendario indica que la fecha {Fecha} no está operativa. Se marcarán sus slots como NoDisponible.",
-                        fecha.ToString("yyyy-MM-dd"));
-
-                    foreach (var slot in slots)
-                    {
-                        _logger.LogInformation(
-                            "Slot {Inicio}-{Fin}: Estado=NoDisponible por día no operativo.",
-                            slot.Inicio,
-                            slot.Fin);
-
-                        resultado.Add(
-                            new SlotDisponibleVisitaAutoguiada(
-                                slot,
-                                configuracion.CalcularCapacidadMaximaSimultanea(),
-                                0,
-                                configuracion.CapacidadMaximaPorGrupo,
-                                EstadoTurno.NoDisponible));
-                    }
-
-                    continue;
-                }
-
-                // 4. Procesar cada horario posible de entrada.
+                // 3. Validar cada turno individualmente contra el calendario
+                // general del museo. No se bloquea el día completo.
                 foreach (var slot in slots)
                 {
                     _logger.LogInformation(
-                        "Validando slot: Inicio={Inicio}, Fin={Fin}",
+                        "Validando turno {Inicio}-{Fin}.",
                         slot.Inicio,
                         slot.Fin);
 
-                    // 4.1. Verificar que el horario completo esté dentro del horario operativo del museo.
-                    bool estaAbierto = calendario.EstaAbierto(slot.Inicio, slot.Fin);
-
-                    _logger.LogInformation(
-                        "Slot {Inicio}-{Fin}: EstaAbierto={EstaAbierto}",
+                    bool estaAbierto = calendario.EstaAbierto(
                         slot.Inicio,
-                        slot.Fin,
-                        estaAbierto);
+                        slot.Fin);
 
                     if (!estaAbierto)
                     {
-                        _logger.LogWarning(
-                            "Slot {Inicio}-{Fin} fuera del horario operativo. Estado=NoDisponible.",
+                        _logger.LogInformation(
+                            "Turno {Inicio}-{Fin} fuera del horario operativo.",
                             slot.Inicio,
                             slot.Fin);
 
@@ -204,36 +108,31 @@ namespace Domain.VisitasGrupales.DomainServices
                         continue;
                     }
 
-                    // 4.2. Determinar cuántas visitas existentes se encuentran simultáneamente con el nuevo grupo.
-                    int visitasSimultaneas = ContarVisitasSimultaneas(slot, visitasAutoguiadas);
+                    // 4. Contar las visitas existentes que se solapan con el turno.
+                    int visitasSimultaneas = ContarVisitasSimultaneas(
+                        slot,
+                        visitasAutoguiadas);
+
+                    // 5. Calcular cuántas visitas adicionales pueden reservarse.
+                    int cuposDisponibles = Math.Max(
+                        0,
+                        configuracion.VisitasSimultaneasMaximas
+                            - visitasSimultaneas);
+
+                    EstadoTurno estado = cuposDisponibles <= 0
+                        ? EstadoTurno.Completo
+                        : EstadoTurno.Disponible;
 
                     _logger.LogInformation(
-                        "Slot {Inicio}-{Fin}: visitas simultáneas encontradas={Cantidad}.",
+                        "Turno {Inicio}-{Fin}: simultáneas={Simultaneas}, " +
+                        "máximo={Maximo}, disponibles={Disponibles}, estado={Estado}.",
                         slot.Inicio,
                         slot.Fin,
-                        visitasSimultaneas);
-
-                    // 4.3. Calcular cuántos grupos adicionales pueden entrar.
-                    int cuposDisponibles = Math.Max(0, configuracion.VisitasSimultaneasMaximas - visitasSimultaneas);
-
-                    _logger.LogInformation(
-                        "Slot {Inicio}-{Fin}: máximo simultáneo={Maximo}, ocupados={Ocupados}, cupos disponibles={Disponibles}.",
-                        slot.Inicio,
-                        slot.Fin,
-                        configuracion.VisitasSimultaneasMaximas,
                         visitasSimultaneas,
-                        cuposDisponibles);
-
-                    // 4.4. Estado del horario.
-                    EstadoTurno estado = cuposDisponibles <= 0 ? EstadoTurno.Completo : EstadoTurno.Disponible;
-
-                    _logger.LogInformation(
-                        "Slot {Inicio}-{Fin}: estado final={Estado}.",
-                        slot.Inicio,
-                        slot.Fin,
+                        configuracion.VisitasSimultaneasMaximas,
+                        cuposDisponibles,
                         estado);
 
-                    // 4.5. Agregar resultado.
                     resultado.Add(
                         new SlotDisponibleVisitaAutoguiada(
                             slot,
@@ -245,50 +144,18 @@ namespace Domain.VisitasGrupales.DomainServices
             }
 
             _logger.LogInformation(
-                "CalcularDisponibilidad finalizado. Total de slots devueltos={CantidadResultados}.",
+                "Disponibilidad calculada. Total de turnos devueltos: {Cantidad}.",
                 resultado.Count);
 
             return Task.FromResult(resultado);
         }
 
-        /// <summary>
-        /// Cuenta las visitas existentes que se solapan con el período completo de permanencia del nuevo grupo.
-        /// </summary>
         private int ContarVisitasSimultaneas(
             TimeSlot slot,
             IReadOnlyCollection<VisitaGrupalAutoguiada> visitasAutoguiadas)
         {
-            _logger.LogInformation(
-                "Contando visitas simultáneas para el slot {Inicio}-{Fin}. Total de visitas a evaluar={CantidadVisitas}.",
-                slot.Inicio,
-                slot.Fin,
-                visitasAutoguiadas.Count);
-
-            int contador = 0;
-
-            foreach (var visita in visitasAutoguiadas)
-            {
-                bool seSolapa = visita.Horario.SeSolapaCon(slot);
-
-                _logger.LogInformation(
-                    "Visita evaluada: VisitaId={VisitaId}, Horario={Horario}, Slot={InicioSlot}-{FinSlot}, SeSolapa={SeSolapa}.",
-                    visita.Id,
-                    visita.Horario,
-                    slot.Inicio,
-                    slot.Fin,
-                    seSolapa);
-
-                if (seSolapa)
-                    contador++;
-            }
-
-            _logger.LogInformation(
-                "Resultado del conteo para el slot {Inicio}-{Fin}: {CantidadSimultaneas}.",
-                slot.Inicio,
-                slot.Fin,
-                contador);
-
-            return contador;
+            return visitasAutoguiadas.Count(
+                visita => visita.Horario.SeSolapaCon(slot));
         }
     }
 }

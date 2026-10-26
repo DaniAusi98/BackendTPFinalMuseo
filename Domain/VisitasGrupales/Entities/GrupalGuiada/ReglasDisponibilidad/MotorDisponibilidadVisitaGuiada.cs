@@ -1,35 +1,49 @@
-﻿namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
-
-public class MotorDisponibilidadVisitasGuiadas
+﻿
+namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad
 {
-    private readonly IReadOnlyCollection<IReglaDisponibilidadVisitaGuiada> _reglas;
-
-    public MotorDisponibilidadVisitasGuiadas(
-        IEnumerable<IReglaDisponibilidadVisitaGuiada> reglas)
+    public class MotorDisponibilidadVisitasGuiadas
     {
-        _reglas = reglas.ToList().AsReadOnly();
-    }
+        private readonly IReadOnlyCollection<IReglaDisponibilidadVisitaGuiada>
+            _reglas;
 
-    public ResultadoDisponibilidad Evaluar(
-        ContextoDisponibilidadVisitaGuiada contexto)
-    {
-        foreach (var regla in _reglas)
+        public MotorDisponibilidadVisitasGuiadas(
+            IEnumerable<IReglaDisponibilidadVisitaGuiada> reglas)
         {
-            var resultado = regla.Evaluar(contexto);
-
-            if (!resultado.EsValida)
-            {
-                return ResultadoDisponibilidad.NoDisponible(
-                    resultado.Motivo!);
-            }
+            _reglas = reglas.ToList().AsReadOnly();
         }
 
-        // ÚNICO LUGAR DONDE SE OBTIENEN LOS CUPOS
-        int cuposDisponibles =
-            contexto.Configuracion.CalcularCapacidadDisponible(
-                contexto.GuiasDisponibles);
+        public ResultadoDisponibilidad Evaluar(
+            ContextoDisponibilidadVisitaGuiada contexto)
+        {
+            foreach (var regla in _reglas)
+            {
+                var resultado = regla.Evaluar(contexto);
 
-        return ResultadoDisponibilidad.DisponibleCon(
-            cuposDisponibles);
+                if (!resultado.EsValida)
+                {
+                    return ResultadoDisponibilidad.NoDisponible(
+                        resultado.Motivo);
+                }
+            }
+
+            // Capacidad que pueden cubrir los guías libres.
+            int capacidadPorGuias =
+                contexto.Configuracion.CalcularCapacidadDisponible(
+                    contexto.GuiasDisponibles);
+
+            // Respetar también la capacidad restante del turno.
+            int cuposDisponibles = Math.Min(
+                capacidadPorGuias,
+                contexto.CapacidadPersonasRestante);
+
+            if (cuposDisponibles <= 0)
+            {
+                return ResultadoDisponibilidad.NoDisponible(
+                    "No quedan cupos disponibles para el turno.");
+            }
+
+            return ResultadoDisponibilidad.DisponibleCon(
+                cuposDisponibles);
+        }
     }
 }

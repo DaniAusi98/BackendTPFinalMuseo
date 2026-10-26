@@ -1,4 +1,4 @@
-﻿namespace Domain.VisitasGrupales.Entities.GrupalGuiada.ReglasDisponibilidad;
+﻿using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 public class ReglaMaximoVisitasSimultaneas
     : IReglaDisponibilidadVisitaGuiada
@@ -6,14 +6,13 @@ public class ReglaMaximoVisitasSimultaneas
     public ResultadoReglaDisponibilidad Evaluar(
         ContextoDisponibilidadVisitaGuiada contexto)
     {
-        int visitasSimultaneas =
-            contexto.VisitasExistentes.Count;
+        int reservasSimultaneas = contexto.VisitasExistentes.Count;
 
-        if (visitasSimultaneas >=
+        if (reservasSimultaneas >=
             contexto.Configuracion.MaximoVisitasSimultaneas)
         {
             return ResultadoReglaDisponibilidad.Invalida(
-                "Se alcanzó el máximo de visitas simultáneas.");
+                "Se alcanzó el máximo de reservas simultáneas para este turno.");
         }
 
         return ResultadoReglaDisponibilidad.Valida();

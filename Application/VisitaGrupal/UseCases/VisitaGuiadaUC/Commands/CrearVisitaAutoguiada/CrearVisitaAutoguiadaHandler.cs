@@ -31,16 +31,11 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaA
                     "Una o más temáticas no existen.");
             }
 
-            // Salas opcionales
-            var salas = request.SalasIds.Any()
-                ? await _repositorioSala.ObtenerSalasporIdsAsync(request.SalasIds)
-                : [];
 
-            if (salas.Count != request.SalasIds.Count)
-            {
-                throw new BussinessException(
-                    "Una o más salas no existen.");
-            }
+            var salas = tematicas
+                .SelectMany(tematica => tematica.Salas)
+                .DistinctBy(sala => sala.Id)
+                .ToList();
 
             var visita = new VisitaGrupalAutoguiada(
                 usuarioVisitanteId: request.UsuarioVisitanteId,

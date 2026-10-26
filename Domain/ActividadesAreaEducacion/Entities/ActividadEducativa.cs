@@ -5,9 +5,8 @@ using static Domain.ActividadesAreaEducacion.Enums.Enums;
 
 namespace Domain.ActividadesAreaEducacion.Entities
 {
-    public class ActividadEducativa : ActividadMuseo.Entities.ActividadMuseo
+    public class ActividadEducativa : ActividadBase
     {
-        public string Titulo { get; set; }
         public TipoActividadEducativa TipoActividadEducativa { get; set; }
         public string ProyectoVinculadaId { get; private set; }
         public ProyectosAreaEducacion ProyectoVinculada { get; private set; }
@@ -41,14 +40,13 @@ namespace Domain.ActividadesAreaEducacion.Entities
             //List<string>? nombres = null
 
             ) : base(
-                titulo,
-                ActividadMuseo.Enums.Enums.TipoActividad.ActividadEducativa,
-                cantidadAsistentes,
-                horario,
-                salas,
-                recursos,
-                rrule
-            )
+            titulo,
+            ActividadMuseo.Enums.Enums.TipoActividad.ActividadEducativa,
+            horario,
+            cantidadAsistentes,
+            salas,
+            recursos,
+            rrule)
         {
             if (string.IsNullOrWhiteSpace(titulo))
             {
@@ -66,7 +64,6 @@ namespace Domain.ActividadesAreaEducacion.Entities
             {
                 throw new ArgumentException("El público objetivo no puede estar vacío.", nameof(publicoObjetivo));
             }
-            Titulo = titulo;
             TipoActividadEducativa = tipoActividadEducativa;
             ProyectoVinculadaId = proyectoVinculadaId;
             InstitucionVinculada = institucionVinculada;
@@ -113,7 +110,6 @@ namespace Domain.ActividadesAreaEducacion.Entities
             {
                 throw new ArgumentException("El público objetivo no puede estar vacío.", nameof(publicoObjetivo));
             }
-            Titulo = titulo;
             TipoActividadEducativa = tipoActividadEducativa;
             ProyectoVinculadaId = proyectoVinculadaId;
             InstitucionVinculada = institucionVinculada;

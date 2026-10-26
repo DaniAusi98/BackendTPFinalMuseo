@@ -7,7 +7,7 @@ using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 
 namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
 {
-    public class VisitaGrupalAutoguiada : ActividadMuseo.Entities.ActividadMuseo
+    public class VisitaGrupalAutoguiada : ActividadMuseo.Entities.ActividadBase
     {
         public string UsuarioVisitanteId { get; private set; }
         public string NombreSolicitante { get; private set; }
@@ -52,8 +52,8 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
         : base(
             "Visita Autoguiada",
             TipoActividad.VisitaGrupalAutoguiada,
-            cantidadPersonas,
             horario,
+            cantidadPersonas,
             salas)
         {
 

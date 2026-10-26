@@ -9,6 +9,11 @@ using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 using Infrastructure.Configurations;
+using Infrastructure.Configurations.Actividad;
+using Infrastructure.Configurations.ActividadEducativaConfiguraciones;
+using Infrastructure.Configurations.EventoConfiguraciones;
+using Infrastructure.Configurations.HorarioMuseo;
+using Infrastructure.Configurations.Recursos;
 using Infrastructure.Configurations.Reportes;
 using Infrastructure.Configurations.UbicacionMundial;
 using Infrastructure.Configurations.VisitasGrupales;
@@ -34,7 +39,7 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<VisitaGrupalGuiada> VisitaGuiada { get; set; }
         public DbSet<VisitaGrupalAutoguiada> VisitaGrupalAutoguiada { get; set; }
         public DbSet<ReporteGeneralVisitasGrupales> ReporteGeneralVisitasGrupales { get; set; }
-        public DbSet<Domain.ActividadMuseo.Entities.ActividadMuseo> ActividadAgendaMuseo { get; set; }
+        public DbSet<Domain.ActividadMuseo.Entities.ActividadBase> ActividadAgendaMuseo { get; set; }
         public DbSet<RecursoAsignado> RecursoAsignado { get; set; }
         public DbSet<Recurso> RecursoMuseo { get; set; }
         public DbSet<Sala> SalaMuseo { get; set; }
@@ -45,9 +50,6 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<HorarioGuia> HorarioGuia { get; set; }
         public DbSet<TematicaVisita> TematicaVisita { get; set; }
         public DbSet<ConfiguracionVisitasGrupalesGuiadas> ConfiguracionVisitasGrupalesGuiadas { get; set; }
-        public DbSet<Provincia> Provincias { get; set; }
-        public DbSet<Departamento> Departamentos { get; set; }
-        public DbSet<LocalidadArg> Localidades { get; set; }
         public DbSet<HorarioAperturaMuseo> CalendarioMuseo { get; set; }
         public DbSet<ConfiguracionHorarioAutoguiada> ConfiguracionHorarioVisitaAutoguiada { get; set; }
         public DbSet<ReporteVisitasGuiadas> ReporteVisitasGuiadas { get; set; }
@@ -65,6 +67,13 @@ namespace Infrastructure.Repositories.Sql
 
         public DbSet<VisitaReprogramada> VisitaGuiadaReprogramada { get; set; }
         public DbSet<VisitaAutoguiadaReprogramada> VisitaAutoguiadaReprogramada { get; set; }
+        public DbSet<MuestraTemporal> MuestrasExposicionesTemporales { get; set; }
+
+        public DbSet<BloqueoSala> BloqueoSala { get; set; }
+
+        public DbSet<PropuestaEventoBloqueoSala> PropuestaEventoBloqueosSala { get; set; }
+
+
 
 
 
@@ -99,9 +108,6 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new DiaCierreMuseoConfiguration());
             modelBuilder.ApplyConfiguration(new BloqueoSalaConfiguration());
             modelBuilder.ApplyConfiguration(new TematicaVisitaConfiguration());
-            modelBuilder.ApplyConfiguration(new ProvinciaConfiguration());
-            modelBuilder.ApplyConfiguration(new DepartamentoConfiguration());
-            modelBuilder.ApplyConfiguration(new LocalidadConfiguration());
             modelBuilder.ApplyConfiguration(new ConfiguracionVisitasGrupalesGuiadaConfig());
             modelBuilder.ApplyConfiguration(new ConfiguracionCalendarioMuseo());
             modelBuilder.ApplyConfiguration(new ConfiguracionHorarioVisitaGrupalAutoguiadaConfiguration());
@@ -117,9 +123,15 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new ActividadEducativaConfig());
             modelBuilder.ApplyConfiguration(new ProyectosAreaEducacionConfig());
             modelBuilder.ApplyConfiguration(new EquipoTrabajoResponsableConfig());
-
             modelBuilder.ApplyConfiguration(new VisitaReprogramadaConfig());
             modelBuilder.ApplyConfiguration(new VisitaAutoguiadaReprogramadaConfig());
+            modelBuilder.ApplyConfiguration(new MuestraTemporalConfiguration());
+            modelBuilder.ApplyConfiguration(new BloqueoSalaConfiguration());
+            modelBuilder.ApplyConfiguration(new PropuestaEventoBloqueoSalaConfiguracion());
+
+
+
+
 
 
 

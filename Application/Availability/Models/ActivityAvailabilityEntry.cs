@@ -9,12 +9,12 @@ namespace Application.Availability.Models
     {
         public class ActivityAvailabilityEntry
         {
-            public Domain.ActividadMuseo.Entities.ActividadMuseo Actividad { get; }
+            public Domain.ActividadMuseo.Entities.ActividadBase Actividad { get; }
 
             public IReadOnlyCollection<TimeSlot> TimeSlots { get; }
 
             public ActivityAvailabilityEntry(
-                Domain.ActividadMuseo.Entities.ActividadMuseo actividad,
+                Domain.ActividadMuseo.Entities.ActividadBase actividad,
                 IReadOnlyCollection<TimeSlot> timeSlots)
             {
                 Actividad = actividad;

@@ -10,7 +10,7 @@ using Domain.Common.ValueObjets;
 using Domain.Eventos.Entities;
 using static Domain.ActividadMuseo.Enums.Enums;
 using static Domain.Eventos.Enums.Enums;
-using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadMuseo;
+using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadBase;
 
 namespace Application.Eventos.ApplicationServices
 {

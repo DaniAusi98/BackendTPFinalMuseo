@@ -6,9 +6,9 @@ using static Domain.ActividadMuseo.Enums.Enums;
 namespace Infrastructure.Repositories.Sql.ActividadMuseo
 {
     internal sealed class RepositorioActividadMuseo(MuseoDbContext context)
-        : BaseRepository<Domain.ActividadMuseo.Entities.ActividadMuseo>(context), IRepositorioActividadMuseo
+        : BaseRepository<Domain.ActividadMuseo.Entities.ActividadBase>(context), IRepositorioActividadMuseo
     {
-        public async Task<List<Domain.ActividadMuseo.Entities.ActividadMuseo>> FindAllAsync(
+        public async Task<List<Domain.ActividadMuseo.Entities.ActividadBase>> FindAllAsync(
             DateTime fechaDesde,
             DateTime fechaHasta)
         {
@@ -35,7 +35,7 @@ namespace Infrastructure.Repositories.Sql.ActividadMuseo
             return actividadesEnRango;
         }
 
-        public async Task<List<Domain.ActividadMuseo.Entities.ActividadMuseo>> FindAllCalendarAsync(
+        public async Task<List<Domain.ActividadMuseo.Entities.ActividadBase>> FindAllCalendarAsync(
             DateTime fechaDesde,
             DateTime fechaHasta)
         {

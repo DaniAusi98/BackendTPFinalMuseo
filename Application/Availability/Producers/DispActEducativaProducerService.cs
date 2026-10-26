@@ -10,7 +10,7 @@ using Domain.Common.ValueObjets;
 using Microsoft.Extensions.Logging;
 using static Domain.ActividadesAreaEducacion.Enums.Enums;
 using static Domain.ActividadMuseo.Enums.Enums;
-using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadMuseo;
+using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadBase;
 
 namespace Application.Availability.Producers
 {

@@ -20,11 +20,11 @@ namespace Domain.Common.Enums
         {
             MYSQL,
             MARIADB,
-            SQLSERVER, 
+            SQLSERVER,
             MONGODB
         }
 
-        
+
         public enum NivelBloqueo
         {
             BloqueoParcialMuseo,
@@ -53,8 +53,7 @@ namespace Domain.Common.Enums
         {
             Mantenimiento,
             EventoInstitucional,
-            MontajeMuestraTemporal,
-            DesmontajeMuestraTemporal,
+            MontajeDesmontajeMuestra,
             Otro
         }
 

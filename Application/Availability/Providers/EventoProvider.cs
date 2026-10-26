@@ -10,13 +10,13 @@ namespace Application.Availability.Providers
         private readonly NoEventoHallConActividad noEventoHallConActividad = noEventoHallConActividad;
         private readonly NoConflictoSala noConflictoSala = noConflictoSala;
 
-        public bool CanHandle(Domain.ActividadMuseo.Entities.ActividadMuseo candidate)
+        public bool CanHandle(Domain.ActividadMuseo.Entities.ActividadBase candidate)
         {
             return candidate is Evento;
                 
         }
 
-        public IEnumerable<IAvailabilityRule> CreateRules(Domain.ActividadMuseo.Entities.ActividadMuseo candidate)
+        public IEnumerable<IAvailabilityRule> CreateRules(Domain.ActividadMuseo.Entities.ActividadBase candidate)
         {
             yield return noEventoHallConActividad;
             yield return noConflictoSala;

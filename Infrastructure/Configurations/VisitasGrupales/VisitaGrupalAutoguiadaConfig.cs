@@ -13,7 +13,7 @@ namespace Infrastructure.Configurations.VisitasGrupales
         {
             builder.ToTable("VisitasGrupalesAutoguiadas");
 
-            builder.HasBaseType<ActividadMuseo>();
+            builder.HasBaseType<ActividadBase>();
 
             builder.Property(x => x.UsuarioVisitanteId)
                 .IsRequired();

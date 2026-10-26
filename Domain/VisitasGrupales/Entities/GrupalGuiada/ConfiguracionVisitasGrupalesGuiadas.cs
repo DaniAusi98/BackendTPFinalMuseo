@@ -77,36 +77,19 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
                 ?? new List<BloqueoVisitasGuiadas>();
         }
 
-        public void ActualizarDiasDisponibles(
-            IEnumerable<HorarioDisponible> nuevosDias,
-            HorarioAperturaMuseo calendario)
+        public void ActualizarConfiguracion(
+             int capacidadPorGuia,
+             int capacidadMaxima,
+             int maximoVisitasSimultaneas,
+             IEnumerable<HorarioDisponible> nuevosDias,
+             HorarioAperturaMuseo calendario)
         {
-            if (nuevosDias == null)
-                throw new ArgumentNullException(nameof(nuevosDias));
-
             if (calendario == null)
                 throw new ArgumentNullException(nameof(calendario));
 
-            var listaNuevosDias = nuevosDias.ToList();
+            if (nuevosDias == null)
+                throw new ArgumentNullException(nameof(nuevosDias));
 
-            if (!listaNuevosDias.Any())
-                throw new DomainException(
-                    "Debe existir al menos un horario disponible.");
-
-            ValidarHorariosDentroDelCalendario(
-                listaNuevosDias,
-                calendario);
-
-            ValidarHorariosNoSeSolapen(listaNuevosDias);
-
-            DiasDisponibles = listaNuevosDias;
-        }
-
-        public void ActualizarCapacidad(
-            int capacidadPorGuia,
-            int capacidadMaxima,
-            int maximoVisitasSimultaneas)
-        {
             if (capacidadPorGuia <= 0)
                 throw new DomainException(
                     "La capacidad por guía debe ser mayor a 0.");
@@ -123,9 +106,24 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
                 throw new DomainException(
                     "El máximo de visitas simultáneas debe ser mayor a 0.");
 
+            var listaDias = nuevosDias.ToList();
+
+            if (!listaDias.Any())
+                throw new DomainException(
+                    "Debe existir al menos un horario disponible.");
+
+            ValidarHorariosDentroDelCalendario(
+                listaDias,
+                calendario);
+
+            ValidarHorariosNoSeSolapen(listaDias);
+
             CapacidadPorGuia = capacidadPorGuia;
             CapacidadMaximaPorTurno = capacidadMaxima;
             MaximoVisitasSimultaneas = maximoVisitasSimultaneas;
+
+            // Reemplaza los horarios anteriores por los nuevos.
+            DiasDisponibles = listaDias;
         }
 
         public void AgregarBloqueo(BloqueoVisitasGuiadas bloqueo)
@@ -219,14 +217,14 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
                         "No se pueden configurar visitas guiadas.");
                 }
 
-                if (horarioVisita.Desde < horarioMuseo.HoraInicio ||
-                    horarioVisita.Hasta > horarioMuseo.HoraFin)
+                if (horarioVisita.Desde < horarioMuseo.Desde ||
+                    horarioVisita.Hasta > horarioMuseo.Hasta)
                 {
                     throw new DomainException(
                         $"El horario configurado para el día {horarioVisita.Dia} " +
                         $"({horarioVisita.Desde} - {horarioVisita.Hasta}) excede " +
                         $"el horario de apertura del museo " +
-                        $"({horarioMuseo.HoraInicio} - {horarioMuseo.HoraFin}).");
+                        $"({horarioMuseo.Desde} - {horarioMuseo.Hasta}).");
                 }
             }
         }

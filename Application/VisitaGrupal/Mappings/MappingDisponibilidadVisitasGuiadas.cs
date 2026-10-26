@@ -133,6 +133,15 @@ namespace Application.VisitaGrupal.Mappings
 
             CreateMap<VisitaReprogramada, VisitaGuiadaReprogramadaDto>();
 
+            CreateMap<HorarioDisponible, HorarioDisponibleDto>();
+
+            CreateMap<BloqueoAutoguiada, BloqueoVisitaAutoguiadaDto>();
+
+            CreateMap<ConfiguracionHorarioAutoguiada, ConfiguracionVisitasAutoguiadasDto>();
+
+
+
+
 
 
 

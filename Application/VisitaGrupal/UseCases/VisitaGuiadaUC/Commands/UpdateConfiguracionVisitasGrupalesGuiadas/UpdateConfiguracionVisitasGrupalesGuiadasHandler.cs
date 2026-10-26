@@ -46,14 +46,12 @@ namespace Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.UpdateConfig
                 .ToList();
 
             // Validar y actualizar los horarios contra el calendario.
-            configuracion.ActualizarDiasDisponibles(
+            configuracion.ActualizarConfiguracion(request.CapacidadPorGuia,
+                request.CapacidadMaximaPorTurno,
+                request.MaximoVisitasSimultaneas,
                 diasDisponibles,
                 calendario);
 
-            configuracion.ActualizarCapacidad(
-                request.CapacidadPorGuia,
-                request.CapacidadMaximaPorTurno,
-                request.MaximoVisitasSimultaneas);
 
             _repositorio.Update(configuracion.Id, configuracion);
         }

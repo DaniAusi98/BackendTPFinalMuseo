@@ -2,7 +2,7 @@ namespace Application.Availability
 {
     public interface IRuleFactory
     {
-        IEnumerable<IAvailabilityRule> GetRulesFor(Domain.ActividadMuseo.Entities.ActividadMuseo candidate);
+        IEnumerable<IAvailabilityRule> GetRulesFor(Domain.ActividadMuseo.Entities.ActividadBase candidate);
     }
 
     public class CompositeRuleFactory : IRuleFactory
@@ -14,7 +14,7 @@ namespace Application.Availability
             _providers = providers;
         }
 
-        public IEnumerable<IAvailabilityRule> GetRulesFor(Domain.ActividadMuseo.Entities.ActividadMuseo candidate)
+        public IEnumerable<IAvailabilityRule> GetRulesFor(Domain.ActividadMuseo.Entities.ActividadBase candidate)
         {
             return _providers
                 .Where(p => p.CanHandle(candidate))
