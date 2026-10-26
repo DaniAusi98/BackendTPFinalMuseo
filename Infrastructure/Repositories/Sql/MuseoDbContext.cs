@@ -68,18 +68,9 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<VisitaReprogramada> VisitaGuiadaReprogramada { get; set; }
         public DbSet<VisitaAutoguiadaReprogramada> VisitaAutoguiadaReprogramada { get; set; }
         public DbSet<MuestraTemporal> MuestrasExposicionesTemporales { get; set; }
-
         public DbSet<BloqueoSala> BloqueoSala { get; set; }
-
-        public DbSet<PropuestaEventoBloqueoSala> PropuestaEventoBloqueosSala { get; set; }
-
-
-
-
-
-
-
-
+        public DbSet<PropuestaEvento> PropuestasEvento { get; set; }
+        public DbSet<PropuestasRecursos> PropuestasRecursosReservados { get; set; }
 
 
         protected MuseoDbContext()
@@ -127,7 +118,9 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new VisitaAutoguiadaReprogramadaConfig());
             modelBuilder.ApplyConfiguration(new MuestraTemporalConfiguration());
             modelBuilder.ApplyConfiguration(new BloqueoSalaConfiguration());
-            modelBuilder.ApplyConfiguration(new PropuestaEventoBloqueoSalaConfiguracion());
+            modelBuilder.ApplyConfiguration(new PropuestaEventoConfiguracion());
+            modelBuilder.ApplyConfiguration(new PropuestaRecursoConfiguration());
+
 
 
 

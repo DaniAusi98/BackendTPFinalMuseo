@@ -212,28 +212,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SalaId");
 
-                    b.ToTable("BloqueosSala", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Common.Entities.Departamento", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("ProvinciaId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProvinciaId", "Nombre");
-
-                    b.ToTable("Departamentos", (string)null);
+                    b.ToTable("BloqueoSala", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Common.Entities.DiaCierreMuseo", b =>
@@ -289,50 +268,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CalendariosMuseo", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Common.Entities.LocalidadArg", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("DepartamentoId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("ProvinciaId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartamentoId");
-
-                    b.HasIndex("ProvinciaId", "DepartamentoId", "Nombre");
-
-                    b.ToTable("Localidades", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Common.Entities.Provincia", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nombre");
-
-                    b.ToTable("Provincias", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", b =>
@@ -428,6 +363,80 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Paises", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaEvento", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("FechaEnvioFormulario")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("FechaHasta")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("FormularioEnviado")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("FormularioEventoCompletado")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("NombreApellidoResponsable")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("RRule")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("RRule");
+
+                    b.Property<string>("TipoEvento")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("TituloPropuesta")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PropuestaEvento", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestasRecursos", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("CantidadAsignada")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fin")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("Inicio")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PropuestaId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("RecursoId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecursoId");
+
+                    b.HasIndex("PropuestaId", "RecursoId")
+                        .IsUnique();
+
+                    b.ToTable("PropuestaRecursosReservados", (string)null);
                 });
 
             modelBuilder.Entity("Domain.RecursoMuseo.Entities.ConfiguracionSalaActividad", b =>
@@ -1078,6 +1087,21 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("PropuestaSala", b =>
+                {
+                    b.Property<string>("PropuestaId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("SalaId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("PropuestaId", "SalaId");
+
+                    b.HasIndex("SalaId");
+
+                    b.ToTable("PropuestaSalas", (string)null);
+                });
+
             modelBuilder.Entity("TematicaSala", b =>
                 {
                     b.Property<string>("TematicaVisitaId")
@@ -1475,15 +1499,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Sala");
                 });
 
-            modelBuilder.Entity("Domain.Common.Entities.Departamento", b =>
-                {
-                    b.HasOne("Domain.Common.Entities.Provincia", null)
-                        .WithMany()
-                        .HasForeignKey("ProvinciaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Domain.Common.Entities.DiaCierreMuseo", b =>
                 {
                     b.HasOne("Domain.Common.Entities.HorarioAperturaMuseo", null)
@@ -1528,21 +1543,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("HorariosApertura");
                 });
 
-            modelBuilder.Entity("Domain.Common.Entities.LocalidadArg", b =>
-                {
-                    b.HasOne("Domain.Common.Entities.Departamento", null)
-                        .WithMany()
-                        .HasForeignKey("DepartamentoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Common.Entities.Provincia", null)
-                        .WithMany()
-                        .HasForeignKey("ProvinciaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", b =>
                 {
                     b.HasOne("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", "Padre")
@@ -1569,6 +1569,68 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("DivisionAdministrativa");
+                });
+
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaEvento", b =>
+                {
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailResponsable", b1 =>
+                        {
+                            b1.Property<string>("PropuestaEventoId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("varchar(150)")
+                                .HasColumnName("EmailResponsable");
+
+                            b1.HasKey("PropuestaEventoId");
+
+                            b1.ToTable("PropuestaEvento");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropuestaEventoId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "TelefonoResponsable", b1 =>
+                        {
+                            b1.Property<string>("PropuestaEventoId")
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<string>("Valor")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("varchar(20)")
+                                .HasColumnName("TelefonoResponsable");
+
+                            b1.HasKey("PropuestaEventoId");
+
+                            b1.ToTable("PropuestaEvento");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PropuestaEventoId");
+                        });
+
+                    b.Navigation("EmailResponsable");
+
+                    b.Navigation("TelefonoResponsable");
+                });
+
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestasRecursos", b =>
+                {
+                    b.HasOne("Domain.Eventos.Entities.PropuestaEvento", "Propuesta")
+                        .WithMany("Recursos")
+                        .HasForeignKey("PropuestaId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Domain.RecursoMuseo.Entities.Recurso", "Recurso")
+                        .WithMany()
+                        .HasForeignKey("RecursoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Propuesta");
+
+                    b.Navigation("Recurso");
                 });
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.ConfiguracionHorarioAutoguiada", b =>
@@ -1983,6 +2045,21 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PropuestaSala", b =>
+                {
+                    b.HasOne("Domain.Eventos.Entities.PropuestaEvento", null)
+                        .WithMany()
+                        .HasForeignKey("PropuestaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.RecursoMuseo.Entities.Sala", null)
+                        .WithMany()
+                        .HasForeignKey("SalaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("TematicaSala", b =>
                 {
                     b.HasOne("Domain.RecursoMuseo.Entities.Sala", null)
@@ -2387,6 +2464,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Common.Entities.Ubicacion.Pais", b =>
                 {
                     b.Navigation("Divisiones");
+                });
+
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaEvento", b =>
+                {
+                    b.Navigation("Recursos");
                 });
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.Guia.Guia", b =>

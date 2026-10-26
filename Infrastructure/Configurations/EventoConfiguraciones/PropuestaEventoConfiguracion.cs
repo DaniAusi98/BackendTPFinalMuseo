@@ -1,4 +1,5 @@
-﻿using Domain.Eventos.Entities;
+﻿using Domain.Common.ValueObjets;
+using Domain.Eventos.Entities;
 using Domain.RecursoMuseo.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -24,13 +25,15 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
                     .IsRequired();
             });
 
-            builder.OwnsOne(x => x.EmailResponsable, email =>
-            {
-                email.Property(e => e.Valor)
-                    .HasColumnName("EmailResponsable")
-                    .HasMaxLength(150)
-                    .IsRequired();
-            });
+            builder.OwnsOne<Email>(
+                x => x.EmailResponsable,
+                email =>
+                {
+                    email.Property(e => e.Valor)
+                        .HasColumnName("EmailResponsable")
+                        .HasMaxLength(150)
+                        .IsRequired();
+                });
 
             builder.Property(x => x.TituloPropuesta)
                 .IsRequired();
@@ -67,21 +70,23 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
                         j.HasKey("PropuestaId", "SalaId");
                     });
 
+
             builder.Property(x => x.RRule)
                 .HasColumnName("RRule")
                 .HasMaxLength(255)
                 .IsRequired(false);
 
-            builder.HasMany(x => x.BloqueosSala)
-                .WithOne()
-                .HasForeignKey(x => x.PropuestaEventoId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(x => x.FormularioEnviado)
                 .IsRequired();
 
             builder.Property(x => x.FechaEnvioFormulario)
                 .IsRequired(false);
+
+            builder.HasMany(x => x.Recursos)
+                .WithOne(x => x.Propuesta)
+                .HasForeignKey(x => x.PropuestaId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

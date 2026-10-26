@@ -1,25 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.ActividadMuseo.Entities;
 using Domain.Common.ValueObjets;
 
 namespace Application.Availability.Models
+{
+    public class ActivityAvailabilityEntry(
+        ActividadBase actividad,
+        IReadOnlyCollection<TimeSlot> timeSlots)
     {
-        public class ActivityAvailabilityEntry
-        {
-            public Domain.ActividadMuseo.Entities.ActividadBase Actividad { get; }
+        public ActividadBase Actividad { get; } = actividad;
 
-            public IReadOnlyCollection<TimeSlot> TimeSlots { get; }
-
-            public ActivityAvailabilityEntry(
-                Domain.ActividadMuseo.Entities.ActividadBase actividad,
-                IReadOnlyCollection<TimeSlot> timeSlots)
-            {
-                Actividad = actividad;
-                TimeSlots = timeSlots;
-            }
-        }
+        public IReadOnlyCollection<TimeSlot> TimeSlots { get; } = timeSlots;
     }
+}
 

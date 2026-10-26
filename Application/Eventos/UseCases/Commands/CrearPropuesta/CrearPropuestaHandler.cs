@@ -2,6 +2,7 @@
 using Application.Common.Repositories;
 using Application.Eventos.ApplicationServices;
 using Application.Eventos.Repositories;
+using Application.Exceptions;
 using Application.MuseumResources.Repositories;
 using Core.Application;
 using Domain.Common.Entities;
@@ -17,6 +18,7 @@ namespace Application.Eventos.UseCases.Commands.CrearPropuesta
         IRepositorioPropuestaBloqueosSala repositorioPropuestaEventoBloqueoSala,
         IRepositorioSala repositorioSala,
         IRepositorioBloqueoSala repositorioBloqueoSala,
+        IRepositorioRecurso repositorioRecurso,
         IRecurrenceEvaluator recurrenceEvaluator,
         IGenerarUrlFormularioEvento generarUrlFormularioEvento,
         IEnvioFormularioEventoEmailService envioFormularioEventoEmailService)
@@ -28,6 +30,7 @@ namespace Application.Eventos.UseCases.Commands.CrearPropuesta
 
         private readonly IGenerarUrlFormularioEvento _generarUrlFormularioEvento = generarUrlFormularioEvento;
         private readonly IEnvioFormularioEventoEmailService _envioFormularioEventoEmailService = envioFormularioEventoEmailService;
+        private readonly IRepositorioRecurso _repositorioRecurso = repositorioRecurso ?? throw new ArgumentNullException(nameof(repositorioRecurso));
 
         private readonly IRepositorioPropuestaBloqueosSala
             _repositorioPropuestaEventoBloqueoSala =
@@ -49,11 +52,26 @@ namespace Application.Eventos.UseCases.Commands.CrearPropuesta
             // 1. Obtener las salas seleccionadas.
             List<Sala> salas =
                 await _repositorioSala.ObtenerSalasporIdsAsync(
-                    request.salasIds);
+                    request.SalasIds);
 
             if (salas.Count == 0)
                 throw new InvalidOperationException(
                     "La propuesta debe tener al menos una sala.");
+
+            var recursoIds = request.Recursos.Select(r => r.RecursoId).Distinct().ToList();
+            var recursosDb = await _repositorioRecurso.FindAllAsync();
+            var recursosSolicitados = recursosDb.Where(r => recursoIds.Contains(r.Id)).ToList();
+
+            if (recursosSolicitados.Count != recursoIds.Count)
+                throw new BussinessException("Uno o más recursos no existen.");
+
+
+            if (recursosSolicitados.Count != recursoIds.Count)
+                throw new BussinessException("Uno o más recursos no existen.");
+
+            var recursosAsignados = request.Recursos
+                .Select(r => new PropuestasRecursos(r.RecursoId, r.CantidadAsignada, request.Fecha, request.FechaHasta))
+                .ToList();
 
             // 2. Calcular la duración de una ocurrencia.
             int duracionMinutos = (int)(
@@ -122,7 +140,7 @@ namespace Application.Eventos.UseCases.Commands.CrearPropuesta
                 request.Fecha,
                 request.FechaHasta,
                 salas,
-                [],
+                recursosAsignados,
                 request.RRule);
 
             // 7. Guardar la propuesta.

@@ -46,18 +46,29 @@ namespace Application.Eventos.UseCases.Commands.CrearPropuesta
                 .WithMessage("La fecha de fin debe ser posterior a la fecha de inicio.");
 
             // Salas
-            RuleFor(x => x.salasIds)
+            RuleFor(x => x.SalasIds)
                 .NotNull()
                 .NotEmpty()
                 .WithMessage("Debe seleccionar al menos una sala.");
 
-            RuleForEach(x => x.salasIds)
+            RuleForEach(x => x.SalasIds)
                 .NotEmpty()
                 .WithMessage("Los identificadores de las salas no pueden estar vacíos.");
 
-            RuleFor(x => x.salasIds)
+            RuleFor(x => x.SalasIds)
                 .Must(ids => ids == null || ids.Distinct().Count() == ids.Count)
                 .WithMessage("No puede seleccionar la misma sala más de una vez.");
+
+            RuleForEach(x => x.Recursos)
+                .ChildRules(r =>
+                {
+                    r.RuleFor(x => x.RecursoId).NotEmpty();
+                    r.RuleFor(x => x.CantidadAsignada).GreaterThan(0);
+                });
+
+            RuleFor(x => x.Recursos)
+                .Must(rs => rs.Select(r => r.RecursoId).Distinct().Count() == rs.Count)
+                .WithMessage("No debe repetir recursos.");
 
             // Recurrencia
             RuleFor(x => x.RRule)

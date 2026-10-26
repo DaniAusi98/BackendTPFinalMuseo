@@ -1,5 +1,6 @@
 ﻿using Application.Availability.ApplicationServices;
 using Application.Availability.Models;
+using Domain.ActividadMuseo.Entities;
 using Domain.Common.ValueObjets;
 
 
@@ -10,7 +11,7 @@ namespace Application.Availability.Factories
         private readonly IRecurrenceEvaluator _recurrenceEvaluator = recurrenceEvaluator;
 
         public IReadOnlyCollection<ActivityAvailabilityEntry> Create(
-            IEnumerable<Domain.ActividadMuseo.Entities.ActividadBase> actividades,
+            IEnumerable<ActividadBase> actividades,
             DateTime windowStart,
             DateTime windowEnd)
         {
@@ -23,7 +24,7 @@ namespace Application.Availability.Factories
                 if (!actividad.EsRecurrencia)
                 {
                     // Si no es recurrente, el único slot válido es su horario base
-                    timeSlots = new List<TimeSlot> { actividad.Horario };
+                    timeSlots = [actividad.Horario];
                 }
                 else
                 {

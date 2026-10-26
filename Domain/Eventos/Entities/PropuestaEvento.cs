@@ -17,8 +17,8 @@ namespace Domain.Eventos.Entities
         public DateTime FechaHasta { get; private set; }
         public bool FormularioEventoCompletado { get; private set; }
         public List<Sala> Salas { get; private set; } = [];
+        public List<PropuestasRecursos> Recursos { get; private set; } = [];
         public string? RRule { get; private set; }
-        public List<PropuestaEventoBloqueoSala> BloqueosSala { get; private set; } = [];
         public bool FormularioEnviado { get; private set; } = false;
         public DateTime? FechaEnvioFormulario { get; private set; }
 
@@ -35,7 +35,7 @@ namespace Domain.Eventos.Entities
             DateTime fecha,
             DateTime fechaHasta,
             IEnumerable<Sala> salas,
-            IEnumerable<PropuestaEventoBloqueoSala> bloqueosSala,
+            IEnumerable<PropuestasRecursos> recursos = null,
             string? rrule = null)
         {
             if (string.IsNullOrEmpty(nombreApellidoResponsable))
@@ -65,15 +65,14 @@ namespace Domain.Eventos.Entities
             if (salasLista.Any(s => s is null))
                 throw new DomainException("No puede haber salas nulas.");
 
-            if (bloqueosSala is null)
-                throw new DomainException(
-                    "La colección de bloqueos no puede ser nula.");
 
-            var bloqueosLista = bloqueosSala.ToList();
-
-            if (bloqueosLista.Any(b => b is null))
-                throw new DomainException(
-                    "Los bloqueos de las salas no pueden ser nulos.");
+            if (recursos is not null)
+            {
+                if (recursos.Any(r => r is null))
+                    throw new DomainException("No puede haber recursos nulos.");
+                if (recursos.GroupBy(r => r.RecursoId).Any(g => g.Count() > 1))
+                    throw new DomainException("No puede haber recursos repetidos.");
+            }
 
             Id = Guid.NewGuid().ToString();
             NombreApellidoResponsable = nombreApellidoResponsable;
@@ -87,7 +86,6 @@ namespace Domain.Eventos.Entities
             FechaHasta = fechaHasta;
             FormularioEventoCompletado = false;
             Salas = salasLista;
-            BloqueosSala = bloqueosLista;
             RRule = rrule;
         }
 
@@ -100,7 +98,7 @@ namespace Domain.Eventos.Entities
             DateTime fecha,
             DateTime fechaHasta,
             IEnumerable<Sala> salas,
-            IEnumerable<PropuestaEventoBloqueoSala> bloqueosSala,
+            IEnumerable<PropuestasRecursos> recursos = null,
             string? rrule = null)
         {
             if (string.IsNullOrEmpty(nombreApellidoResponsable))
@@ -130,15 +128,15 @@ namespace Domain.Eventos.Entities
             if (salasLista.Any(s => s is null))
                 throw new DomainException("No puede haber salas nulas.");
 
-            if (bloqueosSala is null)
-                throw new DomainException(
-                    "La colección de bloqueos no puede ser nula.");
+            if (recursos is not null)
+            {
+                if (recursos.Any(r => r is null))
+                    throw new DomainException("No puede haber recursos nulos.");
+                if (recursos.GroupBy(r => r.RecursoId).Any(g => g.Count() > 1))
+                    throw new DomainException("No puede haber recursos repetidos.");
+            }
 
-            var bloqueosLista = bloqueosSala.ToList();
 
-            if (bloqueosLista.Any(b => b is null))
-                throw new DomainException(
-                    "Los bloqueos de las salas no pueden ser nulos.");
 
             NombreApellidoResponsable = nombreApellidoResponsable;
             TelefonoResponsable = telefonoResponsable
@@ -150,7 +148,6 @@ namespace Domain.Eventos.Entities
             Fecha = fecha;
             FechaHasta = fechaHasta;
             Salas = salasLista;
-            BloqueosSala = bloqueosLista;
             RRule = rrule;
         }
         public void MarcarFormularioEnviado()
