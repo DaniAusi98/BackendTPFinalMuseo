@@ -4,6 +4,6 @@ namespace Application.Eventos.ApplicationServices
 {
     public interface IGenerarUrlFormularioEvento
     {
-        public string GenerarUrlFormularioEvento(string propuestaId, TipoEventoActividad tipoEventoActividad);
+        public string GenerarUrlFormularioEvento(string EventoId, TipoEvento tipoEventoActividad);
     }
 }

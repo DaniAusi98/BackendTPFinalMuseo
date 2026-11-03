@@ -108,30 +108,31 @@ namespace Domain.VisitasGrupales.DomainServices
                         continue;
                     }
 
-                    // 4. Contar las visitas existentes que se solapan con el turno.
+                    // 4. Contar las visitas que se solapan con el turno.
                     int visitasSimultaneas = ContarVisitasSimultaneas(
                         slot,
                         visitasAutoguiadas);
 
-                    // 5. Calcular cuántas visitas adicionales pueden reservarse.
+                    // 5. Verificar si ya existe una reserva con el mismo inicio.
+                    bool horarioOcupado = visitasAutoguiadas.Any(
+                        visita => visita.Horario.Inicio == slot.Inicio);
+
+                    // 6. Calcular cuántas visitas simultáneas quedan disponibles.
                     int cuposDisponibles = Math.Max(
                         0,
-                        configuracion.VisitasSimultaneasMaximas
-                            - visitasSimultaneas);
+                        configuracion.VisitasSimultaneasMaximas - visitasSimultaneas);
 
-                    EstadoTurno estado = cuposDisponibles <= 0
-                        ? EstadoTurno.Completo
-                        : EstadoTurno.Disponible;
+                    // Si ya existe una reserva con ese inicio, no ofrecer el turno.
+                    if (horarioOcupado)
+                    {
+                        cuposDisponibles = 0;
+                    }
 
-                    _logger.LogInformation(
-                        "Turno {Inicio}-{Fin}: simultáneas={Simultaneas}, " +
-                        "máximo={Maximo}, disponibles={Disponibles}, estado={Estado}.",
-                        slot.Inicio,
-                        slot.Fin,
-                        visitasSimultaneas,
-                        configuracion.VisitasSimultaneasMaximas,
-                        cuposDisponibles,
-                        estado);
+                    EstadoTurno estado = cuposDisponibles > 0
+                        ? EstadoTurno.Disponible
+                        : EstadoTurno.Completo;
+
+
 
                     resultado.Add(
                         new SlotDisponibleVisitaAutoguiada(
@@ -150,7 +151,7 @@ namespace Domain.VisitasGrupales.DomainServices
             return Task.FromResult(resultado);
         }
 
-        private int ContarVisitasSimultaneas(
+        private static int ContarVisitasSimultaneas(
             TimeSlot slot,
             IReadOnlyCollection<VisitaGrupalAutoguiada> visitasAutoguiadas)
         {

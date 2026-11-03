@@ -28,7 +28,7 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada.Enums
 
         public enum EstadoConfirmacionVisita
         {
-            PendienteConfirmar,
+            Pendiente,
             Confirmada,
 
 

@@ -1,5 +1,8 @@
-﻿using Application.Eventos.UseCases.Commands.CrearEvento;
+﻿using Application.Eventos.DataTransferObjets;
+using Application.Eventos.UseCases.Commands.CrearEvento;
+using Application.Eventos.UseCases.Commands.UpdateEvento;
 using Application.Eventos.UseCases.Queries;
+using Application.Eventos.UseCases.Queries.GetEventoBy;
 using Application.Eventos.UseCases.Queries.ReporteEventos;
 using Application.Eventos.UseCases.Queries.SalasDisponibles;
 using Application.MuseumResources.UseCases.Commands.ConfigurarSalaActividades;
@@ -19,6 +22,13 @@ namespace Controllers.Evento
         private readonly ICommandQueryBus _commandQueryBus = commandQueryBus;
         private readonly IWebHostEnvironment _environment = environment;
         private readonly IConfiguration _configuration = configuration;
+
+        // ============================================================
+        // FORMULARIO DIRECTO CREAR EVENTO O ACTIVIDAD EXTERNA 
+        // ============================================================
+        /// <summary>
+        /// Es el que utiliza administracion para crear eventos que no necesitan presentar propuesta a direccion. 
+        /// </summary>
 
         [HttpPost]
         [Consumes("multipart/form-data")]
@@ -60,6 +70,66 @@ namespace Controllers.Evento
         }
 
 
+        // ============================================================
+        // GET  EVENTO BY ID
+        // ============================================================
+
+
+        [HttpGet("get-by")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            var entity = await _commandQueryBus.Send(new GetEventoByIdQuery { EventoId = id });
+
+            return Ok(entity);
+        }
+
+        // ============================================================
+        // ACTUALIZAR EVENTO
+        // ============================================================
+        [HttpPut("update-evento")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Update(
+        [FromForm] UpdateEventoCommand command,
+        [FromForm] List<IFormFile>? imagenes)
+        {
+            if (command is null) return BadRequest();
+
+            // Mapeamos los archivos binarios HTTP nativos al DTO puro de bytes
+            if (imagenes is not null && imagenes.Count > 0)
+            {
+                command.ImagenesNuevas = [];
+
+                foreach (var img in imagenes.Where(i => i.Length > 0))
+                {
+                    using var memoryStream = new MemoryStream();
+                    await img.CopyToAsync(memoryStream);
+
+                    command.ImagenesNuevas.Add(new ArchivoNuevoDto
+                    {
+                        Nombre = img.FileName,
+                        ContentType = img.ContentType,
+                        Contenido = memoryStream.ToArray()
+                    });
+                }
+            }
+
+            // Enviamos el comando limpio a la capa de aplicación
+            var eventoActualizado = await _commandQueryBus.Send(command);
+
+            if (eventoActualizado == null)
+            {
+                return NotFound($"No se encontró el registro con el ID {command.EventoId}.");
+            }
+
+            // Retornamos el objeto modificado con un 200 OK
+            return Ok(eventoActualizado);
+        }
+
+
+        ///Disponibilidad para el formCalendar///
+
 
         [HttpGet("disponibilidad")]
         public async Task<IActionResult> ObtenerDisponibilidadEvento(
@@ -76,6 +146,9 @@ namespace Controllers.Evento
 
             return Ok(resultado);
         }
+
+        ///Validacion de recurrencia Form///
+
         [HttpGet("validar-recurrencia")]
         public async Task<IActionResult> ValidarRecurrenciaEvento(
             [FromQuery] DateTime inicio,
@@ -93,6 +166,9 @@ namespace Controllers.Evento
 
             return Ok(resultado);
         }
+
+        ///Configurar salas para Eventos///
+
         [HttpPost("salas/{salaId}/configurar-actividades")]
         public async Task<IActionResult> ConfigurarSalaActividades(
             string salaId,
@@ -105,6 +181,8 @@ namespace Controllers.Evento
             var resultado = await _commandQueryBus.Send(command);
             return Ok(new { exito = resultado });
         }
+        ///Reporte Eventos//
+
         [HttpGet("reporteEventos")]
         public async Task<IActionResult> GetReporteVisitaGuiada(
             [FromQuery] DateTime desde,
@@ -119,6 +197,8 @@ namespace Controllers.Evento
 
             return Ok(reporte);
         }
+        ///Reporte Eventos por sala//
+
         [HttpGet("reporteEventoPorSala")]
         public async Task<IActionResult> GetReporteEventoPorSala(
             [FromQuery] DateTime desde,
@@ -133,6 +213,8 @@ namespace Controllers.Evento
 
             return Ok(reporte);
         }
+        ///Reporte Eventos por Tipo//
+
 
         [HttpGet("reporteEventoPorTipo")]
         public async Task<IActionResult> GetReporteEventoPorTipo(
@@ -148,6 +230,8 @@ namespace Controllers.Evento
 
             return Ok(reporte);
         }
+        ///Salas para eventos //
+
         [HttpGet("salas-disponibles-eventos")]
         public async Task<IActionResult> ObtenerSalasDisponiblesParaEvento()
         {
@@ -170,77 +254,7 @@ namespace Controllers.Evento
             return $"/uploads/eventos/{fileName}";
         }
 
-        // =========================================================
-        // FUTURO: Endpoint para cuando se migre a Cloudflare R2
-        // =========================================================
-        // Requiere:
-        // 1) Instalar AWSSDK.S3 (R2 es compatible con API S3).
-        // 2) Registrar un IAmazonS3 configurado con:
-        //    - ServiceURL: https://<ACCOUNT_ID>.r2.cloudflarestorage.com
-        //    - Credenciales R2 (AccessKey / SecretKey)
-        //    - ForcePathStyle = true
 
-        //donde guardar todo eso ?
 
-        //En appsettings.json(o mejor, en appsettings.Development.json / variables de entorno / secrets, nunca en el repo público):
-        //"CloudflareR2": {
-        //"AccountId": "xxxxxxxxxxxxxxxxxxxx",
-        //"AccessKey": "xxxxxxxxxxxxxxxxxxxx",
-        //"SecretKey": "xxxxxxxxxxxxxxxxxxxx",
-        //"BucketName": "eventos-museo",
-        //"PublicBaseUrl": "https://cdn.tudominio.com"
-        //}
-        // 3) Definir en appsettings:
-        //    "CloudflareR2": {
-        //        "BucketName": "eventos-museo",
-        //        "PublicBaseUrl": "https://cdn.tudominio.com"
-        //    }
-        //
-        // [HttpPost("r2")]
-        // [Consumes("multipart/form-data")]
-        // public async Task<IActionResult> CreateWithR2(
-        //     [FromForm] CrearEventoCommand command,
-        //     [FromForm] List<IFormFile>? imagenes,
-        //     [FromServices] IAmazonS3 s3Client)
-        // {
-        //     if (command is null)
-        //         return BadRequest();
-        //
-        //     var bucketName = _configuration["CloudflareR2:BucketName"];
-        //     var publicBaseUrl = _configuration["CloudflareR2:PublicBaseUrl"]!.TrimEnd('/');
-        //
-        //     var urls = command.UrlImagenes?.ToList() ?? [];
-        //
-        //     if (imagenes is not null && imagenes.Count > 0)
-        //     {
-        //         foreach (var imagen in imagenes.Where(i => i.Length > 0))
-        //         {
-        //             var extension = Path.GetExtension(imagen.FileName);
-        //             var key = $"eventos/{Guid.NewGuid()}{extension}";
-        //
-        //             await using var stream = imagen.OpenReadStream();
-        //
-        //             var putRequest = new PutObjectRequest
-        //             {
-        //                 BucketName = bucketName,
-        //                 Key = key,
-        //                 InputStream = stream,
-        //                 ContentType = imagen.ContentType,
-        //                 // R2 no soporta ACL público via header; el bucket
-        //                 // debe estar configurado como público o servido
-        //                 // detrás de un dominio custom (Cloudflare).
-        //             };
-        //
-        //             await s3Client.PutObjectAsync(putRequest);
-        //
-        //             urls.Add($"{publicBaseUrl}/{key}");
-        //         }
-        //     }
-        //
-        //     command.UrlImagenes = urls;
-        //
-        //     var id = await _commandQueryBus.Send(command);
-        //     return Created($"api/v1/eventos/{id}", new { Id = id });
-        // }
     }
 }

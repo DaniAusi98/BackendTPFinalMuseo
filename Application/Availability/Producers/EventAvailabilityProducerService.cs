@@ -101,10 +101,7 @@ namespace Application.Availability.Producers
                             tituloEvento: "Evento ficticio",
                             descripcionEvento: "",
                             fundamentacionEvento: "",
-                            tipoPublico: new List<TipoPublico>
-                            {
-                                TipoPublico.General
-                            },
+                            tipoPublico: "Publico General",
                             concurrenciaEstimada: 1,
                             horario: timeSlot,
                             salas: salas,

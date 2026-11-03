@@ -270,173 +270,56 @@ namespace Infrastructure.Migrations
                     b.ToTable("CalendariosMuseo", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("Nivel")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("PadreId")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("PaisId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PadreId");
-
-                    b.HasIndex("PaisId");
-
-                    b.ToTable("DivisionesAdministrativas", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Common.Entities.Ubicacion.Localidad", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("CodigoPostal")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<string>("DivisionAdministrativaId")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<double?>("Latitud")
-                        .HasColumnType("double");
-
-                    b.Property<double?>("Longitud")
-                        .HasColumnType("double");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DivisionAdministrativaId");
-
-                    b.ToTable("LocalidadesMundial", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Common.Entities.Ubicacion.Pais", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Codigo")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Paises", (string)null);
-                });
-
             modelBuilder.Entity("Domain.Eventos.Entities.PropuestaEvento", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime(6)");
+                    b.Property<string>("EventoId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("FechaEnvioFormulario")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("FechaHasta")
-                        .HasColumnType("datetime(6)");
+                    b.Property<bool>("FormularioCompletado")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("FormularioEnviado")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("FormularioEventoCompletado")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("NombreApellidoResponsable")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<string>("RRule")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("RRule");
-
-                    b.Property<string>("TipoEvento")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("TituloPropuesta")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("EventoId")
+                        .IsUnique();
 
                     b.ToTable("PropuestaEvento", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Eventos.Entities.PropuestasRecursos", b =>
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaMuestra", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("CantidadAsignada")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Fin")
+                    b.Property<DateTime?>("FechaEnvioFormulario")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("Inicio")
-                        .HasColumnType("datetime(6)");
+                    b.Property<bool>("FormularioCompletado")
+                        .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("PropuestaId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<bool>("FormularioEnviado")
+                        .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("RecursoId")
+                    b.Property<string>("MuestraTemporalId")
+                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecursoId");
-
-                    b.HasIndex("PropuestaId", "RecursoId")
+                    b.HasIndex("MuestraTemporalId")
                         .IsUnique();
 
-                    b.ToTable("PropuestaRecursosReservados", (string)null);
+                    b.ToTable("PropuestaMuestra", (string)null);
                 });
 
             modelBuilder.Entity("Domain.RecursoMuseo.Entities.ConfiguracionSalaActividad", b =>
@@ -1087,21 +970,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PropuestaSala", b =>
-                {
-                    b.Property<string>("PropuestaId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("SalaId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("PropuestaId", "SalaId");
-
-                    b.HasIndex("SalaId");
-
-                    b.ToTable("PropuestaSalas", (string)null);
-                });
-
             modelBuilder.Entity("TematicaSala", b =>
                 {
                     b.Property<string>("TematicaVisitaId")
@@ -1205,11 +1073,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("varchar(2000)");
 
                     b.Property<string>("Institucion")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
 
-                    b.Property<string>("NombreyApellidoSolicitante")
+                    b.Property<string>("NombreyApellidoResponsable")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
@@ -1222,12 +1089,12 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("TipoEvento")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("TipoPublico")
-                        .IsRequired()
-                        .HasColumnType("json");
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
 
                     b.Property<string>("UrlImagenes")
                         .HasColumnType("json");
@@ -1239,13 +1106,11 @@ namespace Infrastructure.Migrations
                 {
                     b.HasBaseType("Domain.ActividadMuseo.Entities.ActividadBase");
 
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
+                    b.Property<string>("DescripcionMuestra")
                         .HasMaxLength(2000)
                         .HasColumnType("varchar(2000)");
 
-                    b.Property<string>("FundamentacionObjetivoMuestra")
-                        .IsRequired()
+                    b.Property<string>("FundamentacionMuestra")
                         .HasMaxLength(2000)
                         .HasColumnType("varchar(2000)");
 
@@ -1259,7 +1124,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("varchar(200)");
 
                     b.Property<string>("Publico")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
@@ -1543,94 +1407,26 @@ namespace Infrastructure.Migrations
                     b.Navigation("HorariosApertura");
                 });
 
-            modelBuilder.Entity("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", b =>
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaEvento", b =>
                 {
-                    b.HasOne("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", "Padre")
-                        .WithMany("Hijas")
-                        .HasForeignKey("PadreId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Domain.Common.Entities.Ubicacion.Pais", "Pais")
-                        .WithMany("Divisiones")
-                        .HasForeignKey("PaisId")
+                    b.HasOne("Domain.Eventos.Entities.Evento", "Evento")
+                        .WithOne()
+                        .HasForeignKey("Domain.Eventos.Entities.PropuestaEvento", "EventoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Padre");
-
-                    b.Navigation("Pais");
+                    b.Navigation("Evento");
                 });
 
-            modelBuilder.Entity("Domain.Common.Entities.Ubicacion.Localidad", b =>
+            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaMuestra", b =>
                 {
-                    b.HasOne("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", "DivisionAdministrativa")
-                        .WithMany("Localidades")
-                        .HasForeignKey("DivisionAdministrativaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.HasOne("Domain.Eventos.Entities.MuestraTemporal", "MuestraTemporal")
+                        .WithOne()
+                        .HasForeignKey("Domain.Eventos.Entities.PropuestaMuestra", "MuestraTemporalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("DivisionAdministrativa");
-                });
-
-            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaEvento", b =>
-                {
-                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailResponsable", b1 =>
-                        {
-                            b1.Property<string>("PropuestaEventoId")
-                                .HasColumnType("varchar(255)");
-
-                            b1.Property<string>("Valor")
-                                .IsRequired()
-                                .HasMaxLength(150)
-                                .HasColumnType("varchar(150)")
-                                .HasColumnName("EmailResponsable");
-
-                            b1.HasKey("PropuestaEventoId");
-
-                            b1.ToTable("PropuestaEvento");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PropuestaEventoId");
-                        });
-
-                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "TelefonoResponsable", b1 =>
-                        {
-                            b1.Property<string>("PropuestaEventoId")
-                                .HasColumnType("varchar(255)");
-
-                            b1.Property<string>("Valor")
-                                .IsRequired()
-                                .HasMaxLength(20)
-                                .HasColumnType("varchar(20)")
-                                .HasColumnName("TelefonoResponsable");
-
-                            b1.HasKey("PropuestaEventoId");
-
-                            b1.ToTable("PropuestaEvento");
-
-                            b1.WithOwner()
-                                .HasForeignKey("PropuestaEventoId");
-                        });
-
-                    b.Navigation("EmailResponsable");
-
-                    b.Navigation("TelefonoResponsable");
-                });
-
-            modelBuilder.Entity("Domain.Eventos.Entities.PropuestasRecursos", b =>
-                {
-                    b.HasOne("Domain.Eventos.Entities.PropuestaEvento", "Propuesta")
-                        .WithMany("Recursos")
-                        .HasForeignKey("PropuestaId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Domain.RecursoMuseo.Entities.Recurso", "Recurso")
-                        .WithMany()
-                        .HasForeignKey("RecursoId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Propuesta");
-
-                    b.Navigation("Recurso");
+                    b.Navigation("MuestraTemporal");
                 });
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalAutoguiada.ConfiguracionHorarioAutoguiada", b =>
@@ -2045,21 +1841,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PropuestaSala", b =>
-                {
-                    b.HasOne("Domain.Eventos.Entities.PropuestaEvento", null)
-                        .WithMany()
-                        .HasForeignKey("PropuestaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.RecursoMuseo.Entities.Sala", null)
-                        .WithMany()
-                        .HasForeignKey("SalaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("TematicaSala", b =>
                 {
                     b.HasOne("Domain.RecursoMuseo.Entities.Sala", null)
@@ -2130,7 +1911,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailSolicitante", b1 =>
+                    b.OwnsOne("Domain.Common.ValueObjets.Email", "EmailResponsable", b1 =>
                         {
                             b1.Property<string>("EventoId")
                                 .HasColumnType("varchar(255)");
@@ -2149,7 +1930,7 @@ namespace Infrastructure.Migrations
                                 .HasForeignKey("EventoId");
                         });
 
-                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "TelefonoSolicitante", b1 =>
+                    b.OwnsOne("Domain.Common.ValueObjets.Telefono", "TelefonoResponsable", b1 =>
                         {
                             b1.Property<string>("EventoId")
                                 .HasColumnType("varchar(255)");
@@ -2168,9 +1949,9 @@ namespace Infrastructure.Migrations
                                 .HasForeignKey("EventoId");
                         });
 
-                    b.Navigation("EmailSolicitante");
+                    b.Navigation("EmailResponsable");
 
-                    b.Navigation("TelefonoSolicitante");
+                    b.Navigation("TelefonoResponsable");
                 });
 
             modelBuilder.Entity("Domain.Eventos.Entities.MuestraTemporal", b =>
@@ -2187,7 +1968,6 @@ namespace Infrastructure.Migrations
                                 .HasColumnType("varchar(255)");
 
                             b1.Property<string>("Valor")
-                                .IsRequired()
                                 .HasMaxLength(150)
                                 .HasColumnType("varchar(150)")
                                 .HasColumnName("EmailInstitucion");
@@ -2452,23 +2232,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Common.Entities.HorarioAperturaMuseo", b =>
                 {
                     b.Navigation("DiasCierre");
-                });
-
-            modelBuilder.Entity("Domain.Common.Entities.Ubicacion.DivisionAdministrativa", b =>
-                {
-                    b.Navigation("Hijas");
-
-                    b.Navigation("Localidades");
-                });
-
-            modelBuilder.Entity("Domain.Common.Entities.Ubicacion.Pais", b =>
-                {
-                    b.Navigation("Divisiones");
-                });
-
-            modelBuilder.Entity("Domain.Eventos.Entities.PropuestaEvento", b =>
-                {
-                    b.Navigation("Recursos");
                 });
 
             modelBuilder.Entity("Domain.VisitasGrupales.Entities.GrupalGuiada.Guia.Guia", b =>

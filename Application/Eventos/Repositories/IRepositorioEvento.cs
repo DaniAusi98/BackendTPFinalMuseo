@@ -7,5 +7,8 @@ namespace Application.Eventos.Repositories
     {
         public Task<List<Evento>> FindAllAsync(DateTime fechaDesde, DateTime fechaHasta);
 
+        public Task<Evento?> FindOneIncludeAsync(string eventoId);
+
+
     }
 }

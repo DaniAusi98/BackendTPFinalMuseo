@@ -29,7 +29,7 @@ namespace Application.Reportes.ApplicationServices
                 if (visita.Estado == EstadoActividad.Cancelada)
                     visitasAutoguiadasCanceladas++;
 
-                if (visita.EstadoConfirmacion == EstadoConfirmacionVisita.PendienteConfirmar)
+                if (visita.EstadoConfirmacion == EstadoConfirmacionVisita.Pendiente)
                     visitasAutoguiadasPendientes++;
 
                 if (visita.Estado == EstadoActividad.Reprogramada)

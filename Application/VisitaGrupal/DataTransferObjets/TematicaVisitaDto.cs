@@ -1,3 +1,5 @@
+using Application.MuseumResources.DataTransferObjects;
+
 namespace Application.VisitaGrupal.DataTransferObjets
 {
     public class TematicaVisitaDto
@@ -6,6 +8,6 @@ namespace Application.VisitaGrupal.DataTransferObjets
         public string Nombre { get; private set; } = string.Empty;
         public string Descripcion { get; private set; } = string.Empty;
         public bool Disponible { get; private set; }
-        public IList<string> SalaIds { get; private set; } = [];
+        public List<SalaDto> Salas { get; private set; } = [];
     }
 }

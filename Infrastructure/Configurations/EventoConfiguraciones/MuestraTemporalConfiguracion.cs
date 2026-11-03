@@ -24,17 +24,17 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
                 .HasMaxLength(200)
                 .IsRequired();
 
-            builder.Property(x => x.Descripcion)
+            builder.Property(x => x.DescripcionMuestra)
                 .HasMaxLength(2000)
-                .IsRequired();
+                .IsRequired(false);
 
-            builder.Property(x => x.FundamentacionObjetivoMuestra)
+            builder.Property(x => x.FundamentacionMuestra)
                 .HasMaxLength(2000)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(x => x.Publico)
                 .HasMaxLength(500)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(x => x.Institucion)
                 .HasMaxLength(200)
@@ -52,7 +52,7 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
                 email.Property(e => e.Valor)
                     .HasColumnName("EmailInstitucion")
                     .HasMaxLength(150)
-                    .IsRequired();
+                    .IsRequired(false);
             });
 
             builder.Navigation(x => x.EmailInstitucion)

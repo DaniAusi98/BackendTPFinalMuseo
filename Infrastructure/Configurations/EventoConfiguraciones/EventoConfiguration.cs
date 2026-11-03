@@ -14,17 +14,17 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
             // TPT
             builder.HasBaseType<ActividadBase>();
 
-            builder.Property(x => x.NombreyApellidoSolicitante)
+            builder.Property(x => x.NombreyApellidoResponsable)
                 .HasMaxLength(200)
                 .IsRequired();
 
             builder.Property(x => x.Institucion)
                 .HasMaxLength(200)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(x => x.TipoEvento)
                 .HasConversion<string>()
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .IsRequired();
 
             builder.Property(x => x.Titulo)
@@ -34,6 +34,9 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
             builder.Property(x => x.DescripcionEvento)
                 .HasMaxLength(2000)
                 .IsRequired(false);
+            builder.Property(x => x.TipoPublico)
+               .HasMaxLength(200)
+               .IsRequired(false);
 
             builder.Property(x => x.FundamentacionEvento)
                 .HasMaxLength(2000)
@@ -48,28 +51,6 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
             builder.Property(x => x.SolicitaFlyer)
                 .IsRequired();
 
-            // =========================
-            // TIPO PUBLICO (lista de enum)
-            // =========================
-
-            builder.Property(x => x.TipoPublico)
-                .HasConversion(
-                    v => System.Text.Json.JsonSerializer.Serialize(
-                        v,
-                        (System.Text.Json.JsonSerializerOptions?)null),
-
-                    v => string.IsNullOrEmpty(v)
-                        ? new List<Domain.Eventos.Enums.Enums.TipoPublico>()
-                        : System.Text.Json.JsonSerializer.Deserialize<List<Domain.Eventos.Enums.Enums.TipoPublico>>(
-                            v,
-                            (System.Text.Json.JsonSerializerOptions?)null)!)
-                .HasColumnType("json")
-                .IsRequired();
-
-
-            // =========================
-            // URL IMAGENES
-            // =========================
 
             builder.Property(x => x.UrlImagenes)
                 .HasConversion(
@@ -90,7 +71,7 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
             // TELEFONO SOLICITANTE
             // =========================
 
-            builder.OwnsOne(x => x.TelefonoSolicitante, tel =>
+            builder.OwnsOne(x => x.TelefonoResponsable, tel =>
             {
                 tel.Property(t => t.Valor)
                    .HasColumnName("TelefonoSolicitante")
@@ -103,7 +84,7 @@ namespace Infrastructure.Configurations.EventoConfiguraciones
             // EMAIL SOLICITANTE
             // =========================
 
-            builder.OwnsOne(x => x.EmailSolicitante, email =>
+            builder.OwnsOne(x => x.EmailResponsable, email =>
             {
                 email.Property(e => e.Valor)
                      .HasColumnName("EmailSolicitante")

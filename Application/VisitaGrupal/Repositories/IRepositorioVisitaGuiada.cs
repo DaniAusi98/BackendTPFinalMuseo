@@ -8,6 +8,8 @@ namespace Application.VisitaGrupal.Repositories
         //Task<List<VisitaGrupalGuiada>> FindByUserIdAsync(Expression<Func<VisitaGrupalGuiada, bool>> filter);
 
         Task<List<VisitaGrupalGuiada>> GetAllGroupVisitAsync(DateTime fechaDesde, DateTime fechaHasta);
+        Task<List<VisitaGrupalGuiada>> GetActiveGuidedTours(DateTime fechaDesde, DateTime fechaHasta);
+
 
         Task<List<VisitaGrupalGuiada>> GetAllGroupVisitCalendarAsync(DateTime fechaDesde, DateTime fechaHasta);
 

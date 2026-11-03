@@ -16,8 +16,8 @@ namespace Application.Eventos.ApplicationServices
             <p>La Propuesta con el titulo "{tituloPropuesta}" ha sido aprobada , haz clic en el siguiente enlace para completar el formulario:</p>
 
             <p>
-                <a href="{urlFormulario}"
-                   style="background-color:#2563eb;color:white;padding:10px 16px;text-decoration:none;border-radius:5px;">
+                <a href="{urlFormulario}" style="color:#2563eb;">
+                    Completar Formulario del Evento
                 </a>
             </p>
 

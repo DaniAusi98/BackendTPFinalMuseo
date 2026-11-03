@@ -7,30 +7,25 @@ namespace Infrastructure.Repositories.Sql.Eventos
 {
     internal sealed class RepositorioPropuestaEvento(MuseoDbContext context) : BaseRepository<PropuestaEvento>(context), IRepositorioPropuestaEvento
     {
-        public async Task<List<PropuestaEvento>> FindAllAsync(
-            DateTime fechaDesde,
-            DateTime fechaHasta)
+        public async Task<List<PropuestaEvento>> FindIncludeAllAsync()
         {
-            if (fechaDesde == fechaHasta)
-            {
-                fechaHasta = fechaHasta.Date.AddDays(1).AddSeconds(-1);
-            }
-
-
-            var actividadesEnRango = await Repository
-                .Include(p => p.Salas)
-                .Include(p => p.Recursos)
-                    .ThenInclude(r => r.Recurso)
-                .Where(p =>
-                    // Caso A: Actividades fijas individuales que caen justo en esta ventana
-                    (!string.IsNullOrEmpty(p.RRule) && p.Fecha < fechaHasta && p.FechaHasta > fechaDesde) ||
-
-                    (string.IsNullOrEmpty(p.RRule) && p.Fecha <= fechaHasta))
+            return await Repository
+                .Include(p => p.Evento)
+                   .ThenInclude(e => e.Salas)
                 .ToListAsync();
+        }
 
-
-
-            return actividadesEnRango;
+        public async Task<PropuestaEvento?> FindIncludeByIdAsync(string id)
+        {
+            return await Repository
+                .Include(p => p.Evento)
+                    .ThenInclude(e => e.Salas)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        public async Task<PropuestaEvento?> FindByEventoIdAsync(string eventoId)
+        {
+            return await Repository
+                .FirstOrDefaultAsync(p => p.EventoId == eventoId);
         }
     }
 }

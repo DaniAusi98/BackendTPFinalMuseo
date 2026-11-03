@@ -17,9 +17,9 @@
             Conversatorio,
             CineDebate,
             Otros,
-            MuestraTemporal
+            MuestraExposicionTemporal
         }
-        public enum TipoEventoActividad
+        public enum TipoPropuestaEvento
         {
             EventoActividadExterna,
             MuestraExposicionTemporal

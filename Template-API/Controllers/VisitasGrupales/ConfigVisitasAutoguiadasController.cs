@@ -1,5 +1,5 @@
-﻿using Application.VisitaGrupal.UseCases.Queries.GetConfiguracionVisitasAutoguiadas;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CreateSettingSelfGuidedTours;
+﻿using Application.VisitaGrupal.UseCases.Commands.CreateSettingSelfGuidedTours;
+using Application.VisitaGrupal.UseCases.Queries.GetConfiguracionVisitasAutoguiadas;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 

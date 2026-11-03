@@ -14,6 +14,12 @@ namespace Infrastructure.Repositories.Sql.RecursosMuseo
                 .Where(r => r.Estado == EstadoRecurso.Disponible)
                 .ToListAsync();
         }
+        public async Task<List<Recurso>> ObtenerRecursosporIdsAsync(IEnumerable<string> ids)
+        {
+            return await context.Set<Recurso>()
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
     }
 }
 

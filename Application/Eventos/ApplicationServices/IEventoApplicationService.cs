@@ -1,6 +1,4 @@
 ﻿using Domain.Common.ValueObjets;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Application.Eventos.ApplicationServices
 {

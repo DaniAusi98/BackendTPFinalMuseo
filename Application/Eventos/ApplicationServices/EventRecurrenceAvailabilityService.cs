@@ -117,11 +117,7 @@ namespace Application.Eventos.ApplicationServices
                     tituloEvento: "Evento ficticio",
                     descripcionEvento: "",
                     fundamentacionEvento: "",
-                    tipoPublico:
-                        new List<TipoPublico>
-                        {
-                            TipoPublico.General
-                        },
+                    tipoPublico: "Publico general",
                     concurrenciaEstimada: 1,
                     horario: timeSlot,
                     salas: salas,

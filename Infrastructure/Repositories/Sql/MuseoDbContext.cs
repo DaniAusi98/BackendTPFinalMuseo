@@ -1,10 +1,8 @@
 using Domain.ActividadesAreaEducacion.Entities;
 using Domain.ActividadMuseo.Entities;
 using Domain.Common.Entities;
-using Domain.Common.Entities.Ubicacion;
 using Domain.Eventos.Entities;
 using Domain.RecursoMuseo.Entities;
-using Domain.Reportes.Entities;
 using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
 using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
@@ -15,7 +13,6 @@ using Infrastructure.Configurations.EventoConfiguraciones;
 using Infrastructure.Configurations.HorarioMuseo;
 using Infrastructure.Configurations.Recursos;
 using Infrastructure.Configurations.Reportes;
-using Infrastructure.Configurations.UbicacionMundial;
 using Infrastructure.Configurations.VisitasGrupales;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -24,22 +21,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Sql
 {
-    /// <summary>
-    /// Contexto de almacenamiento en base de datos. Aca se definen los nombres de 
-    /// las tablas, y los mapeos entre los objetos
-    /// </summary>
     public class MuseoDbContext
     : IdentityDbContext<UsuarioSistema, IdentityRole, string>
     {
         public MuseoDbContext(DbContextOptions<MuseoDbContext> options)
             : base(options)
         {
-        }
 
+        }
         public DbSet<VisitaGrupalGuiada> VisitaGuiada { get; set; }
         public DbSet<VisitaGrupalAutoguiada> VisitaGrupalAutoguiada { get; set; }
-        public DbSet<ReporteGeneralVisitasGrupales> ReporteGeneralVisitasGrupales { get; set; }
-        public DbSet<Domain.ActividadMuseo.Entities.ActividadBase> ActividadAgendaMuseo { get; set; }
+        public DbSet<ActividadBase> ActividadAgendaMuseo { get; set; }
         public DbSet<RecursoAsignado> RecursoAsignado { get; set; }
         public DbSet<Recurso> RecursoMuseo { get; set; }
         public DbSet<Sala> SalaMuseo { get; set; }
@@ -52,30 +44,21 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<ConfiguracionVisitasGrupalesGuiadas> ConfiguracionVisitasGrupalesGuiadas { get; set; }
         public DbSet<HorarioAperturaMuseo> CalendarioMuseo { get; set; }
         public DbSet<ConfiguracionHorarioAutoguiada> ConfiguracionHorarioVisitaAutoguiada { get; set; }
-        public DbSet<ReporteVisitasGuiadas> ReporteVisitasGuiadas { get; set; }
-        public DbSet<ReporteVisitasAutoguiadas> ReporteVisitasAutoguiadas { get; set; }
-        public DbSet<ReporteGeneralVisitasGrupales> ReporteGeneralVisitas { get; set; }
-        public DbSet<Pais> Paises { get; set; }
-        public DbSet<DivisionAdministrativa> DivisionesAdministrativas { get; set; }
-        public DbSet<Localidad> Localidad { get; set; }
         public DbSet<Evento> Evento { get; set; }
         public DbSet<ActividadException> ActividadException { get; set; }
-
         public DbSet<Domain.ActividadesAreaEducacion.Entities.ActividadEducativa> ActividadEducativas { get; set; }
         public DbSet<ProyectosAreaEducacion> ProyectosAreaEducacion { get; set; }
         public DbSet<EquipoTrabajoResponsable> EquipoTrabajoResponsables { get; set; }
-
         public DbSet<VisitaReprogramada> VisitaGuiadaReprogramada { get; set; }
         public DbSet<VisitaAutoguiadaReprogramada> VisitaAutoguiadaReprogramada { get; set; }
         public DbSet<MuestraTemporal> MuestrasExposicionesTemporales { get; set; }
         public DbSet<BloqueoSala> BloqueoSala { get; set; }
         public DbSet<PropuestaEvento> PropuestasEvento { get; set; }
-        public DbSet<PropuestasRecursos> PropuestasRecursosReservados { get; set; }
-
-
+        public DbSet<PropuestaMuestra> PropuestasMuestra { get; set; }
         protected MuseoDbContext()
         {
         }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -84,6 +67,7 @@ namespace Infrastructure.Repositories.Sql
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
 
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<DummyEntity>().ToTable("DummyEntity");
@@ -105,9 +89,6 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new ReporteVisitaGrupalConfig());
             modelBuilder.ApplyConfiguration(new ReporteVisitaGuiadaConfig());
             modelBuilder.ApplyConfiguration(new ReporteVisitaAutoguiadaConfig());
-            modelBuilder.ApplyConfiguration(new PaisConfiguration());
-            modelBuilder.ApplyConfiguration(new DivisionAdministrativaConfiguration());
-            modelBuilder.ApplyConfiguration(new LocalidadMundialConfiguration());
             modelBuilder.ApplyConfiguration(new EventoConfiguration());
             modelBuilder.ApplyConfiguration(new ConfiguracionSalaActividadConfig());
             modelBuilder.ApplyConfiguration(new ActividadExceptionConfiguration());
@@ -117,26 +98,11 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new VisitaReprogramadaConfig());
             modelBuilder.ApplyConfiguration(new VisitaAutoguiadaReprogramadaConfig());
             modelBuilder.ApplyConfiguration(new MuestraTemporalConfiguration());
-            modelBuilder.ApplyConfiguration(new BloqueoSalaConfiguration());
             modelBuilder.ApplyConfiguration(new PropuestaEventoConfiguracion());
-            modelBuilder.ApplyConfiguration(new PropuestaRecursoConfiguration());
+            modelBuilder.ApplyConfiguration(new PropuestaMuestraConfigurations());
 
 
 
-
-
-
-
-
-
-
-
-
-
-            // ... Aquí tienes tus configuraciones actuales de tablas (Entidades, Claves, etc.) ...
-
-            //RUCO: Le indicamos a Entity Framework que ignore por completo 
-            // cualquier tabla que empiece con el prefijo "Hangfire_"
             foreach (var entityType in modelBuilder.Model.GetEntityTypes().ToList())
             {
                 if (entityType.GetTableName() != null && entityType.GetTableName().StartsWith("Hangfire_"))
@@ -149,10 +115,3 @@ namespace Infrastructure.Repositories.Sql
     }
 }
 
-/*public DbSet<PersonalInterno> PersonalInterno { get; set; }
-
-        public DbSet<Area> Area { get; set; }
-
-        public DbSet<AreaPuesto> AreaPuesto { get; set; }
-
-        public DbSet<Puesto> Puesto { get; set; }*/

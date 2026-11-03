@@ -62,6 +62,9 @@ namespace Application.Registrations
             services.AddScoped<IDummyEntityApplicationService, DummyEntityApplicationService>();
             services.AddScoped<IEventoApplicationService, EventoApplicationService>();
             services.AddScoped<IUserConfirmationEmailService, UserConfirmationEmailService>();
+            services.AddScoped<IEnvioFormularioEventoEmailService, EnvioFormularioEventoEmailService>();
+
+
 
 
             //services.AddScoped<IUsuarioApplicationService,UsuarioVisitanteApplicationService>();

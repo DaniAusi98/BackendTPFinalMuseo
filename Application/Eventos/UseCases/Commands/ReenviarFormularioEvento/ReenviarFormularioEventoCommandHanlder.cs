@@ -1,43 +1,58 @@
 ﻿using Application.Eventos.ApplicationServices;
 using Application.Eventos.Repositories;
+using Application.Exceptions;
 using Core.Application;
 
 namespace Application.Eventos.UseCases.Commands.ReenviarFormularioEvento
 {
-    internal class ReenviarFormularioEventoCommandHanlder(
+    internal sealed class ReenviarFormularioEventoCommandHandler(
         IRepositorioPropuestaEvento repositorioPropuestaEvento,
         IGenerarUrlFormularioEvento generarUrlFormularioEvento,
-        IEnvioFormularioEventoEmailService envioFormularioEventoEmailService)
-        : IRequestCommandHandler<ReenviarFormularioEventoCommand>
+        IEnvioFormularioEventoEmailService envioFormularioEventoEmailService
+    ) : IRequestCommandHandler<ReenviarFormularioEventoCommand>
     {
-        private readonly IRepositorioPropuestaEvento _repositorio =
-            repositorioPropuestaEvento;
+        private readonly IRepositorioPropuestaEvento _repositorioPropuestaEvento =
+            repositorioPropuestaEvento
+            ?? throw new ArgumentNullException(nameof(repositorioPropuestaEvento));
 
-        private readonly IGenerarUrlFormularioEvento _generarUrl =
-            generarUrlFormularioEvento;
+        private readonly IGenerarUrlFormularioEvento _generarUrlFormularioEvento =
+            generarUrlFormularioEvento
+            ?? throw new ArgumentNullException(nameof(generarUrlFormularioEvento));
 
-        private readonly IEnvioFormularioEventoEmailService _envioEmail =
-            envioFormularioEventoEmailService;
+        private readonly IEnvioFormularioEventoEmailService _envioFormularioEventoEmailService =
+            envioFormularioEventoEmailService
+            ?? throw new ArgumentNullException(nameof(envioFormularioEventoEmailService));
 
         public async Task Handle(
             ReenviarFormularioEventoCommand request,
             CancellationToken cancellationToken)
         {
-            var propuesta = await _repositorio.FindOneAsync(
-                request.IdEvento);
+            // Buscar la propuesta asociada al evento.
+            var propuesta = await _repositorioPropuestaEvento.FindOneAsync(request.IdPropuesta);
 
             if (propuesta is null)
-                throw new KeyNotFoundException(
-                    $"No se encontró la propuesta con ID {request.IdEvento}.");
+            {
+                throw new EntityDoesNotExistException(
+                    $"No se encontró la propuesta con ID {request.IdPropuesta}.");
+            }
 
-            string urlFormulario = _generarUrl.GenerarUrlFormularioEvento(
-                propuesta.Id,
-                propuesta.TipoEvento);
+            var evento = propuesta.Evento;
 
-            await _envioEmail.SendEnvioFormularioEmailAsync(
-                propuesta.EmailResponsable.Valor,
-                propuesta.TituloPropuesta,
-                urlFormulario);
+            // Generar la URL con el ID del evento.
+            string urlFormulario = _generarUrlFormularioEvento
+                .GenerarUrlFormularioEvento(evento.Id, evento.TipoEvento);
+
+            // Enviar el formulario al responsable.
+            await _envioFormularioEventoEmailService
+                .SendEnvioFormularioEmailAsync(
+                    evento.EmailResponsable.Valor,
+                    evento.Titulo,
+                    urlFormulario);
+
+            // Actualizar la propuesta únicamente si el envío fue exitoso. 
+            propuesta.RegistrarEnvioFormulario();
+
+            _repositorioPropuestaEvento.Update(propuesta.Id, propuesta);
         }
     }
 }

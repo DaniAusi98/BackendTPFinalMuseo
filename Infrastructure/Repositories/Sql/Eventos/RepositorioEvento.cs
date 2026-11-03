@@ -35,5 +35,15 @@ namespace Infrastructure.Repositories.Sql.Eventos
 
             return eventosEnRango;
         }
+
+
+        public async Task<Evento?> FindOneIncludeAsync(string id)
+        {
+            return await Repository
+                .Include(e => e.Salas)
+                .Include(e => e.Recursos)
+                    .ThenInclude(r => r.Recurso)
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
     }
 }

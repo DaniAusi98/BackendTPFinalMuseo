@@ -1,3 +1,7 @@
+using Application.VisitaGrupal.UseCases.Commands.CancelarVisitaGuiada;
+using Application.VisitaGrupal.UseCases.Commands.ConfirmarVisitaGrupal;
+using Application.VisitaGrupal.UseCases.Commands.CrearVisitaGuiada;
+using Application.VisitaGrupal.UseCases.Commands.ReprogramarVisitaGrupal.ReprogramarVisitaGuiada;
 using Application.VisitaGrupal.UseCases.Queries.ConsultarDisponibilidadTurnosVisitaGuiada;
 using Application.VisitaGrupal.UseCases.Queries.GetAllGroupVisitCalendar;
 using Application.VisitaGrupal.UseCases.Queries.GetAllVisitasGuiadasReprogramadas;
@@ -5,10 +9,6 @@ using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId;
 using Application.VisitaGrupal.UseCases.Queries.GetTematicaVisitaGrupal;
 using Application.VisitaGrupal.UseCases.Queries.ReporteVisitaGuiada;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CancelarVisitaGuiada;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ConfirmarVisitaGrupal;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaGuiada;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal.ReprogramarVisitaGuiada;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

@@ -34,7 +34,7 @@ namespace Application.Reportes.ApplicationServices
                 if (visita.Estado == EstadoActividad.Cancelada)
                     visitasGrupalesCanceladas++;
 
-                if (visita.EstadoConfirmacion == EstadoConfirmacionVisita.PendienteConfirmar)
+                if (visita.EstadoConfirmacion == EstadoConfirmacionVisita.Pendiente)
                     visitasGrupalesPendientes++;
 
                 if (visita.Estado == EstadoActividad.Reprogramada)
@@ -51,7 +51,7 @@ namespace Application.Reportes.ApplicationServices
                 if (visita.Estado == EstadoActividad.Cancelada)
                     visitasGrupalesCanceladas++;
 
-                if (visita.EstadoConfirmacion == EstadoConfirmacionVisita.PendienteConfirmar)
+                if (visita.EstadoConfirmacion == EstadoConfirmacionVisita.Pendiente)
                     visitasGrupalesPendientes++;
 
                 if (visita.Estado == EstadoActividad.Reprogramada)

@@ -1,8 +1,11 @@
+using Application.Exceptions;
 using FluentValidation;
 using MediatR;
+
 namespace Application.Behaivors
 {
-    public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
+    public class ValidationBehavior<TRequest, TResponse>(
+        IEnumerable<IValidator<TRequest>> validators)
         : IPipelineBehavior<TRequest, TResponse>
         where TRequest : notnull
     {
@@ -18,7 +21,8 @@ namespace Application.Behaivors
                 var context = new ValidationContext<TRequest>(request);
 
                 var results = await Task.WhenAll(
-                    _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+                    _validators.Select(v =>
+                        v.ValidateAsync(context, cancellationToken)));
 
                 var failures = results
                     .SelectMany(r => r.Errors)
@@ -26,7 +30,7 @@ namespace Application.Behaivors
                     .ToList();
 
                 if (failures.Any())
-                    throw new ValidationException(failures);
+                    throw new InvalidEntityDataException(failures);
             }
 
             return await next();

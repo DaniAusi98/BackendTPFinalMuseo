@@ -9,14 +9,14 @@ namespace Domain.Eventos.Entities
 {
     public class Evento : ActividadBase
     {
-        public string NombreyApellidoSolicitante { get; private set; }
-        public Telefono TelefonoSolicitante { get; private set; }
-        public Email EmailSolicitante { get; private set; }
-        public string Institucion { get; private set; }
+        public string NombreyApellidoResponsable { get; private set; }
+        public Telefono TelefonoResponsable { get; private set; }
+        public Email EmailResponsable { get; private set; }
+        public string? Institucion { get; private set; }
         public TipoEvento TipoEvento { get; private set; }
         public string DescripcionEvento { get; private set; } = string.Empty;
         public string FundamentacionEvento { get; private set; } = string.Empty;
-        public List<TipoPublico> TipoPublico { get; private set; }
+        public string? TipoPublico { get; private set; }
         public int? CantidadEstimada { get; private set; }
         public bool RequiereDifusion { get; private set; }
         public List<string> UrlImagenes { get; private set; } = [];
@@ -33,17 +33,17 @@ namespace Domain.Eventos.Entities
             string nombreyApellidoSolicitante,
             Telefono telefonoSolicitante,
             Email emailSolicitante,
-            string institucion,
             TipoEvento tipoEvento,
             string tituloEvento,
-            string descripcionEvento,
-            string fundamentacionEvento,
-            List<TipoPublico> tipoPublico,
-            int concurrenciaEstimada,
             TimeSlot horario,
             IEnumerable<Sala> salas,
             bool requiereDifusion,
             bool solicitaFlyer,
+            string? descripcionEvento = null,
+            string? fundamentacionEvento = null,
+            string? tipoPublico = null,
+            string? institucion = null,
+            int? concurrenciaEstimada = null,
             IEnumerable<RecursoAsignado>? recursos = null,
             IEnumerable<string?>? urlImagenes = null,
             string? recurrenceRule = null
@@ -59,24 +59,37 @@ namespace Domain.Eventos.Entities
         {
             if (string.IsNullOrWhiteSpace(nombreyApellidoSolicitante))
                 throw new ArgumentException("El nombre y apellido del solicitante no puede estar vacío.", nameof(nombreyApellidoSolicitante));
-            if (string.IsNullOrWhiteSpace(institucion))
-                throw new ArgumentException("La institución no puede estar vacía.", nameof(institucion));
+
+
+            if (institucion is not null && string.IsNullOrWhiteSpace(institucion))
+            {
+                throw new ArgumentException(
+                    "La institución no puede estar vacía.",
+                    nameof(institucion));
+            }
+
+            if (tipoPublico is not null && string.IsNullOrWhiteSpace(tipoPublico))
+            {
+                throw new ArgumentException(
+                    "El tipo de publico no puede estar vacía.",
+                    nameof(institucion));
+            }
+
+
             if (string.IsNullOrWhiteSpace(tituloEvento))
                 throw new ArgumentException("El título del evento no puede estar vacío.", nameof(tituloEvento));
-            if (tipoPublico is null || tipoPublico.Count == 0)
-                throw new ArgumentException("Debe indicar al menos un tipo de público.", nameof(tipoPublico));
-            if (tipoPublico.Distinct().Count() != tipoPublico.Count)
-                throw new ArgumentException("No debe repetir tipos de público.", nameof(tipoPublico));
 
-            NombreyApellidoSolicitante = nombreyApellidoSolicitante;
-            TelefonoSolicitante = telefonoSolicitante;
-            EmailSolicitante = emailSolicitante;
+
+            NombreyApellidoResponsable = nombreyApellidoSolicitante;
+            TelefonoResponsable = telefonoSolicitante;
+            EmailResponsable = emailSolicitante;
             Institucion = institucion;
             TipoEvento = tipoEvento;
             DescripcionEvento = descripcionEvento?.Trim() ?? string.Empty;
             FundamentacionEvento = fundamentacionEvento?.Trim() ?? string.Empty;
-            TipoPublico = [.. tipoPublico];
+            TipoPublico = tipoPublico;
             RequiereDifusion = requiereDifusion;
+            SolicitaFlyer = solicitaFlyer;
             UrlImagenes = urlImagenes?
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Select(x => x!)
@@ -89,16 +102,16 @@ namespace Domain.Eventos.Entities
             string nombreyApellidoSolicitante,
             Telefono telefonoSolicitante,
             Email emailSolicitante,
-            string institucion,
             TipoEvento tipoEvento,
             string tituloEvento,
-            string descripcionEvento,
-            string fundamentacionEvento,
-            List<TipoPublico> tipoPublico,
-            int ConcurrenciaEstimada,
             IEnumerable<Sala> salas,
             bool requiereDifusion,
             bool solicitaFlyer,
+            string? institucion = null,
+            string? descripcionEvento = null,
+            string? fundamentacionEvento = null,
+             string? tipoPublico = null,
+             int? ConcurrenciaEstimada = null,
             IEnumerable<RecursoAsignado>? recursos = null,
             IEnumerable<string?>? urlImagenes = null,
             string? recurrenceRule = null)
@@ -113,22 +126,31 @@ namespace Domain.Eventos.Entities
 
             if (string.IsNullOrWhiteSpace(nombreyApellidoSolicitante))
                 throw new ArgumentException("El nombre y apellido del solicitante no puede estar vacío.", nameof(nombreyApellidoSolicitante));
-            if (string.IsNullOrWhiteSpace(institucion))
-                throw new ArgumentException("La institución no puede estar vacía.", nameof(institucion));
+
             if (string.IsNullOrWhiteSpace(tituloEvento))
                 throw new ArgumentException("El título del evento no puede estar vacío.", nameof(tituloEvento));
-            if (tipoPublico is null || tipoPublico.Count == 0)
-                throw new ArgumentException("Debe indicar al menos un tipo de público.", nameof(tipoPublico));
-            if (tipoPublico.Distinct().Count() != tipoPublico.Count)
-                throw new ArgumentException("No debe repetir tipos de público.", nameof(tipoPublico));
-            NombreyApellidoSolicitante = nombreyApellidoSolicitante;
-            TelefonoSolicitante = telefonoSolicitante;
-            EmailSolicitante = emailSolicitante;
+
+            if (institucion is not null && string.IsNullOrWhiteSpace(institucion))
+            {
+                throw new ArgumentException(
+                    "La institución no puede estar vacía.",
+                    nameof(institucion));
+            }
+
+            if (tipoPublico is not null && string.IsNullOrWhiteSpace(tipoPublico))
+            {
+                throw new ArgumentException(
+                    "El tipo de publico no puede estar vacía.",
+                    nameof(institucion));
+            }
+            NombreyApellidoResponsable = nombreyApellidoSolicitante;
+            TelefonoResponsable = telefonoSolicitante;
+            EmailResponsable = emailSolicitante;
             Institucion = institucion;
             TipoEvento = tipoEvento;
             DescripcionEvento = descripcionEvento?.Trim() ?? string.Empty;
             FundamentacionEvento = fundamentacionEvento?.Trim() ?? string.Empty;
-            TipoPublico = tipoPublico.ToList();
+            TipoPublico = tipoPublico;
             RequiereDifusion = requiereDifusion;
             SolicitaFlyer = solicitaFlyer;
             UrlImagenes = urlImagenes?

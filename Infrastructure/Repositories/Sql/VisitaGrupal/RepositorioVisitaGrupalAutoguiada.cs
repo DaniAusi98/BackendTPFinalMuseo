@@ -11,6 +11,16 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
         : BaseRepository<VisitaGrupalAutoguiada>(context),
           IRepositorioVisitaGrupalAutoguiada
     {
+
+
+        public Task<VisitaGrupalAutoguiada?> FindByIdWithActividadAsync(string id)
+        {
+            return Repository
+                .Include(v => v.Tematicas)
+                .Include(v => v.Horario)
+                .Include(v => v.Salas)
+                .FirstOrDefaultAsync(v => v.Id == id);
+        }
         public async Task<List<VisitaGrupalAutoguiada>> GetAllGroupVisitAuAsync(
             DateTime fechaDesde,
             DateTime fechaHasta)
@@ -27,6 +37,34 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
                     .Where(v =>
                         v.Horario.Inicio < fechaHasta &&
                         v.Horario.Fin > fechaDesde)
+
+                    .OrderBy(v => v.Horario.Inicio)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+        public async Task<List<VisitaGrupalAutoguiada>> GetActiveSelfGuidedTours(
+           DateTime fechaDesde,
+           DateTime fechaHasta)
+        {
+
+            if (fechaDesde == fechaHasta)
+            {
+                fechaHasta = fechaHasta.Date.AddDays(1).AddSeconds(-1); // Ajusta hasta el final del d�a
+            }
+            try
+            {
+                return await Repository
+                    .Include(v => v.Salas)
+                    .Where(v =>
+                        v.Horario.Inicio < fechaHasta &&
+                        v.Horario.Fin > fechaDesde)
+                    .Where(v => v.Estado == EstadoActividad.Activa)
 
                     .OrderBy(v => v.Horario.Inicio)
                     .ToListAsync();

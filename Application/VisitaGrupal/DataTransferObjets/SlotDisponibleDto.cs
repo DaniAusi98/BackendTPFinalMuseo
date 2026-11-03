@@ -1,4 +1,4 @@
-using Application.ApplicationMuseo.DataTransferObjects;
+using Application.Common.DataTransferObjects;
 
 namespace Application.VisitaGrupal.DataTransferObjets
 {

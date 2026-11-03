@@ -116,7 +116,7 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
             AsignarTematicas(tematicas);
 
 
-            EstadoConfirmacion = EstadoConfirmacionVisita.PendienteConfirmar;
+            EstadoConfirmacion = EstadoConfirmacionVisita.Pendiente;
         }
 
 
@@ -195,7 +195,7 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
                 throw new DomainException(
                     "No se puede confirmar una visita cancelada.");
 
-            if (EstadoConfirmacion != EstadoConfirmacionVisita.PendienteConfirmar)
+            if (EstadoConfirmacion != EstadoConfirmacionVisita.Pendiente)
                 throw new DomainException(
                     "Solo se pueden confirmar visitas pendientes.");
 

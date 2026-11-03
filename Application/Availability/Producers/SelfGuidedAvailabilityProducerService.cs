@@ -47,7 +47,7 @@ namespace Application.Availability.Producers
 
             var visitasAutoguiadasExistentes =
                 await _repositorioVisitaGrupalAutoguiada
-                    .GetAllGroupVisitAuAsync(desde, hasta);
+                    .GetActiveSelfGuidedTours(desde, hasta);
 
             // Excluir la visita actual al consultar disponibilidad
             // para una reprogramación.

@@ -105,6 +105,9 @@ namespace Infrastructure.Registrations
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IClock, ArgentinaClock>();
             services.AddSingleton<IRecurrenceEvaluator, IcalRecurrenceEvaluator>();
+            services.AddScoped<JwtTokenService>();
+            services.AddScoped<IStorageService, LocalStorageService>();
+
 
 
             services.AddHostedService<SynchronizeHolidaysBackgroundService>();

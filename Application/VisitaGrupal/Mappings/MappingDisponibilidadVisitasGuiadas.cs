@@ -34,7 +34,7 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
                 .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
                 .ForMember(dest => dest.Disponible, opt => opt.MapFrom(src => src.Disponible))
-                .ForMember(dest => dest.SalaIds, opt => opt.MapFrom(src => src.Salas.Select(s => s.Id)));
+                .ForMember(dest => dest.Salas, opt => opt.MapFrom(src => src.Salas));
 
             CreateMap<VisitaGrupalGuiada, GuidedTourReservationDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
@@ -89,6 +89,7 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.CiudadInstitucion, opt => opt.MapFrom(src => src.LocalidadInstitucion))
                 .ForMember(dest => dest.DescripcionDiscapacidad, opt => opt.MapFrom(src => src.DiversidadFuncional))
                 .ForMember(dest => dest.Observaciones, opt => opt.MapFrom(src => src.Observaciones))
+                .ForMember(dest => dest.TematicasDto, opt => opt.MapFrom(src => src.Tematicas))
                 .ForMember(dest => dest.FechaInicio, opt => opt.MapFrom(src => src.Horario.Inicio))
                 .ForMember(dest => dest.FechaFin, opt => opt.MapFrom(src => src.Horario.Fin))
                 .ForMember(dest => dest.CantidadPersonas, opt => opt.MapFrom(src => src.CantidadPersonas))

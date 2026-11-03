@@ -1,6 +1,6 @@
 ﻿using Application.ActividadMuseo.Repositories;
 using Application.Availability;
-using Application.Availability.ApplicationServices; // Tu interfaz de expansión
+using Application.Availability.ApplicationServices;
 using Application.Availability.Factories;
 using Application.Availability.Models;
 using Application.Eventos.Repositories;
@@ -94,7 +94,7 @@ namespace Application.Eventos.ApplicationServices
                 tituloEvento: "Validación Resguardo",
                 descripcionEvento: "",
                 fundamentacionEvento: "",
-                tipoPublico: new List<TipoPublico> { TipoPublico.General },
+                tipoPublico: "Publico general",
                 concurrenciaEstimada: 1,
                 horario: horarioBasePropuesto,
                 salas: salas,

@@ -9,22 +9,29 @@ namespace Infrastructure.Adapters.UrlGenerator
         private readonly IConfiguration _configuration = configuration;
 
         public string GenerarUrlFormularioEvento(
-            string propuestaId,
-            TipoEventoActividad tipoEvento)
+            string EventoId,
+            TipoEvento tipoEvento)
         {
 
-            string ruta = tipoEvento switch
+            string ruta;
+
+            if (tipoEvento == TipoEvento.MuestraExposicionTemporal)
             {
-                TipoEventoActividad.EventoActividadExterna => "eventos/formulario",
+                ruta = "muestras/formulario";
+            }
+            else if (Enum.IsDefined(typeof(TipoEvento), tipoEvento))
+            {
+                ruta = "eventos/formulario";
+            }
+            else
+            {
+                // Si no es ninguno de los anteriores, lanzar excepción
+                throw new ArgumentOutOfRangeException(nameof(tipoEvento), $"El estado {tipoEvento} no está soportado.");
+            }
 
-                TipoEventoActividad.MuestraExposicionTemporal => "muestras/formulario",
-
-                _ => throw new ArgumentException(
-                    "El tipo de propuesta no tiene un formulario asociado.")
-            };
             var frontendUrl = _configuration["Frontend:BaseUrl"];
 
-            return $"{frontendUrl}/{ruta}/{propuestaId}";
+            return $"{frontendUrl}/{ruta}/{EventoId}";
 
 
         }

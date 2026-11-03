@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Application.MuseumResources.DataTransferObjects;
 using Application.VisitaGrupal.DataTransferObjets;
 
 using AutoMapper;
-
+using Domain.ActividadMuseo.Entities;
 using Domain.RecursoMuseo.Entities;
 using Domain.VisitasGrupales.Entities.GrupalGuiada;
-using static Domain.RecursoMuseo.Enums.Enums;
 
 namespace Application.MuseumResources.Mappings
 {
@@ -20,12 +13,16 @@ namespace Application.MuseumResources.Mappings
         public MappingRecurso()
         {
             CreateMap<Recurso, RecursoDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.NombreRecurso, opt => opt.MapFrom(src => src.NombreRecurso))
-
                 .ForMember(dest => dest.TipoRecurso, opt => opt.MapFrom(src => src.TipoRecurso.ToString()))
                 .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado.ToString()))
                 .ForMember(dest => dest.CantidadTotal, opt => opt.MapFrom(src => src.CantidadTotal));
+
+            CreateMap<RecursoAsignado, RecursosAsignadosEventoDto>();
+
+
 
             /*CreateMap<RecursoDto, Recurso>()
                   .ForMember(dest => dest.NombreRecurso, opt => opt.MapFrom(src => src.NombreRecurso))
@@ -34,13 +31,15 @@ namespace Application.MuseumResources.Mappings
                   .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => Enum.Parse<EstadoRecurso>(src.Estado)))
                   .ForMember(dest => dest.CantidadTotal, opt => opt.MapFrom(src => src.CantidadTotal));*/
             CreateMap<Sala, SalaDto>()
+                  .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                   .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
                   .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.EstadoSala.ToString()))
                   .ForMember(dest => dest.CodigoSala, opt => opt.MapFrom(src => src.CodigoSala))
                   .ForMember(dest => dest.Capacidad, opt => opt.MapFrom(src => src.Capacidad))
                   .ForMember(dest => dest.TipoSala, opt => opt.MapFrom(src => src.TipoSala.ToString()))
                   .ForMember(dest => dest.Ubicacion, opt => opt.MapFrom(src => src.Ubicacion.ToString()));
-            CreateMap<TematicaVisita,TematicaVisitaDto>()
+
+            CreateMap<TematicaVisita, TematicaVisitaDto>()
                 .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
                 .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
                 .ForMember(dest => dest.Disponible, opt => opt.MapFrom(src => src.Disponible.ToString()));

@@ -6,6 +6,8 @@ namespace Application.ActividadMuseo.DataTransferObjets
         public string NombreRecurso { get; set; }
         public string TipoRecurso { get; set; }
         public int CantidadAsignada { get; set; }
+        public DateTime Desde { get; set; }
+        public DateTime Hasta { get; set; }
 
     }
 }

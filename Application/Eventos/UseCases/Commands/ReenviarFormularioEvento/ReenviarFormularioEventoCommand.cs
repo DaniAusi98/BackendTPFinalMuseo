@@ -4,7 +4,7 @@ namespace Application.Eventos.UseCases.Commands.ReenviarFormularioEvento
 {
     public class ReenviarFormularioEventoCommand : IRequestCommand
     {
-        public string IdEvento { get; set; }
+        public string IdPropuesta { get; set; }
         public ReenviarFormularioEventoCommand()
         {
 

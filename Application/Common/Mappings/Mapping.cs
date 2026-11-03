@@ -1,6 +1,6 @@
 using Application.ApplicationMuseo.DataTransferObjects;
 using Application.ApplicationMuseo.DomainEvents;
-
+using Application.Common.DataTransferObjects;
 using AutoMapper;
 
 using Domain.Common.Entities;
@@ -23,6 +23,13 @@ namespace Application.ApplicationMuseo.Mappings
             CreateMap<TimeSlot, TimeSlotDto>()
                .ForMember(dest => dest.Inicio, opt => opt.MapFrom(src => src.Inicio))
                .ForMember(dest => dest.Fin, opt => opt.MapFrom(src => src.Fin));
+
+            CreateMap<Telefono, TelefonoDto>().ReverseMap();
+
+            CreateMap<Email, EmailDto>().ReverseMap();
+
+
+
 
 
 

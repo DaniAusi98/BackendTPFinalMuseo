@@ -8,6 +8,26 @@ namespace Application.Eventos.Mappings
     {
         public EventoMapping()
         {
+
+            CreateMap<Evento, EventoDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.NombreyApellidoResponsable, opt => opt.MapFrom(src => src.NombreyApellidoResponsable))
+                .ForMember(dest => dest.TelefonoResponsable, opt => opt.MapFrom(src => src.TelefonoResponsable))
+                .ForMember(dest => dest.EmailResponsable, opt => opt.MapFrom(src => src.EmailResponsable))
+                .ForMember(dest => dest.Institucion, opt => opt.MapFrom(src => src.Institucion))
+                .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.Titulo))
+                .ForMember(dest => dest.Horario, opt => opt.MapFrom(src => src.Horario))
+                .ForMember(dest => dest.SalaDtos, opt => opt.MapFrom(src => src.Salas))
+                .ForMember(dest => dest.Recursos, opt => opt.MapFrom(src => src.Recursos));
+
+
+
+            CreateMap<PropuestaEvento, PropuestaEventoDto>();
+            CreateMap<RecursoAsignadoPropuesta, RecursoAsignadoPropuestaDto>();
+
+
+
+
             CreateMap<Evento, TablaReporteEventoDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.FechaInicio, opt => opt.MapFrom(src => src.Horario.Inicio))
@@ -18,7 +38,7 @@ namespace Application.Eventos.Mappings
                 .ForMember(dest => dest.Institucion, opt => opt.MapFrom(src => src.Institucion))
                 .ForMember(dest => dest.TipoPublico, opt => opt.MapFrom(src => src.TipoPublico.Select(tp => tp.ToString()).ToList()))
                 .ForMember(dest => dest.Salas, opt => opt.MapFrom(src => src.Salas.Select(sala => sala.Nombre).ToList()))
-                .ForMember(dest => dest.NombreSolicitante, opt => opt.MapFrom(src => src.NombreyApellidoSolicitante))
+                .ForMember(dest => dest.NombreSolicitante, opt => opt.MapFrom(src => src.NombreyApellidoResponsable))
                 .ForMember(dest => dest.CantidadEstimada, opt => opt.MapFrom(src => src.CantidadEstimada ?? 0))
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado.ToString()));
 

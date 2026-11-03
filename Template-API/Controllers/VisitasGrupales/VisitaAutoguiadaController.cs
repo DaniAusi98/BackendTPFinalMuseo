@@ -1,9 +1,10 @@
-﻿using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
+﻿using Application.VisitaGrupal.UseCases.Commands.CancelarVisitaAutoguiada;
+using Application.VisitaGrupal.UseCases.Commands.ConfirmarVisitaGrupal;
+using Application.VisitaGrupal.UseCases.Commands.CrearVisitaAutoguiada;
+using Application.VisitaGrupal.UseCases.Commands.ReprogramarVisitaGrupal.ReprogramarAutoguiada;
+using Application.VisitaGrupal.UseCases.Queries.GetReservationById;
 using Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId;
 using Application.VisitaGrupal.UseCases.Queries.ReporteVisitaAutoguiada;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ConfirmarVisitaGrupal;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.CrearVisitaAutoguiada;
-using Application.VisitaGrupal.UseCases.VisitaGuiadaUC.Commands.ReprogramarVisitaGrupal.ReprogramarAutoguiada;
 using Core.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -119,6 +120,22 @@ namespace Controllers.VisitasGrupales
                 return BadRequest();
             var entity = await _commandQueryBus.Send(new GetSelfGuidedByIdQuery { VisitaId = id });
             return Ok(entity);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> Cancel(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
+
+            await _commandQueryBus.Send(
+                new CancelarVisitaAutoGuiadaCommand
+                {
+                    ReservationId = id
+                });
+
+            return NoContent();
         }
     }
 

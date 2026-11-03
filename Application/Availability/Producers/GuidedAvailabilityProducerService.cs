@@ -62,7 +62,7 @@ namespace Application.Availability.Producers
                 await _repositorioGuia.ObtenerGuiasConDisponibilidadAsync();
 
             var visitasGuiadasExistentes =
-                await _repositorioVisitaGuiada.GetAllGroupVisitAsync(
+                await _repositorioVisitaGuiada.GetActiveGuidedTours(
                     desde,
                     hasta);
             //en caso de que se pase un id de visita, se filtra para no tener en cuenta la misma visita cuando se consulta disponiblidad en una reprogramacion 
@@ -117,20 +117,6 @@ namespace Application.Availability.Producers
             _logger.LogInformation(
                 "[GuidedAvailabilityProducer] Turnos disponibles despu�s del filtro: {Cantidad}",
                 candidatosTurnos.Count);
-
-            // ============================================================
-            // 3) OBTENER ACTIVIDADES EXISTENTES
-            //
-            // IMPORTANTE:
-            // El repositorio debe traer:
-            //
-            // - Actividad
-            // - TimeSlots
-            // - Exceptions
-            //
-            // RecurrenceRule es parte de la actividad, no necesita Include
-            // si est� configurada como owned/value object.
-            // ============================================================
 
             var actividadesEnRango =
                 await _repositorioActividadMuseo

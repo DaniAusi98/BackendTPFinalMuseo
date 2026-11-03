@@ -1,4 +1,4 @@
-﻿using Application.ApplicationMuseo.DataTransferObjects;
+﻿using Application.Common.DataTransferObjects;
 using static Domain.ActividadMuseo.Enums.Enums;
 using static Domain.VisitasGrupales.Entities.GrupalGuiada.Enums.Enums;
 

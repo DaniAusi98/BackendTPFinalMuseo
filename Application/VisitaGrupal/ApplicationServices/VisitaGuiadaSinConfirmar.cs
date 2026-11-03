@@ -18,7 +18,7 @@ namespace Application.VisitaGrupal.ApplicationServices
             {
                 throw new Exception("No se encontró la visita guiada con el ID proporcionado.");
             }
-            if (visita.EstadoConfirmacion==EstadoConfirmacionVisita.PendienteConfirmar)
+            if (visita.EstadoConfirmacion==EstadoConfirmacionVisita.Pendiente)
             {
                 visita.CancelarVisitaGuiada();
                 _repositorioVisitaGuiada.Update(visita.Id,visita);

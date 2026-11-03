@@ -23,10 +23,7 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
             DateTime fechaDesde,
             DateTime fechaHasta)
         {
-            Console.WriteLine("========================================");
-            Console.WriteLine("[RepositorioVisitaGuiada] CONSULTANDO");
-            Console.WriteLine($"Desde: {fechaDesde:O}");
-            Console.WriteLine($"Hasta: {fechaHasta:O}");
+
 
             if (fechaDesde == fechaHasta)
             {
@@ -42,20 +39,36 @@ namespace Infrastructure.Repositories.Sql.VisitaGrupal
                 .OrderBy(v => v.Horario.Inicio)
                 .ToListAsync();
 
-            Console.WriteLine(
-                $"[RepositorioVisitaGuiada] Encontradas: {visitas.Count}");
 
-            foreach (var visita in visitas)
-            {
-                Console.WriteLine(
-                    $"Visita {visita.Id} | " +
-                    $"Inicio: {visita.Horario.Inicio:O} | " +
-                    $"Fin: {visita.Horario.Fin:O}");
-            }
 
             return visitas;
         }
 
+        public async Task<List<VisitaGrupalGuiada>> GetActiveGuidedTours(
+           DateTime fechaDesde,
+           DateTime fechaHasta)
+        {
+
+
+            if (fechaDesde == fechaHasta)
+            {
+                fechaHasta = fechaHasta.Date.AddDays(1).AddSeconds(-1); // Ajusta hasta el final del d�a
+            }
+
+            var visitas = await Repository
+                .Include(v => v.Tematicas)
+                .Include(v => v.Salas)
+                .Where(v =>
+                    v.Horario.Inicio < fechaHasta &&
+                    v.Horario.Fin > fechaDesde)
+                .Where(v => v.Estado == EstadoActividad.Activa)
+                .OrderBy(v => v.Horario.Inicio)
+                .ToListAsync();
+
+
+
+            return visitas;
+        }
         public async Task<List<VisitaGrupalGuiada>> GetAllGroupVisitCalendarAsync(
             DateTime fechaDesde,
             DateTime fechaHasta)

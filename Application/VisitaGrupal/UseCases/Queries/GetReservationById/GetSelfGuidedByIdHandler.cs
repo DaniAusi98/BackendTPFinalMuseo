@@ -11,7 +11,7 @@ namespace Application.VisitaGrupal.UseCases.Queries.GetReservationById
         private readonly IRepositorioVisitaGrupalAutoguiada _repositorioVisitaGrupalAutoguiada = repositorioVisitaGrupalAutoguiada ?? throw new ArgumentNullException(nameof(repositorioVisitaGrupalAutoguiada));
         public async Task<VisitaAutoguiadaDto> Handle(GetSelfGuidedByIdQuery request, CancellationToken cancellationToken)
         {
-            var visitaAutoguiada =await _repositorioVisitaGrupalAutoguiada.FindOneAsync(request.VisitaId);
+            var visitaAutoguiada = await _repositorioVisitaGrupalAutoguiada.FindByIdWithActividadAsync(request.VisitaId);
 
             return visitaAutoguiada == null
                 ? throw new Exception($"No se encontró la visita autoguiada con ID: {request.VisitaId}")

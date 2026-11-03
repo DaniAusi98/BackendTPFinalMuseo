@@ -38,8 +38,7 @@ namespace Application.Eventos.UseCases.Commands.CrearEvento
 
             RuleFor(x => x.TipoPublico)
                 .NotEmpty()
-                .Must(tp => tp.Distinct().Count() == tp.Count)
-                .WithMessage("Debe indicar al menos un tipo de público sin repetir.");
+                .MaximumLength(200);
 
             RuleForEach(x => x.TipoPublico)
                 .IsInEnum();

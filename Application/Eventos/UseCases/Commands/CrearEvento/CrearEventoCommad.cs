@@ -1,12 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Application.MuseumResources.DataTransferObjects;
+﻿using Application.MuseumResources.DataTransferObjects;
 using Core.Application;
+using System.ComponentModel.DataAnnotations;
 using static Domain.Eventos.Enums.Enums;
 
 
 namespace Application.Eventos.UseCases.Commands.CrearEvento
 {
-    
+
 
     public class CrearEventoCommand : IRequestCommand<string>
     {
@@ -31,7 +31,7 @@ namespace Application.Eventos.UseCases.Commands.CrearEvento
 
         public string FundamentacionEvento { get; set; } = string.Empty;
 
-        public List<TipoPublico> TipoPublico { get; set; } = [];
+        public string TipoPublico { get; set; } = string.Empty;
 
         [Required]
         public int ConcurrenciaEstimada { get; set; }

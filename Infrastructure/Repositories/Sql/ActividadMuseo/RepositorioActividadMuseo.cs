@@ -28,6 +28,7 @@ namespace Infrastructure.Repositories.Sql.ActividadMuseo
                     (!string.IsNullOrEmpty(a.RRule) && a.Horario.Inicio < fechaHasta && a.Horario.Fin > fechaDesde) ||
 
                     (string.IsNullOrEmpty(a.RRule) && a.Horario.Inicio <= fechaHasta))
+                .Where(a => a.Estado == EstadoActividad.Activa)
                 .ToListAsync();
 
 
