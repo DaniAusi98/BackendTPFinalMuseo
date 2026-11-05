@@ -7,7 +7,7 @@ namespace Application.MuseumResources.Repositories
     {
         Task<List<Sala>> ObtenerSalasporIdsAsync(IEnumerable<string> ids);
         Task<List<Sala>> ObtenerSalasDisponiblesAsync();
-        Task<List<Sala>> ObtenerSalasEventoAsync();
+        Task<List<Sala>> ObtenerSalasEventosActividadesAsync();
         Task<List<Sala>> ObtenerSalasVisitasGrupalesAsync();
 
 

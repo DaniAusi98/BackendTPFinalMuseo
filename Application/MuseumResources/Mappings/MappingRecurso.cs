@@ -22,14 +22,6 @@ namespace Application.MuseumResources.Mappings
 
             CreateMap<RecursoAsignado, RecursosAsignadosEventoDto>();
 
-
-
-            /*CreateMap<RecursoDto, Recurso>()
-                  .ForMember(dest => dest.NombreRecurso, opt => opt.MapFrom(src => src.NombreRecurso))
-                  .ForMember(dest => dest.TipoRecurso, opt => opt.MapFrom(src => Enum.Parse<TipoRecurso>(src.TipoRecurso)))
-                  .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
-                  .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => Enum.Parse<EstadoRecurso>(src.Estado)))
-                  .ForMember(dest => dest.CantidadTotal, opt => opt.MapFrom(src => src.CantidadTotal));*/
             CreateMap<Sala, SalaDto>()
                   .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                   .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))

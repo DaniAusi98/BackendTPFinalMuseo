@@ -17,16 +17,3 @@ namespace Application.Eventos.DataTransferObjets
 
     }
 }
-/*public string NombreyApellidoSolicitante { get; private set; }
-        public Telefono TelefonoSolicitante { get; private set; }
-        public Email EmailSolicitante { get; private set; }
-        public string Institucion { get; private set; }
-        public TipoEvento TipoEvento { get; private set; }
-        public string TituloEvento { get; private set; }
-        public string DescripcionEvento { get; private set; } = string.Empty;
-        public string FundamentacionEvento { get; private set; } = string.Empty;
-        public List<TipoPublico> TipoPublico { get; private set; }
-        public int? CantidadEstimada { get; private set; }
-        public bool RequiereDifusion { get; private set; }
-        public List<string> UrlImagenes { get; private set; } = [];
-        public bool SolicitaFlyer { get; private set; }*/

@@ -10,7 +10,6 @@ namespace Domain.Common.Entities
         public List<HorarioApertura> HorariosApertura { get; private set; }
 
         private readonly List<DiaCierreMuseo> _diasCierre;
-        public string ZonaHoraria { get; private set; }
 
         public IReadOnlyCollection<DiaCierreMuseo> DiasCierre
             => _diasCierre.AsReadOnly();
@@ -24,7 +23,6 @@ namespace Domain.Common.Entities
 
         public HorarioAperturaMuseo(
             IEnumerable<HorarioApertura> horarios,
-            string zonaHoraria,
             IEnumerable<DiaCierreMuseo>? diasCierre = null
             )
         {
@@ -37,11 +35,7 @@ namespace Domain.Common.Entities
             _diasCierre = diasCierre?.ToList()
                 ?? new List<DiaCierreMuseo>();
 
-            if (string.IsNullOrWhiteSpace(zonaHoraria))
-            {
-                throw new ArgumentException("La zona horaria no puede estar vacía.", nameof(zonaHoraria));
-            }
-            ZonaHoraria = zonaHoraria;
+
         }
 
         public void ActualizarHorario(

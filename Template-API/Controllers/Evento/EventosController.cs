@@ -1,6 +1,7 @@
 ﻿using Application.Eventos.DataTransferObjets;
 using Application.Eventos.UseCases.Commands.CrearEvento;
 using Application.Eventos.UseCases.Commands.UpdateEvento;
+using Application.Eventos.UseCases.Commands.UpdateMuestra;
 using Application.Eventos.UseCases.Queries;
 using Application.Eventos.UseCases.Queries.GetEventoBy;
 using Application.Eventos.UseCases.Queries.ReporteEventos;
@@ -84,6 +85,15 @@ namespace Controllers.Evento
 
             return Ok(entity);
         }
+        [HttpGet("get-muestra-by")]
+        public async Task<IActionResult> GetMuestraById(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            var entity = await _commandQueryBus.Send(new GetMuestraByIdQuery { Id = id });
+
+            return Ok(entity);
+        }
 
         // ============================================================
         // ACTUALIZAR EVENTO
@@ -127,6 +137,47 @@ namespace Controllers.Evento
             return Ok(eventoActualizado);
         }
 
+        // ============================================================
+        // COMPLETAR -ACTUALIZAR MUESTRA
+        // ============================================================
+
+        [HttpPut("completar-propuesta-muestra")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CompletarMuestra(
+        [FromForm] CompletarPropuestaMuestraCommand command,
+        [FromForm] List<IFormFile>? imagenes)
+        {
+            if (command is null) return BadRequest();
+
+            // Mapeamos los archivos binarios HTTP nativos al DTO puro de bytes
+            if (imagenes is not null && imagenes.Count > 0)
+            {
+                command.ImagenesNuevas = [];
+
+                foreach (var img in imagenes.Where(i => i.Length > 0))
+                {
+                    using var memoryStream = new MemoryStream();
+                    await img.CopyToAsync(memoryStream);
+
+                    command.ImagenesNuevas.Add(new ArchivoNuevoDto
+                    {
+                        Nombre = img.FileName,
+                        ContentType = img.ContentType,
+                        Contenido = memoryStream.ToArray()
+                    });
+                }
+            }
+
+            var muestraActualizado = await _commandQueryBus.Send(command);
+
+            if (muestraActualizado == null)
+            {
+                return NotFound($"No se encontró el registro con el ID {command.MuestraId}.");
+            }
+
+            // Retornamos el objeto modificado con un 200 OK
+            return Ok(muestraActualizado);
+        }
 
         ///Disponibilidad para el formCalendar///
 
@@ -186,14 +237,20 @@ namespace Controllers.Evento
         [HttpGet("reporteEventos")]
         public async Task<IActionResult> GetReporteVisitaGuiada(
             [FromQuery] DateTime desde,
-            [FromQuery] DateTime hasta)
+            [FromQuery] DateTime? hasta)
         {
-            if (desde == default || hasta == default)
+            if (desde == default)
             {
-                return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+                return BadRequest("El parámetro 'desde' es requerido. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
             }
 
-            var reporte = await _commandQueryBus.Send(new EventsReportTableQuery(desde, hasta));
+            if (hasta.HasValue && hasta.Value < desde)
+            {
+                return BadRequest("La fecha 'hasta' no puede ser anterior a 'desde'.");
+            }
+
+            var reporte = await _commandQueryBus.Send(
+                new EventsReportTableQuery(desde, hasta));
 
             return Ok(reporte);
         }
@@ -202,14 +259,20 @@ namespace Controllers.Evento
         [HttpGet("reporteEventoPorSala")]
         public async Task<IActionResult> GetReporteEventoPorSala(
             [FromQuery] DateTime desde,
-            [FromQuery] DateTime hasta)
+            [FromQuery] DateTime? hasta)
         {
-            if (desde == default || hasta == default)
+            if (desde == default)
             {
-                return BadRequest("Parámetros 'desde' y 'hasta' requeridos en la query. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+                return BadRequest("El parámetro 'desde' es requerido. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
             }
 
-            var reporte = await _commandQueryBus.Send(new ReporteEventosPorSalaQuery(desde, hasta));
+            if (hasta.HasValue && hasta.Value < desde)
+            {
+                return BadRequest("La fecha 'hasta' no puede ser anterior a 'desde'.");
+            }
+
+            var reporte = await _commandQueryBus.Send(
+                new ReporteEventosPorSalaQuery(desde, hasta));
 
             return Ok(reporte);
         }

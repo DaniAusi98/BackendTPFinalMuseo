@@ -22,7 +22,7 @@ namespace Infrastructure.Repositories.Sql.Eventos
                     .ThenInclude(e => e.Salas)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
-        public async Task<PropuestaMuestra?> FindByEventoIdAsync(string muestraId)
+        public async Task<PropuestaMuestra?> FindByMuestraIdAsync(string muestraId)
         {
             return await Repository
                 .FirstOrDefaultAsync(p => p.MuestraTemporalId == muestraId);

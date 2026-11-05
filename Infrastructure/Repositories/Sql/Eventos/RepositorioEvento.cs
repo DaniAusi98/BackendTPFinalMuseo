@@ -8,14 +8,17 @@ namespace Infrastructure.Repositories.Sql.Eventos
     internal sealed class RepositorioEvento(MuseoDbContext context) : BaseRepository<Evento>(context), IRepositorioEvento
     {
         public async Task<List<Evento>> FindAllAsync(
-           DateTime fechaDesde,
-           DateTime fechaHasta)
+    DateTime fechaDesde,
+    DateTime? fechaHasta)
         {
-            if (fechaDesde == fechaHasta)
+            if (fechaHasta == null)
             {
-                fechaHasta = fechaHasta.Date.AddDays(1).AddSeconds(-1);
+                fechaHasta = DateTime.Today.AddDays(1).AddSeconds(-1);
             }
-
+            else if (fechaDesde.Date == fechaHasta.Value.Date)
+            {
+                fechaHasta = fechaHasta.Value.Date.AddDays(1).AddSeconds(-1);
+            }
 
             var eventosEnRango = await Repository
                 .Include(a => a.Salas)
@@ -23,15 +26,16 @@ namespace Infrastructure.Repositories.Sql.Eventos
                     .ThenInclude(r => r.Recurso)
                 .Include(a => a.Exceptions)
                 .Where(a =>
-                    // Caso A: Actividades fijas individuales que caen justo en esta ventana
-                    (!string.IsNullOrEmpty(a.RRule) && a.Horario.Inicio < fechaHasta && a.Horario.Fin > fechaDesde) ||
+                    // Actividades recurrentes
+                    (!string.IsNullOrEmpty(a.RRule) &&
+                     a.Horario.Inicio < fechaHasta.Value &&
+                     a.Horario.Fin > fechaDesde) ||
 
-                    // Caso B: Actividades recurrentes que YA empezaron en el pasado o empiezan ahora.
-                    (string.IsNullOrEmpty(a.RRule) && a.Horario.Inicio <= fechaHasta))
-
+                    // Actividades no recurrentes
+                    (string.IsNullOrEmpty(a.RRule) &&
+                     a.Horario.Inicio <= fechaHasta.Value))
                 .OrderByDescending(a => a.Horario.Inicio)
                 .ToListAsync();
-
 
             return eventosEnRango;
         }

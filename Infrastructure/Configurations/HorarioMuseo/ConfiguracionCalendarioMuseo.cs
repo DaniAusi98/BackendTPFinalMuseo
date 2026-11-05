@@ -34,6 +34,7 @@ namespace Infrastructure.Configurations.HorarioMuseo
                     .IsRequired();
             });
 
+
             // Cierres especiales del museo.
             builder.HasMany(x => x.DiasCierre)
                 .WithOne()

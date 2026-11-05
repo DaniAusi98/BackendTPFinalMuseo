@@ -26,7 +26,7 @@ namespace Application.Eventos.UseCases.Queries.SalasDisponibles
         {
 
 
-            List<Sala> salasParaEventos = await _repositorioSala.ObtenerSalasEventoAsync();
+            List<Sala> salasParaEventos = await _repositorioSala.ObtenerSalasEventosActividadesAsync();
 
             // 4. Mapear a DTOs
             var dtos = salasParaEventos

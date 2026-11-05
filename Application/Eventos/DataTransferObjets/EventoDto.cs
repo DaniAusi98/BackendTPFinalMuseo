@@ -1,7 +1,5 @@
 ﻿using Application.Common.DataTransferObjects;
 using Application.MuseumResources.DataTransferObjects;
-using static Domain.ActividadMuseo.Enums.Enums;
-using static Domain.Eventos.Enums.Enums;
 
 namespace Application.Eventos.DataTransferObjets
 {
@@ -11,13 +9,13 @@ namespace Application.Eventos.DataTransferObjets
         public string NombreyApellidoResponsable { get; private set; }
         public TelefonoDto TelefonoResponsable { get; private set; }
         public EmailDto EmailResponsable { get; private set; }
+        public string Titulo { get; private set; }
         public TimeSlotDto Horario { get; private set; }
         public string? Institucion { get; private set; }
-        public string Titulo { get; private set; }
         public int? CantidadPersonas { get; private set; }
-        public EstadoActividad EstadoActividad { get; private set; }
+        public string Estado { get; private set; }
         public List<SalaDto> SalaDtos { get; private set; }
-        public TipoEvento TipoEvento { get; private set; }
+        public string TipoEvento { get; private set; }
         public string DescripcionEvento { get; private set; }
         public string FundamentacionEvento { get; private set; }
         public string? TipoPublico { get; private set; }

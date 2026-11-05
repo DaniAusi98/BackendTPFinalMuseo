@@ -8,7 +8,7 @@ namespace Application.Eventos.Repositories
         Task<List<PropuestaMuestra>> FindIncludeAllAsync();
         Task<PropuestaMuestra?> FindIncludeByIdAsync(string id);
 
-        Task<PropuestaMuestra?> FindByEventoIdAsync(string MuestraId);
+        Task<PropuestaMuestra?> FindByMuestraIdAsync(string MuestraId);
 
 
     }

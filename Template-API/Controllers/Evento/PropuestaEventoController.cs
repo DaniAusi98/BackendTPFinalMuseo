@@ -1,6 +1,7 @@
 ﻿using Application.Eventos.UseCases.Commands.CrearPropuestaEvento;
 using Application.Eventos.UseCases.Commands.ReenviarFormularioEvento;
 using Application.Eventos.UseCases.Queries.GetAllPropuestas;
+using Application.Eventos.UseCases.Queries.GetAllPropuestas.GetAllExhibitions;
 using Application.Eventos.UseCases.Queries.GetPropuestaByQuery;
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,14 @@ namespace Controllers.Evento
         public async Task<IActionResult> GetAll(uint pageIndex = 1, uint pageSize = 10)
         {
             var entities = await _commandQueryBus.Send(new GetAllPropuestasEventoQuery() { PageIndex = pageIndex, PageSize = pageSize });
+
+            return Ok(entities);
+        }
+
+        [HttpGet("get-all-exhibitions")]
+        public async Task<IActionResult> GetAllExhibitions(uint pageIndex = 1, uint pageSize = 10)
+        {
+            var entities = await _commandQueryBus.Send(new GetAllProposalsExhibitionsQuery() { PageIndex = pageIndex, PageSize = pageSize });
 
             return Ok(entities);
         }

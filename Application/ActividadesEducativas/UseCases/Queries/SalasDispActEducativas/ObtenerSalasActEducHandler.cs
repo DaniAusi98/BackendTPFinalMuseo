@@ -1,9 +1,9 @@
-﻿using Application.MuseumResources.Repositories;
+﻿using Application.MuseumResources.DataTransferObjects;
+using Application.MuseumResources.Repositories;
 using AutoMapper;
 using Core.Application;
+using Core.Application.Mapping;
 using Microsoft.Extensions.Logging;
-using static Domain.ActividadMuseo.Enums.Enums;
-using static Domain.RecursoMuseo.Enums.Enums;
 
 namespace Application.ActividadesEducativas.UseCases.Queries.SalasDispActEducativas
 {
@@ -11,7 +11,7 @@ namespace Application.ActividadesEducativas.UseCases.Queries.SalasDispActEducati
         IRepositorioConfiguracionSalaActividad repositorioConfiguracion,
         IMapper mapper,
         ILogger<ObtenerSalasActEducHandler> logger)
-        : IRequestQueryHandler<ObtenerSalasParaActEducQuery, QueryResult<SalasActEducDto>>
+        : IRequestQueryHandler<ObtenerSalasParaActEducQuery, QueryResult<SalaDto>>
     {
         private readonly IRepositorioSala _repositorioSala =
        repositorioSala ?? throw new ArgumentNullException(nameof(repositorioSala));
@@ -22,62 +22,13 @@ namespace Application.ActividadesEducativas.UseCases.Queries.SalasDispActEducati
 
         private readonly IMapper _mapper =
             mapper ?? throw new ArgumentNullException(nameof(mapper));
-        public async Task<QueryResult<SalasActEducDto>> Handle(
+        public async Task<QueryResult<SalaDto>> Handle(
     ObtenerSalasParaActEducQuery request,
     CancellationToken cancellationToken)
         {
 
-            var salasActivas = await _repositorioSala.ObtenerSalasDisponiblesAsync();
-
-            _logger.LogInformation(
-                "SALAS: {@Salas}",
-                salasActivas.Select(x => new
-                {
-                    x.Id,
-                    x.Nombre,
-                    x.EstadoSala
-                }));
-
-            var configuraciones = await _repositorioConfiguracion
-                .ObtenerPorTipoActividadAsync(TipoActividad.ActividadEducativa);
-
-            _logger.LogInformation(
-                "CONFIGURACIONES: {@Configuraciones}",
-                configuraciones.Select(x => new
-                {
-                    x.SalaId,
-                    x.TipoActividad,
-                    x.Habilitada
-                }));
-
-            var salasDisp = salasActivas
-                .Where(s => s.EstadoSala == EstadoSala.Activa &&
-                            configuraciones.Any(config =>
-                                config.SalaId == s.Id &&
-                                config.Habilitada))
-                .ToList();
-
-            _logger.LogInformation(
-                "SALAS DISPONIBLES: {Cantidad}",
-                salasDisp.Count);
-
-            var dtos = salasDisp
-                .Select(s => new SalasActEducDto
-                {
-                    Id = s.Id,
-                    Nombre = s.Nombre,
-                    CodigoSala = s.CodigoSala,
-                    Capacidad = s.Capacidad,
-                    Ubicacion = s.Ubicacion.ToString(),
-                    TipoSala = s.TipoSala.ToString()
-                })
-                .ToList();
-
-            return new QueryResult<SalasActEducDto>(
-                dtos,
-                dtos.Count,
-                pageIndex: 0,
-                pageSize: (uint)dtos.Count);
+            var salasActivas = await _repositorioSala.ObtenerSalasEventosActividadesAsync();
+            return new QueryResult<SalaDto>(salasActivas.To<SalaDto>(), salasActivas.Count, request.PageIndex, request.PageSize);
         }
     }
 }

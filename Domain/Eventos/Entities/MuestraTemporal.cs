@@ -10,19 +10,19 @@ namespace Domain.Eventos.Entities
 {
     public class MuestraTemporal : ActividadBase
     {
-        public string NombreApellidoResponsable { get; private set; }
-        public Telefono TelefonoResponsable { get; private set; }
-        public Email EmailResponsable { get; private set; }
-        public string? Institucion { get; private set; }
-        public Email? EmailInstitucion { get; private set; }
-        public string TituloPropuesta { get; private set; }
-        public string DescripcionMuestra { get; private set; } = string.Empty;
-        public string FundamentacionMuestra { get; private set; } = string.Empty;
-        public LogisticaMuestraTemporal LogisticaMuestraTemporal { get; private set; }
-        public string? Publico { get; private set; }
-        public bool RequiereDifusion { get; private set; }
-        public List<string> UrlImagenesMuestra { get; private set; } = [];
-        public bool SolicitaFlyer { get; private set; }
+        public string NombreApellidoResponsable { get; private set; }//ya esta 
+        public Telefono TelefonoResponsable { get; private set; }//ya esta 
+        public Email EmailResponsable { get; private set; } //ya esta 
+        public string? Institucion { get; private set; } // no esta 
+        public Email? EmailInstitucion { get; private set; } // no esta  
+        public string TituloPropuesta { get; private set; }//ya esta 
+        public string DescripcionMuestra { get; private set; } = string.Empty;// no esta
+        public string FundamentacionMuestra { get; private set; } = string.Empty; // no esta
+        public LogisticaMuestraTemporal LogisticaMuestraTemporal { get; private set; }//ya esta
+        public string? Publico { get; private set; }// no esta
+        public bool RequiereDifusion { get; private set; }// no esta
+        public List<string> UrlImagenesMuestra { get; private set; } = [];// no esta
+        public bool SolicitaFlyer { get; private set; }// no esta
 
         public MuestraTemporal(
             string nombreResponsable,

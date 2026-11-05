@@ -1,6 +1,7 @@
 using Application.Eventos.DataTransferObjets;
 using AutoMapper;
 using Domain.Eventos.Entities;
+using Domain.Eventos.ValueObjets;
 
 namespace Application.Eventos.Mappings
 {
@@ -20,9 +21,38 @@ namespace Application.Eventos.Mappings
                 .ForMember(dest => dest.SalaDtos, opt => opt.MapFrom(src => src.Salas))
                 .ForMember(dest => dest.Recursos, opt => opt.MapFrom(src => src.Recursos));
 
+            CreateMap<LogisticaMuestraTemporal, LogisticaMuestraTemporalDto>().ReverseMap();
+
+            CreateMap<PropuestaMuestra, PropuestaMuestraDto>()
+                .ForMember(dest => dest.MuestraDto, opt => opt.MapFrom(src => src.MuestraTemporal)); ;
+
+            CreateMap<MuestraTemporal, MuestraDto>()
+                .ForMember(dest => dest.MuestraId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.NombreApellidoResponsable, opt => opt.MapFrom(src => src.NombreApellidoResponsable))
+                .ForMember(dest => dest.TelefonoResponsable, opt => opt.MapFrom(src => src.TelefonoResponsable))
+                .ForMember(dest => dest.EmailResponsable, opt => opt.MapFrom(src => src.EmailResponsable))
+                .ForMember(dest => dest.Institucion, opt => opt.MapFrom(src => src.Institucion))
+                .ForMember(dest => dest.EmailInstitucion, opt => opt.MapFrom(src => src.EmailInstitucion))
+                .ForMember(dest => dest.TituloPropuesta, opt => opt.MapFrom(src => src.Titulo))
+                .ForMember(dest => dest.DescripcionMuestra, opt => opt.MapFrom(src => src.DescripcionMuestra))
+                .ForMember(dest => dest.FundamentacionMuestra, opt => opt.MapFrom(src => src.FundamentacionMuestra))
+                .ForMember(dest => dest.LogisticaMuestraTemporal, opt => opt.MapFrom(src => src.LogisticaMuestraTemporal))
+                .ForMember(dest => dest.Publico, opt => opt.MapFrom(src => src.Publico))
+                .ForMember(dest => dest.RequiereDifusion, opt => opt.MapFrom(src => src.RequiereDifusion))
+                .ForMember(dest => dest.UrlImagenes, opt => opt.MapFrom(src => src.UrlImagenesMuestra))
+                .ForMember(dest => dest.SolicitaFlyer, opt => opt.MapFrom(src => src.SolicitaFlyer))
+                .ForMember(dest => dest.Horario, opt => opt.MapFrom(src => src.Horario))
+                .ForMember(dest => dest.EstadoActividad, opt => opt.MapFrom(src => src.Estado))
+                .ForMember(dest => dest.SalaDtos, opt => opt.MapFrom(src => src.Salas));
 
 
-            CreateMap<PropuestaEvento, PropuestaEventoDto>();
+            CreateMap<PropuestaEvento, PropuestaEventoDto>()
+                .ForMember(dest => dest.Evento, opt => opt.MapFrom(src => src.Evento)); ;
+
+
+
+
+
             CreateMap<RecursoAsignadoPropuesta, RecursoAsignadoPropuestaDto>();
 
 

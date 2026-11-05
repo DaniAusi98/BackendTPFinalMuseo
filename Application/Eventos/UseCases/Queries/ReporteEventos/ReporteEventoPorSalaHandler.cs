@@ -1,3 +1,4 @@
+
 using Application.Availability.ApplicationServices;
 using Application.Eventos.DataTransferObjets;
 using Application.Eventos.Repositories;
@@ -24,9 +25,16 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
             ReporteEventosPorSalaQuery request,
             CancellationToken cancellationToken)
         {
+            var fechaDesde = request.Desde;
+
+            var fechaHasta = (request.Hasta ?? request.Desde)
+                .Date
+                .AddDays(1)
+                .AddSeconds(-1);
+
             var eventos = await _repositorioEvento.FindAllAsync(
-                request.Desde,
-                request.Hasta);
+                fechaDesde,
+                fechaHasta);
 
             var ocurrencias = new List<(Evento Evento, DateTime Inicio, DateTime Fin)>();
 
@@ -37,8 +45,8 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
                 // Evento sin recurrencia
                 if (string.IsNullOrWhiteSpace(evento.RRule))
                 {
-                    if (evento.Horario.Inicio < request.Hasta &&
-                        evento.Horario.Fin > request.Desde)
+                    if (evento.Horario.Inicio <= fechaHasta &&
+                        evento.Horario.Fin > fechaDesde)
                     {
                         ocurrencias.Add((
                             evento,
@@ -54,8 +62,8 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
                     evento.RRule,
                     evento.Horario.Inicio,
                     (int)duracion.TotalMinutes,
-                    request.Desde,
-                    request.Hasta);
+                    fechaDesde,
+                    fechaHasta);
 
                 foreach (var slot in slots)
                 {

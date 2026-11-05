@@ -5,7 +5,7 @@ namespace Application.Eventos.Repositories
 {
     public interface IRepositorioEvento : IRepository<Evento>
     {
-        public Task<List<Evento>> FindAllAsync(DateTime fechaDesde, DateTime fechaHasta);
+        public Task<List<Evento>> FindAllAsync(DateTime fechaDesde, DateTime? fechaHasta);
 
         public Task<Evento?> FindOneIncludeAsync(string eventoId);
 

@@ -1,3 +1,4 @@
+
 using Application.Availability.ApplicationServices;
 using Application.Eventos.DataTransferObjets;
 using Application.Eventos.Repositories;
@@ -12,7 +13,7 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
         IRecurrenceEvaluator recurrenceEvaluator)
         : IRequestQueryHandler<
             EventsReportTableQuery,
-            QueryResult<TablaReporteEventoDto>>
+            QueryResult<EventoDto>>
     {
         private readonly IRepositorioEvento _repositorioEvento =
             repositorioEvento ?? throw new ArgumentNullException(nameof(repositorioEvento));
@@ -20,13 +21,20 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
         private readonly IRecurrenceEvaluator _recurrenceEvaluator =
             recurrenceEvaluator ?? throw new ArgumentNullException(nameof(recurrenceEvaluator));
 
-        public async Task<QueryResult<TablaReporteEventoDto>> Handle(
+        public async Task<QueryResult<EventoDto>> Handle(
             EventsReportTableQuery request,
             CancellationToken cancellationToken)
         {
+            var fechaDesde = request.Desde;
+
+            var fechaHasta = (request.Hasta ?? request.Desde)
+                .Date
+                .AddDays(1)
+                .AddSeconds(-1);
+
             var eventos = await _repositorioEvento.FindAllAsync(
-                request.Desde,
-                request.Hasta);
+                fechaDesde,
+                fechaHasta);
 
             var ocurrencias = new List<(Evento Evento, DateTime Inicio, DateTime Fin)>();
 
@@ -37,8 +45,8 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
                 // Evento sin recurrencia
                 if (string.IsNullOrWhiteSpace(evento.RRule))
                 {
-                    if (evento.Horario.Inicio < request.Hasta &&
-                        evento.Horario.Fin > request.Desde)
+                    if (evento.Horario.Inicio <= fechaHasta &&
+                        evento.Horario.Fin > fechaDesde)
                     {
                         ocurrencias.Add((
                             evento,
@@ -54,8 +62,8 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
                     evento.RRule,
                     evento.Horario.Inicio,
                     (int)duracion.TotalMinutes,
-                    request.Desde,
-                    request.Hasta);
+                    fechaDesde,
+                    fechaHasta);
 
                 foreach (var slot in slots)
                 {
@@ -69,16 +77,12 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
             var resultado = ocurrencias
                 .Select(x =>
                 {
-                    var dto = x.Evento.To<TablaReporteEventoDto>();
-
-                    dto.FechaInicio = x.Inicio;
-                    dto.FechaFin = x.Fin;
-
+                    var dto = x.Evento.To<EventoDto>();
                     return dto;
                 })
                 .ToList();
 
-            return new QueryResult<TablaReporteEventoDto>(
+            return new QueryResult<EventoDto>(
                 resultado,
                 resultado.Count,
                 request.PageIndex,

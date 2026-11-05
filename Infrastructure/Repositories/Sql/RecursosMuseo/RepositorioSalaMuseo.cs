@@ -23,7 +23,7 @@ namespace Infrastructure.Repositories.Sql.RecursosMuseo
                 .ToListAsync();
         }
 
-        public async Task<List<Sala>> ObtenerSalasEventoAsync()
+        public async Task<List<Sala>> ObtenerSalasEventosActividadesAsync()
         {
             return await context.Set<Sala>()
                 .Where(s => s.TipoSala == TipoSala.Auditorio || s.TipoSala == TipoSala.Biblioteca || s.TipoSala == TipoSala.Multifuncion)
