@@ -2,30 +2,30 @@
 using Domain.RecursoMuseo.ValueObjets;
 using Domain.VisitasGrupales.Entities.GrupalGuiada.Guia;
 
-namespace Domain.RecursoMuseo.Factories
+namespace Domain.VisitasGrupales.Factories
 {
     public static class GuiaFactory
     {
         public static List<Guia> CrearGuiasPorDefecto()
         {
-            return new List<Guia>
-            {
+            return
+            [
                 CrearGuiaManana(
                     "Carlos", "Gómez",
-                    "carlos@ museo.com", "3511111111"),
+                    "carlos.gómez@gmail.com", "3511111111"),
 
                 CrearGuiaManana(
                     "María", "Fernández",
-                    "maria@museo.com", "3512222222"),
+                    "maria.fernández@gmail.com", "3512222222"),
 
                 CrearGuiaTarde(
                     "Juan", "Pérez",
-                    "juan@museo.com", "3513333333"),
+                    "juan.pérez@gmail.com", "3513333333"),
 
                 CrearGuiaTarde(
                     "Laura", "Rodríguez",
-                    "laura@museo.com", "3514444444")
-            };
+                    "laura.rodríguez@gmail.com", "3514444444")
+            ];
         }
 
         private static Guia CrearGuiaManana(
@@ -68,28 +68,28 @@ namespace Domain.RecursoMuseo.Factories
             TimeOnly inicio,
             TimeOnly fin)
         {
-            return new List<HorarioGuia>
-            {
-                new HorarioGuia(
+            return
+            [
+                new(
                     new DiaLaboral(DayOfWeek.Monday),
                     inicio, fin),
 
-                new HorarioGuia(
+                new(
                     new DiaLaboral(DayOfWeek.Tuesday),
                     inicio, fin),
 
-                new HorarioGuia(
+                new(
                     new DiaLaboral(DayOfWeek.Wednesday),
                     inicio, fin),
 
-                new HorarioGuia(
+                new(
                     new DiaLaboral(DayOfWeek.Thursday),
                     inicio, fin),
 
-                new HorarioGuia(
+                new(
                     new DiaLaboral(DayOfWeek.Friday),
                     inicio, fin)
-            };
+            ];
         }
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.VisitaGrupal.DataTransferObjets.Guias
 {
     public class GuiaHorarioDto

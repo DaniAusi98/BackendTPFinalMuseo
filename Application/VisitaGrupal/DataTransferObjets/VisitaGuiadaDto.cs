@@ -3,9 +3,10 @@ using Domain.Common.ValueObjets;
 
 namespace Application.VisitaGrupal.DataTransferObjets
 {
-    public class GuidedTourReservationDto
+    public class VisitaGuiadaDto
     {
         public string Id { get; set; }
+        public string TipoActividad { get; set; }
         public string Titulo { get; set; }
         public string UsuarioVisitanteId { get; set; } = default!;
         public string NombreSolicitante { get; set; }

@@ -8,6 +8,7 @@
         public int CantidadAsignada { get; private set; }
 
         public DateTime Inicio { get; private set; }
+
         public DateTime Fin { get; private set; }
     }
 }

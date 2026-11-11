@@ -16,7 +16,7 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada.Guia
         public List<HorarioGuia> HorariosGuia { get; private set; } = new();
         public List<AusenciaGuia> AusenciasProgramadas { get; private set; } = new();
 
-        public string UserId { get; private set; }
+        public string? UserId { get; private set; }
         public bool Activo { get; private set; } = true;
 
         protected Guia()

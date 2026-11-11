@@ -1,101 +1,35 @@
 using Application.VisitaGrupal.DataTransferObjets;
 using Application.VisitaGrupal.Repositories;
 using Core.Application;
+using Core.Application.Mapping;
+using Domain.VisitasGrupales.Entities.GrupalAutoguiada;
+using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Application.VisitaGrupal.UseCases.Queries.GetAllGroupVisitCalendar
 {
     internal sealed class GetAllGroupVisitCalendarHandler(
         IRepositorioVisitaGrupalAutoguiada repositorioVisitaGrupalAutoguiada,
         IRepositorioVisitaGuiada repositorioVisitaGuiada
-    ) : IRequestQueryHandler<
-            GetAllGroupVisitCalendarQuery,
-            QueryResult<VisitaGrupalCalendarDto>>
+    ) : IRequestQueryHandler<GetAllGroupVisitCalendarQuery, VisitasGrupalesDto>
     {
-        private readonly IRepositorioVisitaGuiada _repositorioVisitaGuiada =
-            repositorioVisitaGuiada
-            ?? throw new ArgumentNullException(nameof(repositorioVisitaGuiada));
+        private readonly IRepositorioVisitaGuiada _repositorioVisitaGuiada = repositorioVisitaGuiada ?? throw new ArgumentNullException(nameof(repositorioVisitaGuiada));
 
-        private readonly IRepositorioVisitaGrupalAutoguiada _repositorioVisitaGrupalAutoguiada =
-            repositorioVisitaGrupalAutoguiada
-            ?? throw new ArgumentNullException(nameof(repositorioVisitaGrupalAutoguiada));
+        private readonly IRepositorioVisitaGrupalAutoguiada _repositorioVisitaGrupalAutoguiada = repositorioVisitaGrupalAutoguiada ?? throw new ArgumentNullException(nameof(repositorioVisitaGrupalAutoguiada));
 
-        public async Task<QueryResult<VisitaGrupalCalendarDto>> Handle(
-            GetAllGroupVisitCalendarQuery request,
-            CancellationToken cancellationToken)
+        public async Task<VisitasGrupalesDto> Handle(GetAllGroupVisitCalendarQuery request, CancellationToken cancellationToken)
         {
-            var visitasGuiadas =
-                await _repositorioVisitaGuiada.GetAllGroupVisitCalendarAsync(
-                    request.FechaConsultaDesde,
-                    request.FechaConsultaHasta);
+            List<VisitaGrupalGuiada> visitasGuiadas = await _repositorioVisitaGuiada.GetAllGroupVisitCalendarAsync(request.FechaConsultaDesde, request.FechaConsultaHasta);
+            List<VisitaGrupalAutoguiada> visitasAutoguiadas = await _repositorioVisitaGrupalAutoguiada.GetAllGroupVisitCalendarAsync(request.FechaConsultaDesde, request.FechaConsultaHasta);
 
-            var visitasAutoguiadas =
-                await _repositorioVisitaGrupalAutoguiada.GetAllGroupVisitCalendarAsync(
-                    request.FechaConsultaDesde,
-                    request.FechaConsultaHasta);
+            List<VisitaGuiadaDto> visitaGuiadaDtos = [.. visitasGuiadas.To<VisitaGuiadaDto>()];
+            List<VisitaAutoguiadaDto> visitaAutoguiadaDtos = [.. visitasAutoguiadas.To<VisitaAutoguiadaDto>()];
 
-            var visitasGrupalesDto = new List<VisitaGrupalCalendarDto>();
-
-            // Visitas guiadas
-            foreach (var visitaGuiada in visitasGuiadas)
+            return new VisitasGrupalesDto
             {
-                var slot = visitaGuiada.Horario;
+                VisitasGuiadas = visitaGuiadaDtos,
+                VisitasAutoguiadas = visitaAutoguiadaDtos
+            };
 
-
-                visitasGrupalesDto.Add(new VisitaGrupalCalendarDto
-                {
-
-                    Id = visitaGuiada.Id,
-                    Titulo = visitaGuiada.Titulo,
-                    Tipo = VisitaGrupalCalendarDto.TipoVisitaGrupal.Guiada,
-
-                    Pais = visitaGuiada.PaisInstitucion,
-                    Provincia = visitaGuiada.ProvinciaInstitucion,
-                    Localidad = visitaGuiada.LocalidadInstitucion,
-
-                    CantidadPersonas = visitaGuiada.CantidadPersonas ?? 0,
-                    Institucion = visitaGuiada.Institucion,
-                    DiversidadFuncional = visitaGuiada.DiversidadFuncionalDescripcion,
-
-                    HoraInicio = slot?.Inicio,
-                    HoraFin = slot?.Fin
-                });
-            }
-
-            // Visitas autoguiadas
-            foreach (var visitaAutoguiada in visitasAutoguiadas)
-            {
-                var slot = visitaAutoguiada.Horario;
-
-
-                visitasGrupalesDto.Add(new VisitaGrupalCalendarDto
-                {
-                    Id = visitaAutoguiada.Id,
-                    Titulo = visitaAutoguiada.Titulo,
-                    Tipo = VisitaGrupalCalendarDto.TipoVisitaGrupal.Autoguiada,
-
-                    Pais = visitaAutoguiada.PaisInstitucion,
-                    Provincia = visitaAutoguiada.ProvinciaInstitucion,
-                    Localidad = visitaAutoguiada.LocalidadInstitucion,
-
-                    CantidadPersonas = visitaAutoguiada.CantidadPersonas ?? 0,
-                    Institucion = visitaAutoguiada.Institucion,
-                    DiversidadFuncional = visitaAutoguiada.DiversidadFuncional,
-
-                    HoraInicio = slot?.Inicio,
-                    HoraFin = slot?.Fin
-                });
-            }
-
-            long totalElementos = visitasGrupalesDto.Count;
-            uint tamañoPagina = (uint)visitasGrupalesDto.Count;
-            uint indicePagina = 1;
-
-            return new QueryResult<VisitaGrupalCalendarDto>(
-                visitasGrupalesDto,
-                totalElementos,
-                tamañoPagina,
-                indicePagina
-            );
         }
     }
 }

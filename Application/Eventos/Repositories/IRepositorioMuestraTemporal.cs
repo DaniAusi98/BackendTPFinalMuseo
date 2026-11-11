@@ -5,10 +5,14 @@ namespace Application.Eventos.Repositories
 {
     public interface IRepositorioMuestraTemporal : IRepository<MuestraTemporal>
     {
-        public Task<List<MuestraTemporal>> FindAllIncludeAsync();
+        Task<List<MuestraTemporal>> FindAllIncludeAsync();
+
+        Task<List<MuestraTemporal>> FindAllIncludeByPeriodAsync(
+          DateTime fechaDesde,
+          DateTime fechaHasta);
 
 
-        public Task<MuestraTemporal?> FindOneIncludeAsync(string muestraId);
+        Task<MuestraTemporal?> FindOneIncludeAsync(string muestraId);
 
     }
 }

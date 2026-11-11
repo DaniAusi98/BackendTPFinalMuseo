@@ -41,5 +41,14 @@ namespace Infrastructure.Repositories.Sql.ActividadEducativa
 
             return actividadEducativas;
         }
+        public async Task<Domain.ActividadesAreaEducacion.Entities.ActividadEducativa?> FindOneIncludeAsync(string id)
+        {
+            return await Repository
+                .Include(e => e.Salas)
+                .Include(e => e.ProyectoVinculada)
+                .Include(e => e.Recursos)
+                    .ThenInclude(r => r.Recurso)
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
     }
 }

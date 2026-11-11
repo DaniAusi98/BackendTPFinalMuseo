@@ -21,7 +21,7 @@ internal sealed class ActividadesEducacionHandler(
         var visitasGuiadas = await repositorioVisitaGuiada.GetAllGroupVisitAsync(request.Desde, request.Hasta);
         var actividadesEducacion = await repositorioActividadEducativa.GetAllActEducationAsync(request.Desde, request.Hasta);
 
-        var visitasGuiadasDtos = visitasGuiadas.To<GuidedTourReservationDto>().ToList();
+        var visitasGuiadasDtos = visitasGuiadas.To<VisitaGuiadaDto>().ToList();
 
         var ocurrencias = ObtenerOcurrencias(actividadesEducacion, request.Desde, request.Hasta);
 

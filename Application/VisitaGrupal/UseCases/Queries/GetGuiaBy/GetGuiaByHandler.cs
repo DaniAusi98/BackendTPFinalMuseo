@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Application.Exceptions;
 using Application.VisitaGrupal.DataTransferObjets.Guias;
 using Application.VisitaGrupal.Repositories;
@@ -14,7 +12,7 @@ namespace Application.VisitaGrupal.UseCases.Queries.GetGuiaBy
         private readonly IRepositorioGuia _context = repositorioGuia ?? throw new ArgumentNullException(nameof(repositorioGuia));
         public async Task<GuiaDto> Handle(GetGuiaByQuery request, CancellationToken cancellationToken)
         {
-            Guia entity = await _context.FindOneAsync(request.GuiaId) ?? throw new EntityDoesNotExistException();
+            Guia entity = await _context.ObtenerGuiaConDisponibilidadAsync(request.GuiaId) ?? throw new EntityDoesNotExistException();
             return entity.To<GuiaDto>();
         }
     }

@@ -10,7 +10,7 @@ namespace Application.Eventos.DataTransferObjets
         public TelefonoDto TelefonoResponsable { get; private set; }
         public EmailDto EmailResponsable { get; private set; }
         public string Titulo { get; private set; }
-        public TimeSlotDto Horario { get; private set; }
+        public TimeSlotDto Horario { get; set; }
         public string? Institucion { get; private set; }
         public int? CantidadPersonas { get; private set; }
         public string Estado { get; private set; }

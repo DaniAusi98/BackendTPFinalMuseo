@@ -6,6 +6,8 @@ namespace Application.VisitaGrupal.DataTransferObjets
     {
         public string Id { get; set; }
         public string Titulo { get; set; }
+        public string TipoActividad { get; set; }
+
         public string UsuarioVisitanteId { get; set; } = default!;
         public string Institucion { get; set; } = string.Empty;
         public string NombreSolicitante { get; set; }

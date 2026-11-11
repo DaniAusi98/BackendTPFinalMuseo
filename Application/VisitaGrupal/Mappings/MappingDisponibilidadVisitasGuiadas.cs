@@ -36,7 +36,7 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.Disponible, opt => opt.MapFrom(src => src.Disponible))
                 .ForMember(dest => dest.Salas, opt => opt.MapFrom(src => src.Salas));
 
-            CreateMap<VisitaGrupalGuiada, GuidedTourReservationDto>()
+            CreateMap<VisitaGrupalGuiada, VisitaGuiadaDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UsuarioVisitanteId, opt => opt.MapFrom(src => src.UsuarioVisitanteId))
                 .ForMember(dest => dest.Institucion, opt => opt.MapFrom(src => src.Institucion))
@@ -44,7 +44,6 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.ApellidoSolicitante, opt => opt.MapFrom(src => src.ApellidoSolicitante))
                 .ForMember(dest => dest.EmailSolicitante, opt => opt.MapFrom(src => src.EmailSolicitante.Valor))
                 .ForMember(dest => dest.TelefonoSolicitante, opt => opt.MapFrom(src => src.TelefonoSolicitante.Valor))
-
                 .ForMember(dest => dest.TelefonoInstitucion, opt => opt.MapFrom(src => src.TelefonoInstitucion.Valor))
                 .ForMember(dest => dest.EmailInstitucion, opt => opt.MapFrom(src => src.EmailInstitucion.Valor))
                 .ForMember(dest => dest.PaisInstitucion, opt => opt.MapFrom(src => src.PaisInstitucion))
@@ -97,7 +96,7 @@ namespace Application.VisitaGrupal.Mappings
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado));
 
             CreateMap<HorarioGuia, GuiaHorarioDto>()
-            .ForMember(dest => dest.DiaAsignado, opt => opt.MapFrom(src => src.DiaAsignado.Dia));
+            .ForMember(dest => dest.DiaAsignado, opt => opt.MapFrom(src => src.DiaAsignado.Dia.ToString()));
 
             CreateMap<DisponibilidadGuiaFecha, DisponibilidadGuiaFechaDto>()
                 .ForMember(dest => dest.Fecha, opt => opt.MapFrom(src => src.Fecha))

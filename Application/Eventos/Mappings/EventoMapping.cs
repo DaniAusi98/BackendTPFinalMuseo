@@ -42,7 +42,7 @@ namespace Application.Eventos.Mappings
                 .ForMember(dest => dest.UrlImagenes, opt => opt.MapFrom(src => src.UrlImagenesMuestra))
                 .ForMember(dest => dest.SolicitaFlyer, opt => opt.MapFrom(src => src.SolicitaFlyer))
                 .ForMember(dest => dest.Horario, opt => opt.MapFrom(src => src.Horario))
-                .ForMember(dest => dest.EstadoActividad, opt => opt.MapFrom(src => src.Estado))
+                .ForMember(dest => dest.EstadoActividad, opt => opt.MapFrom(src => src.Estado.ToString()))
                 .ForMember(dest => dest.SalaDtos, opt => opt.MapFrom(src => src.Salas));
 
 

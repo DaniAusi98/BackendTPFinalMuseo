@@ -5,6 +5,7 @@ using Application.Eventos.UseCases.Commands.UpdateMuestra;
 using Application.Eventos.UseCases.Queries;
 using Application.Eventos.UseCases.Queries.GetEventoBy;
 using Application.Eventos.UseCases.Queries.ReporteEventos;
+using Application.Eventos.UseCases.Queries.ReporteMuestras;
 using Application.Eventos.UseCases.Queries.SalasDisponibles;
 using Application.MuseumResources.UseCases.Commands.ConfigurarSalaActividades;
 
@@ -76,7 +77,7 @@ namespace Controllers.Evento
         // ============================================================
 
 
-        [HttpGet("get-by")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
             if (string.IsNullOrEmpty(id)) return BadRequest();
@@ -235,7 +236,7 @@ namespace Controllers.Evento
         ///Reporte Eventos//
 
         [HttpGet("reporteEventos")]
-        public async Task<IActionResult> GetReporteVisitaGuiada(
+        public async Task<IActionResult> GetReporteEventos(
             [FromQuery] DateTime desde,
             [FromQuery] DateTime? hasta)
         {
@@ -254,6 +255,27 @@ namespace Controllers.Evento
 
             return Ok(reporte);
         }
+        [HttpGet("muestras-temporales")]
+        public async Task<IActionResult> GetMuestrasTemporales(
+            [FromQuery] DateTime desde,
+            [FromQuery] DateTime? hasta)
+        {
+            if (desde == default)
+            {
+                return BadRequest("El parámetro 'desde' es requerido. Formato ISO: yyyy-MM-dd o yyyy-MM-ddTHH:mm:ss");
+            }
+
+            if (hasta.HasValue && hasta.Value < desde)
+            {
+                return BadRequest("La fecha 'hasta' no puede ser anterior a 'desde'.");
+            }
+
+            var reporte = await _commandQueryBus.Send(
+                new MuestrasTemporalesQuery(desde, hasta));
+
+            return Ok(reporte);
+        }
+
         ///Reporte Eventos por sala//
 
         [HttpGet("reporteEventoPorSala")]
@@ -276,6 +298,7 @@ namespace Controllers.Evento
 
             return Ok(reporte);
         }
+
         ///Reporte Eventos por Tipo//
 
 

@@ -3,7 +3,7 @@ using Core.Application;
 
 namespace Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId
 {
-    public class GetReservationsByUserIdQuery : QueryRequest<QueryResult<GuidedTourReservationDto>>
+    public class GetReservationsByUserIdQuery : QueryRequest<QueryResult<VisitaGuiadaDto>>
     {
         public string UsuarioVisitanteId { get; set; }
         public GetReservationsByUserIdQuery()

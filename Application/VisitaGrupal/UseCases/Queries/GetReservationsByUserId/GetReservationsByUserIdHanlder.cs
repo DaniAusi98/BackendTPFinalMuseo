@@ -7,15 +7,15 @@ using Domain.VisitasGrupales.Entities.GrupalGuiada;
 
 namespace Application.VisitaGrupal.UseCases.Queries.GetReservationsByUserId
 {
-    internal class GetReservationsByUserIdHanlder(IRepositorioVisitaGuiada repositorioVisitaGuiada,IClock clock ) : IRequestQueryHandler<GetReservationsByUserIdQuery, QueryResult<GuidedTourReservationDto>>
+    internal class GetReservationsByUserIdHanlder(IRepositorioVisitaGuiada repositorioVisitaGuiada,IClock clock ) : IRequestQueryHandler<GetReservationsByUserIdQuery, QueryResult<VisitaGuiadaDto>>
     {
         private readonly IRepositorioVisitaGuiada _repositorioVisitaGuiada = repositorioVisitaGuiada ?? throw new ArgumentNullException(nameof(repositorioVisitaGuiada));
         private readonly IClock _clock = clock ?? throw new ArgumentNullException(nameof(clock));
-        public async Task<QueryResult<GuidedTourReservationDto>> Handle(GetReservationsByUserIdQuery request, CancellationToken cancellationToken)
+        public async Task<QueryResult<VisitaGuiadaDto>> Handle(GetReservationsByUserIdQuery request, CancellationToken cancellationToken)
         {
             var fechaActual = _clock.Now();
             IList<VisitaGrupalGuiada> entities = await _repositorioVisitaGuiada.ObtenerPorUsuarioIdAsync(request.UsuarioVisitanteId,fechaActual);
-            return new QueryResult<GuidedTourReservationDto>(entities.To<GuidedTourReservationDto>(), entities.Count, request.PageIndex, request.PageSize);
+            return new QueryResult<VisitaGuiadaDto>(entities.To<VisitaGuiadaDto>(), entities.Count, request.PageIndex, request.PageSize);
         }
     }
 }

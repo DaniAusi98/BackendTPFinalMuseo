@@ -4,7 +4,7 @@ using Core.Application;
 
 namespace Application.VisitaGrupal.UseCases.Queries.ReporteVisitaGuiada{
     
-    public class GetReportAllGuidedToursQuery(DateTime desde, DateTime hasta) : QueryRequest<QueryResult<GuidedTourReservationDto>>
+    public class GetReportAllGuidedToursQuery(DateTime desde, DateTime hasta) : QueryRequest<QueryResult<VisitaGuiadaDto>>
     {
         public DateTime Desde { get; } = desde;
         public DateTime Hasta { get; } = hasta;

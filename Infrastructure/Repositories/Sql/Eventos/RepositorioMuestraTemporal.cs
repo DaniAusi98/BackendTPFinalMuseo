@@ -5,28 +5,34 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Sql.Eventos
 {
-    internal sealed class RepositorioMuestraTemporal(MuseoDbContext context) : BaseRepository<MuestraTemporal>(context), IRepositorioMuestraTemporal
+    internal sealed class RepositorioMuestraTemporal(MuseoDbContext context)
+        : BaseRepository<MuestraTemporal>(context), IRepositorioMuestraTemporal
     {
         public async Task<List<MuestraTemporal>> FindAllIncludeAsync()
         {
-
-
-
-            var eventosEnRango = await Repository
+            return await Repository
                 .Include(a => a.Salas)
                 .Include(a => a.UrlImagenesMuestra)
                 .Include(a => a.Recursos)
                     .ThenInclude(r => r.Recurso)
-
-
                 .OrderByDescending(a => a.Horario.Inicio)
                 .ToListAsync();
-
-            return eventosEnRango;
         }
 
-
-
+        public async Task<List<MuestraTemporal>> FindAllIncludeByPeriodAsync(
+            DateTime fechaDesde,
+            DateTime fechaHasta)
+        {
+            return await Repository
+                .Where(m =>
+                    m.Horario.Inicio <= fechaHasta &&
+                    m.Horario.Fin >= fechaDesde)
+                .Include(a => a.Salas)
+                .Include(a => a.Recursos)
+                    .ThenInclude(r => r.Recurso)
+                .OrderByDescending(a => a.Horario.Inicio)
+                .ToListAsync();
+        }
 
         public async Task<MuestraTemporal?> FindOneIncludeAsync(string id)
         {
@@ -37,5 +43,4 @@ namespace Infrastructure.Repositories.Sql.Eventos
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
     }
-
 }

@@ -2,6 +2,7 @@
 using Application.ActividadesEducativas.UseCases.Queries;
 using Application.ActividadesEducativas.UseCases.Queries.GetActEducacion;
 using Application.ActividadesEducativas.UseCases.Queries.GetActividadesEducativas;
+using Application.ActividadesEducativas.UseCases.Queries.GetById;
 using Application.ActividadesEducativas.UseCases.Queries.ProyectosEducativos;
 using Application.ActividadesEducativas.UseCases.Queries.SalasDispActEducativas;
 using Core.Application;
@@ -71,13 +72,15 @@ namespace Controllers.ActividadEducativaController
             return Ok(actEducativas);
         }
 
-        /*[HttpGet("api/v1/[Controller]")]
-        public async Task<IActionResult> GetAll(uint pageIndex = 1, uint pageSize = 10)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
         {
-            var entities = await _commandQueryBus.Send(new GetAllDummyEntitiesQuery() { PageIndex = pageIndex, PageSize = pageSize });
+            if (string.IsNullOrEmpty(id)) return BadRequest();
 
-            return Ok(entities);
-        }*/
+            var entity = await _commandQueryBus.Send(new GetActividadEducativaQuery { ActividadId = id });
+
+            return Ok(entity);
+        }
 
         [HttpGet("actividadeseducacion")]
         public async Task<IActionResult> GetReporteActEducacion(

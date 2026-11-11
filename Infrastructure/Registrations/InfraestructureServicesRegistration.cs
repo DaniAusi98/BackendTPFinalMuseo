@@ -12,7 +12,7 @@ using Core.Infraestructure.Adapters.Http;
 using Hangfire;
 using Hangfire.MySql;
 using Infrastructure.Adapters;
-using Infrastructure.Adapters.EmailSender.ResendEmailService;
+using Infrastructure.Adapters.EmailSender.Email;
 using Infrastructure.Adapters.EmailSender.ResendEmailService.ConfirmarVisitaUrl;
 using Infrastructure.Adapters.EmailSender.ResendEmailService.User;
 using Infrastructure.Adapters.Feriados;
@@ -96,7 +96,12 @@ namespace Infrastructure.Registrations
 
             services.AddScoped<IURLConfirmacionVisitaGrupal, UrlConfirmacionVisitaGrupal>();
 
-            services.AddScoped<IEmailService, ResendEmailService>();
+            /*  CONFIGURACIÓN DE GMAIL CON MAILKIT */
+
+            services.Configure<MailOptions>(configuration.GetSection("MailSettings"));
+
+            services.AddScoped<IEmailService, MailKitEmailService>();
+
 
             /* Adapters */
             services.AddSingleton<IExternalApiClient, ExternalApiHttpAdapter>();

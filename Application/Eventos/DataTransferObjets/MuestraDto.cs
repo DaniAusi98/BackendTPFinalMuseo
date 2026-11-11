@@ -1,7 +1,6 @@
 ﻿using Application.Common.DataTransferObjects;
 using Application.MuseumResources.DataTransferObjects;
 using Domain.Eventos.ValueObjets;
-using static Domain.ActividadMuseo.Enums.Enums;
 
 namespace Application.Eventos.DataTransferObjets
 {
@@ -23,7 +22,7 @@ namespace Application.Eventos.DataTransferObjets
         public bool RequiereDifusion { get; private set; }
         public List<string> UrlImagenes { get; private set; }
         public bool SolicitaFlyer { get; private set; }
-        public EstadoActividad EstadoActividad { get; private set; }
+        public string EstadoActividad { get; private set; }
 
     }
     public record LogisticaMuestraTemporalDto

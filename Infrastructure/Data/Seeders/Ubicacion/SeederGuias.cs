@@ -1,5 +1,5 @@
 ﻿using Application.VisitaGrupal.Repositories;
-using Domain.RecursoMuseo.Factories;
+using Domain.VisitasGrupales.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

@@ -20,4 +20,5 @@ namespace Application.VisitaGrupal.UseCases.Guias.Commands.CreateGuia
 
         public List<GuiaHorarioDto> Horarios { get; set; } = new();
     }
+
 }

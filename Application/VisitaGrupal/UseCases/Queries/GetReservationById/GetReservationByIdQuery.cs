@@ -10,7 +10,7 @@ using Core.Application;
 
 namespace Application.VisitaGrupal.UseCases.Queries.GetReservationById
 {
-    public class GetReservationByIdQuery:IRequestQuery<GuidedTourReservationDto>
+    public class GetReservationByIdQuery:IRequestQuery<VisitaGuiadaDto>
     {
         public string ReservationId { get; set; }
         public GetReservationByIdQuery()

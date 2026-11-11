@@ -13,7 +13,7 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
         IRecurrenceEvaluator recurrenceEvaluator)
         : IRequestQueryHandler<
             ReporteEventosPorSalaQuery,
-            QueryResult<EventoPorSalaDto>>
+            QueryResult<EventoDto>>
     {
         private readonly IRepositorioEvento _repositorioEvento =
             repositorioEvento ?? throw new ArgumentNullException(nameof(repositorioEvento));
@@ -21,7 +21,7 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
         private readonly IRecurrenceEvaluator _recurrenceEvaluator =
             recurrenceEvaluator ?? throw new ArgumentNullException(nameof(recurrenceEvaluator));
 
-        public async Task<QueryResult<EventoPorSalaDto>> Handle(
+        public async Task<QueryResult<EventoDto>> Handle(
             ReporteEventosPorSalaQuery request,
             CancellationToken cancellationToken)
         {
@@ -74,19 +74,20 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
                 }
             }
 
+            // Generar un DTO por cada ocurrencia
             var resultado = ocurrencias
                 .Select(x =>
                 {
-                    var dto = x.Evento.To<EventoPorSalaDto>();
+                    var dto = x.Evento.To<EventoDto>();
 
-                    dto.FechaInicio = x.Inicio;
-                    dto.FechaFin = x.Fin;
+                    dto.Horario.Inicio = x.Inicio;
+                    dto.Horario.Fin = x.Fin;
 
                     return dto;
                 })
                 .ToList();
 
-            return new QueryResult<EventoPorSalaDto>(
+            return new QueryResult<EventoDto>(
                 resultado,
                 resultado.Count,
                 request.PageIndex,

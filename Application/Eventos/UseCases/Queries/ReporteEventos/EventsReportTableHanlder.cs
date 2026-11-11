@@ -74,10 +74,15 @@ namespace Application.Eventos.UseCases.Queries.ReporteEventos
                 }
             }
 
+            // Generar un DTO por cada ocurrencia
             var resultado = ocurrencias
                 .Select(x =>
                 {
                     var dto = x.Evento.To<EventoDto>();
+
+                    dto.Horario.Inicio = x.Inicio;
+                    dto.Horario.Fin = x.Fin;
+
                     return dto;
                 })
                 .ToList();
