@@ -139,6 +139,17 @@ public class VisitasGuiadasController(ICommandQueryBus commandQueryBus) : Contro
 
         return Created($"api/v1/VisitasGuiadas/{nuevaVisitaId}", new { Id = nuevaVisitaId });
     }
+    [HttpPut("{id}/reprogramar-visita-guiada")]
+    public async Task<IActionResult> ReprogramarVisitaGuiada(
+        string id,
+        ReprogramarGuiadaRecepcionCommand command)
+    {
+        command.VisitaId = id;
+
+        var visitaReprogramadaId = await _commandQueryBus.Send(command);
+
+        return Created($"api/v1/VisitasGuiadas/{visitaReprogramadaId}", new { Id = visitaReprogramadaId });
+    }
 
     [HttpGet("calendar")]
     public async Task<IActionResult> GetAllGroupVisitCalendar(

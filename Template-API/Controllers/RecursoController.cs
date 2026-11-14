@@ -1,11 +1,11 @@
-using Core.Application;
 using Application.MuseumResources.UseCases.Recurso.Commands.CreateRecurso;
+using Application.MuseumResources.UseCases.Recurso.Commands.DeleteRecurso;
+using Application.MuseumResources.UseCases.Recurso.Commands.UpdateRecurso;
+using Application.MuseumResources.UseCases.Recurso.Queries.DisponibilidadRecursos;
 using Application.MuseumResources.UseCases.Recurso.Queries.GetAllRecursos;
 using Application.MuseumResources.UseCases.Recurso.Queries.GetRecursoBy;
-using Application.MuseumResources.UseCases.Recurso.Commands.UpdateRecurso;
-using Application.MuseumResources.UseCases.Recurso.Commands.DeleteRecurso;
+using Core.Application;
 using Microsoft.AspNetCore.Mvc;
-using Application.MuseumResources.UseCases.Recurso.Queries.DisponibilidadRecursos;
 
 namespace Controllers
 {
@@ -25,7 +25,7 @@ namespace Controllers
         [HttpGet("api/v1/[Controller]/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            if (id<0 || id>int.MaxValue) return BadRequest();
+            if (id < 0 || id > int.MaxValue) return BadRequest();
 
             var entity = await _commandQueryBus.Send(new GetRecursoByQuery { RecursoId = id });
 
@@ -33,9 +33,10 @@ namespace Controllers
         }
         [HttpGet("api/v1/[Controller]/disponibilidad")]
         public async Task<IActionResult> GetDisponibilidad(
-           [FromQuery] DateTime inicio,
-           [FromQuery] DateTime fin,
-           [FromQuery] string? rrule)
+     [FromQuery] DateTime inicio,
+     [FromQuery] DateTime fin,
+     [FromQuery] string? rrule,
+     [FromQuery] string? eventoIdExcluir)
         {
             if (fin <= inicio)
                 return BadRequest("La fecha de fin debe ser posterior a la fecha de inicio.");
@@ -45,7 +46,8 @@ namespace Controllers
                 {
                     Inicio = inicio,
                     Fin = fin,
-                    RRule = rrule
+                    RRule = rrule,
+                    EventoIdExcluir = eventoIdExcluir
                 });
 
             return Ok(resultado);

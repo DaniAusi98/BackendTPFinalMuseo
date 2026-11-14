@@ -107,18 +107,19 @@ namespace Domain.Eventos.Entities
             IEnumerable<Sala> salas,
             bool requiereDifusion,
             bool solicitaFlyer,
+            TimeSlot horario,
             string? institucion = null,
             string? descripcionEvento = null,
             string? fundamentacionEvento = null,
-             string? tipoPublico = null,
-             int? ConcurrenciaEstimada = null,
+            string? tipoPublico = null,
+            int? ConcurrenciaEstimada = null,
             IEnumerable<RecursoAsignado>? recursos = null,
             IEnumerable<string?>? urlImagenes = null,
             string? recurrenceRule = null)
         {
 
 
-
+            AsignarTimeSlots(horario);
             ActualizarRecursos(recursos);
             ActualizarSalas(salas);
             ActualizarRRule(recurrenceRule);

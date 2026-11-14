@@ -121,53 +121,49 @@ namespace Domain.VisitasGrupales.Entities.GrupalAutoguiada
 
 
         public void ActualizarDatos(
-          string institucion,
-          Email emailInstitucion,
-          Telefono telefonoInstitucion,
-          string paisInstitucion,
-          string provinciaInstitucion,
-          string localidadInstitucion,
-
-          string? descripcionDiversidad,
-          string? motivoVisita,
-          string? observaciones)
+            string nombreSolicitante,
+            string apellidoSolicitante,
+            Email emailSolicitante,
+            Telefono telefonoSolicitante,
+            string institucion,
+            Email emailInstitucion,
+            string paisInstitucion,
+            string provinciaInstitucion,
+            string localidadInstitucion,
+            string? descripcionDiversidad,
+            string? observaciones,
+            IEnumerable<TematicaVisita> tematicas)
         {
+            ArgumentNullException.ThrowIfNull(emailSolicitante);
+            ArgumentNullException.ThrowIfNull(telefonoSolicitante);
+            ArgumentNullException.ThrowIfNull(emailInstitucion);
+
             if (string.IsNullOrWhiteSpace(institucion))
-                throw new DomainException(
-                    "La institución es obligatoria.");
+                throw new DomainException("La institución es obligatoria.");
 
             if (string.IsNullOrWhiteSpace(paisInstitucion))
-                throw new DomainException(
-                    "El país de la institución es obligatorio.");
+                throw new DomainException("El país de la institución es obligatorio.");
 
             if (string.IsNullOrWhiteSpace(provinciaInstitucion))
-                throw new DomainException(
-                    "La provincia de la institución es obligatoria.");
+                throw new DomainException("La provincia de la institución es obligatoria.");
 
             if (string.IsNullOrWhiteSpace(localidadInstitucion))
-                throw new DomainException(
-                    "La localidad de la institución es obligatoria.");
+                throw new DomainException("La localidad de la institución es obligatoria.");
 
-            ArgumentNullException.ThrowIfNull(emailInstitucion);
-            ArgumentNullException.ThrowIfNull(telefonoInstitucion);
-
+            NombreSolicitante = nombreSolicitante?.Trim() ?? string.Empty;
+            ApellidoSolicitante = apellidoSolicitante?.Trim() ?? string.Empty;
+            EmailSolicitante = emailSolicitante;
+            TelefonoSolicitante = telefonoSolicitante;
 
             Institucion = institucion.Trim();
             EmailInstitucion = emailInstitucion;
-
             PaisInstitucion = paisInstitucion.Trim();
             ProvinciaInstitucion = provinciaInstitucion.Trim();
             LocalidadInstitucion = localidadInstitucion.Trim();
 
-
-
-            DiversidadFuncional =
-                descripcionDiversidad?.Trim() ?? string.Empty;
-
-
-
-            Observaciones =
-                observaciones?.Trim() ?? string.Empty;
+            DiversidadFuncional = descripcionDiversidad?.Trim() ?? string.Empty;
+            Observaciones = observaciones?.Trim() ?? string.Empty;
+            AsignarTematicas(tematicas);
         }
         public void AsignarTematicas(
            IEnumerable<TematicaVisita> tematicas)

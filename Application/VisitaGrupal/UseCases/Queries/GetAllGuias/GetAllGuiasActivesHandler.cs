@@ -26,23 +26,24 @@ internal class GetAllGuiasActivesHandler(
 
         List<GuiaDto> guiaDtos = [.. entities.To<GuiaDto>()];
 
-        List<string> userIds = guiaDtos
+        List<string> userIds = [.. guiaDtos
             .Select(g => g.UserId)
             .Where(id => !string.IsNullOrEmpty(id))
-            .Distinct()
-            .ToList();
+            .Distinct()];
 
         List<UserDto> usuarios = await _identityService.FindByIdsAsync(userIds);
 
         var usuariosPorId = usuarios.ToDictionary(u => u.Id);
 
         List<GuiaUsuarioDto> resultado = guiaDtos
-            .Select(guia => new GuiaUsuarioDto
-            {
-                Guia = guia,
-                UserGuia = usuariosPorId.GetValueOrDefault(guia.UserId)
-            })
-            .ToList();
+    .Select(guia => new GuiaUsuarioDto
+    {
+        Guia = guia,
+        UserGuia = !string.IsNullOrEmpty(guia.UserId)
+            ? usuariosPorId.GetValueOrDefault(guia.UserId)
+            : null
+    })
+    .ToList();
 
         return resultado;
     }

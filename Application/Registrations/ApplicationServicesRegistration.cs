@@ -109,6 +109,8 @@ namespace Application.Registrations
             // Register event availability producer service
             services.AddScoped<EventAvailabilityProducerService>();
             services.AddScoped<DispActEducativaProducerService>();
+            services.AddScoped<DisponibilidadMuestrasExposicionesService>();
+
 
 
 

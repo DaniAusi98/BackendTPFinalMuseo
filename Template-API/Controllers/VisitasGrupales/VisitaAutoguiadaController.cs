@@ -94,7 +94,18 @@ namespace Controllers.VisitasGrupales
 
             var nuevaVisitaId = await _commandQueryBus.Send(command);
 
-            return Created($"api/v1/VisitasAutoguiadas/{nuevaVisitaId}", new { Id = nuevaVisitaId });
+            return Ok(new { Id = nuevaVisitaId });
+        }
+        [HttpPut("{id}/reprogramar-visita-autoguiada")]
+        public async Task<IActionResult> ReprogramarVisitaAutoguiada(
+            string id,
+            ReprogramarAutoguiadaRecepcionCommand command)
+        {
+            command.VisitaId = id;
+
+            var visitaReprogramadaId = await _commandQueryBus.Send(command);
+
+            return Ok(new { Id = visitaReprogramadaId });
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

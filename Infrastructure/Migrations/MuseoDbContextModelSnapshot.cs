@@ -101,6 +101,32 @@ namespace Infrastructure.Migrations
                     b.ToTable("ActividadExceptions", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadReprogramada", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ActividadId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("FechaReprogramacion")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Motivo")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("UsuarioId")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActividadId");
+
+                    b.ToTable("ActividadesReprogramadas", (string)null);
+                });
+
             modelBuilder.Entity("Domain.ActividadMuseo.Entities.RecursoAsignado", b =>
                 {
                     b.Property<string>("Id")
@@ -1323,6 +1349,79 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ActividadMuseoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.ActividadMuseo.Entities.ActividadReprogramada", b =>
+                {
+                    b.HasOne("Domain.ActividadMuseo.Entities.ActividadBase", "Actividad")
+                        .WithMany()
+                        .HasForeignKey("ActividadId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Domain.Common.ValueObjets.TimeSlot", "HorarioAnterior", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("ActividadReprogramadaId")
+                                .IsRequired()
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<DateTime>("Fin")
+                                .HasColumnType("datetime");
+
+                            b1.Property<DateTime>("Inicio")
+                                .HasColumnType("datetime");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ActividadReprogramadaId")
+                                .IsUnique();
+
+                            b1.ToTable("ReprogramacionHorarioAnterior", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ActividadReprogramadaId");
+                        });
+
+                    b.OwnsOne("Domain.Common.ValueObjets.TimeSlot", "HorarioNuevo", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("ActividadReprogramadaId")
+                                .IsRequired()
+                                .HasColumnType("varchar(255)");
+
+                            b1.Property<DateTime>("Fin")
+                                .HasColumnType("datetime");
+
+                            b1.Property<DateTime>("Inicio")
+                                .HasColumnType("datetime");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("ActividadReprogramadaId")
+                                .IsUnique();
+
+                            b1.ToTable("ReprogramacionHorarioNuevo", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("ActividadReprogramadaId");
+                        });
+
+                    b.Navigation("Actividad");
+
+                    b.Navigation("HorarioAnterior");
+
+                    b.Navigation("HorarioNuevo");
                 });
 
             modelBuilder.Entity("Domain.ActividadMuseo.Entities.RecursoAsignado", b =>

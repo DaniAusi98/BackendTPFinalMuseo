@@ -100,6 +100,8 @@ namespace Domain.Eventos.Entities
             LogisticaMuestraTemporal logisticaMuestraTemporal,
             string? publico,
             bool requiereDifusion,
+            bool solicitarFlyer,
+            TimeSlot horario,
             IEnumerable<Sala> salas,
             string? descripcionMuestra = null,
             string? fundamentacionMuestra = null,
@@ -128,7 +130,7 @@ namespace Domain.Eventos.Entities
             ArgumentNullException.ThrowIfNull(emailResponsable);
             ArgumentNullException.ThrowIfNull(logisticaMuestraTemporal);
             ArgumentNullException.ThrowIfNull(salas);
-
+            AsignarTimeSlots(horario);
             ActualizarTitulo(tituloPropuesta);
             ActualizarSalas(salas);
             ActualizarRecursos(recursos);
@@ -144,6 +146,8 @@ namespace Domain.Eventos.Entities
 
             Publico = publico?.Trim();
             RequiereDifusion = requiereDifusion;
+            SolicitaFlyer = solicitarFlyer;
+
             Institucion = institucion?.Trim();
             EmailInstitucion = emailInstitucion;
 

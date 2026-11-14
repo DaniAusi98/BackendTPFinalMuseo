@@ -1,3 +1,4 @@
+
 using Application.ActividadMuseo.Repositories;
 using Application.Availability.Factories;
 using Application.Availability.Models;
@@ -9,6 +10,7 @@ using Domain.Eventos.Entities;
 using Microsoft.Extensions.Logging;
 using static Domain.ActividadMuseo.Enums.Enums;
 using static Domain.Eventos.Enums.Enums;
+
 using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadBase;
 
 namespace Application.Availability.Producers
@@ -21,23 +23,34 @@ namespace Application.Availability.Producers
         ActivityAvailabilityFactory availabilityFactory,
         ILogger<EventAvailabilityProducerService> logger)
     {
-        private readonly IRepositorioActividadMuseo _repositorioActividadMuseo = repositorioActividadMuseo
-                ?? throw new ArgumentNullException(nameof(repositorioActividadMuseo));
-        private readonly IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario
-                ?? throw new ArgumentNullException(nameof(repositorioCalendario));
-        private readonly IRepositorioSala _repositorioSalaMuseo = repositorioSalaMuseo
-                ?? throw new ArgumentNullException(nameof(repositorioSalaMuseo));
+        private readonly IRepositorioActividadMuseo _repositorioActividadMuseo =
+            repositorioActividadMuseo
+            ?? throw new ArgumentNullException(nameof(repositorioActividadMuseo));
+
+        private readonly IRepositorioCalendarioMuseo _repositorioCalendario =
+            repositorioCalendario
+            ?? throw new ArgumentNullException(nameof(repositorioCalendario));
+
+        private readonly IRepositorioSala _repositorioSalaMuseo =
+            repositorioSalaMuseo
+            ?? throw new ArgumentNullException(nameof(repositorioSalaMuseo));
+
         private readonly AvailabilityEngine _engine = engine
-                ?? throw new ArgumentNullException(nameof(engine));
-        private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory
-                ?? throw new ArgumentNullException(nameof(availabilityFactory));
-        private readonly ILogger<EventAvailabilityProducerService> _logger = logger
-                ?? throw new ArgumentNullException(nameof(logger));
+            ?? throw new ArgumentNullException(nameof(engine));
+
+        private readonly ActivityAvailabilityFactory _availabilityFactory =
+            availabilityFactory
+            ?? throw new ArgumentNullException(nameof(availabilityFactory));
+
+        private readonly ILogger<EventAvailabilityProducerService> _logger =
+            logger
+            ?? throw new ArgumentNullException(nameof(logger));
 
         public async Task<EventoDisponibilidadDto> GetEventAvailabilityAsync(
             DateTime desde,
             DateTime hasta,
-            List<string> salasIds)
+            List<string> salasIds,
+            string? eventoIdExcluir = null)
         {
             if (desde.Date > hasta.Date)
                 throw new ArgumentException(
@@ -46,10 +59,12 @@ namespace Application.Availability.Producers
             ArgumentNullException.ThrowIfNull(salasIds);
 
             _logger.LogInformation(
-                "Calculando disponibilidad de eventos desde {Desde} hasta {Hasta}. Salas: {Cantidad}",
+                "Calculando disponibilidad de eventos desde {Desde} hasta {Hasta}. " +
+                "Salas: {Cantidad}. Evento excluido: {EventoIdExcluir}",
                 desde.Date,
                 hasta.Date,
-                salasIds.Count);
+                salasIds.Count,
+                eventoIdExcluir);
 
             // 1. Obtener el calendario activo.
             var calendario = await _repositorioCalendario
@@ -59,9 +74,13 @@ namespace Application.Availability.Producers
 
             // 2. Obtener las actividades existentes.
             var actividadesEnRango =
-                await ObtenerActividadesConConflictoPotencial(desde, hasta);
+                await ObtenerActividadesConConflictoPotencial(
+                    desde,
+                    hasta,
+                    eventoIdExcluir);
 
             // 3. Preparar las actividades para el motor.
+            // El evento que se está reprogramando ya fue excluido.
             var existingActivities = _availabilityFactory.Create(
                 actividadesEnRango.Cast<ActividadMuseoEntity>().ToList(),
                 desde,
@@ -171,12 +190,104 @@ namespace Application.Availability.Producers
             };
         }
 
-        private Task<List<ActividadMuseoEntity>>
+        public async Task<bool> EstaDisponibleAsync(
+            Evento evento,
+            string? eventoIdExcluir = null)
+        {
+            ArgumentNullException.ThrowIfNull(evento);
+
+            var desde = evento.Horario.Inicio;
+            var hasta = evento.Horario.Fin;
+
+            // 1. Obtener el calendario activo.
+            var calendario = await _repositorioCalendario
+                .ObtenerCalendarioActivoAsync()
+                ?? throw new InvalidOperationException(
+                    "No hay calendario activo del museo.");
+
+            // 2. Comprobar que el horario esté dentro de una franja operativa.
+            var franjasOperativas = calendario
+                .ObtenerFranjasOperativas(DateOnly.FromDateTime(desde))
+                .ToList();
+
+            var horarioOperativo = franjasOperativas.Any(franja =>
+                desde >= franja.Inicio &&
+                hasta <= franja.Fin);
+
+            if (!horarioOperativo)
+                return false;
+
+            // 3. Obtener las actividades existentes excluyendo el evento actual.
+            var actividadesEnRango =
+                await ObtenerActividadesConConflictoPotencial(
+                    desde,
+                    hasta,
+                    eventoIdExcluir);
+
+            // 4. Preparar las actividades existentes para el motor.
+            var existingActivities = _availabilityFactory.Create(
+                actividadesEnRango.Cast<ActividadMuseoEntity>().ToList(),
+                desde,
+                hasta);
+
+            // 5. Crear un único candidato con el evento recibido.
+            var candidato = new CandidateEntry(
+                Guid.NewGuid(),
+                evento,
+                new List<TimeSlot> { evento.Horario }.AsReadOnly(),
+                null,
+                "EventCandidate");
+
+            var candidatos = new List<CandidateEntry>
+            {
+                candidato
+            };
+
+            // 6. Crear el mismo contexto que utiliza el producer.
+            var contexto = new AvailabilityContext
+            {
+                Start = desde,
+                End = hasta,
+                ExistingActivities = existingActivities,
+                Metadata = new Dictionary<string, object>
+                {
+                    { "tipoActividad", TipoActividad.EventoActividadExterna },
+                    {
+                        "salasIds",
+                        evento.Salas.Select(sala => sala.Id).ToList()
+                    }
+                }
+            };
+
+            // 7. Validar el único candidato.
+            var resultados = await _engine.CheckManyAsync(
+                contexto,
+                candidatos);
+
+            // 8. Devolver si está disponible.
+            return resultados.TryGetValue(candidato.Id, out var resultado)
+                && resultado.IsOk;
+        }
+
+        private async Task<List<ActividadMuseoEntity>>
             ObtenerActividadesConConflictoPotencial(
                 DateTime desde,
-                DateTime hasta)
+                DateTime hasta,
+                string? eventoIdExcluir = null)
         {
-            return _repositorioActividadMuseo.FindAllAsync(desde, hasta);
+            var actividades = await _repositorioActividadMuseo
+                .FindAllAsync(desde, hasta);
+
+            // Si se está reprogramando, quitamos el evento actual
+            // antes de preparar las actividades para el motor.
+            if (!string.IsNullOrWhiteSpace(eventoIdExcluir))
+            {
+                actividades = actividades
+                    .Where(actividad => actividad.Id != eventoIdExcluir)
+                    .ToList();
+            }
+
+            return actividades;
         }
     }
 }

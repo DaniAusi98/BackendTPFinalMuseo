@@ -118,6 +118,9 @@ namespace Infrastructure.Factories
             services.AddTransient<IRepositorioPropuestaEvento, RepositorioPropuestaEvento>();
             services.AddTransient<IRepositorioMuestraTemporal, RepositorioMuestraTemporal>();
             services.AddTransient<IRepositorioPropuestaMuestra, RepositorioPropuestaMuestra>();
+            services.AddTransient<IRepositorioActividadReprogramada, RepositorioActividadReprogramada>();
+
+
 
 
 

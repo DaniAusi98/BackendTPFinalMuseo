@@ -74,9 +74,22 @@ namespace Application.Eventos.UseCases.Commands.UpdateMuestra
                 request.LogisticaMuestraTemporal.FechaDesmontajeHasta);
 
 
-            muestra.ActualizarMuestra(request.NombreResponsable, telefonoResponsable, emailResponsable,
-                request.TituloPropuesta, logistica, request.Publico, request.RequiereDifusion, salas, request.DescripcionMuestra,
-                request.FundamentacionMuestra, request.Institucion, emailInstitucion, imagenesConservadas);
+            muestra.ActualizarMuestra(
+                request.NombreResponsable,
+                telefonoResponsable,
+                emailResponsable,
+                request.TituloPropuesta,
+                logistica,
+                request.Publico,
+                request.RequiereDifusion,
+                request.SolicitarAsistenciaDifusion,
+                muestra.Horario,
+                salas,
+                request.DescripcionMuestra,
+                request.FundamentacionMuestra,
+                request.Institucion,
+                emailInstitucion,
+                imagenesConservadas);
 
             _repositorioMuestra.Update(muestra.Id, muestra);
             var imagenesEliminadas = imagenesAnteriores

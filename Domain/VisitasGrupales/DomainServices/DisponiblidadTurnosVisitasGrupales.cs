@@ -130,6 +130,61 @@ namespace Domain.VisitasGrupales.DomainServices
 
             return Task.FromResult(resultado);
         }
+        public Task<bool> ValidarDisponibilidadTurno(
+            TimeSlot horario,
+            IReadOnlyCollection<Guia> guias,
+            IReadOnlyCollection<VisitaGrupalGuiada> visitasGuiadas,
+            ConfiguracionVisitasGrupalesGuiadas configuracion,
+            HorarioAperturaMuseo calendario)
+        {
+            ArgumentNullException.ThrowIfNull(horario);
+            ArgumentNullException.ThrowIfNull(guias);
+            ArgumentNullException.ThrowIfNull(visitasGuiadas);
+            ArgumentNullException.ThrowIfNull(configuracion);
+            ArgumentNullException.ThrowIfNull(calendario);
+
+            var fecha = horario.Inicio.Date;
+
+            var horariosDelDia = configuracion.DiasDisponibles
+                .Where(t => t.Dia == fecha.DayOfWeek)
+                .ToList();
+
+            var horarioDisponible = horariosDelDia.FirstOrDefault(t =>
+                t.ContieneIntervalo(horario.Inicio, horario.Fin));
+
+            if (horarioDisponible == null)
+                return Task.FromResult(false);
+
+            if (!configuracion.EstaDisponibleEnFecha(fecha))
+                return Task.FromResult(false);
+
+            if (!calendario.EstaAbierto(horario.Inicio, horario.Fin))
+                return Task.FromResult(false);
+
+            var visitasDelTurno = visitasGuiadas
+                .Where(v => v.Horario.SeSolapaCon(horario))
+                .ToList();
+
+            int cantidadGuias = guias.Count(g =>
+                ValidarDisponibilidadGuia.GuiaPuedeCubrirTurno(g, horario));
+
+            int guiasOcupados = visitasDelTurno.Sum(v =>
+                CalcularGuiasNecesarios(
+                    (int)v.CantidadPersonas,
+                    configuracion.CapacidadPorGuia));
+
+            int guiasLibres = Math.Max(0, cantidadGuias - guiasOcupados);
+
+            var contexto = new ContextoDisponibilidadVisitaGuiada(
+                configuracion,
+                horarioDisponible,
+                visitasDelTurno,
+                guiasLibres);
+
+            var disponibilidad = _motor.Evaluar(contexto);
+
+            return Task.FromResult(disponibilidad.Disponible);
+        }
 
         private static TimeSlot CrearTimeSlot(
             DateTime fecha,

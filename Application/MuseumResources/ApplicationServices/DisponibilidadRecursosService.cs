@@ -5,7 +5,6 @@ using Application.MuseumResources.DataTransferObjects;
 using Application.MuseumResources.Repositories;
 using Domain.Common.ValueObjets;
 
-
 namespace Application.MuseumResources.ApplicationServices
 {
     public class DisponibilidadRecursosService(
@@ -32,16 +31,17 @@ namespace Application.MuseumResources.ApplicationServices
             ?? throw new ArgumentNullException(nameof(repositorioRecurso));
 
         public async Task<List<DisponibilidadRecursoDto>> ConsultarAsync(
-    DateTime inicio,
-    DateTime fin,
-    string? rrule)
+            DateTime inicio,
+            DateTime fin,
+            string? rrule,
+            string? eventoIdExcluir)
         {
             DateTime windowStart = inicio;
             DateTime windowEnd = fin;
 
             int duracionMinutos = (int)(fin - inicio).TotalMinutes;
 
-            // 1. Si es recurrente, calculamos hasta dónde llega la recurrencia
+            // 1. Calcular la ventana de la recurrencia.
             if (!string.IsNullOrWhiteSpace(rrule))
             {
                 windowEnd = _recurrenceEvaluator.GetWindowEnd(
@@ -50,7 +50,7 @@ namespace Application.MuseumResources.ApplicationServices
                     duracionMinutos);
             }
 
-            // 2. Crear los TimeSlots de la nueva actividad
+            // 2. Crear los TimeSlots de la nueva actividad.
             List<TimeSlot> timeSlotsNuevaActividad;
 
             if (string.IsNullOrWhiteSpace(rrule))
@@ -70,43 +70,50 @@ namespace Application.MuseumResources.ApplicationServices
                     windowEnd);
             }
 
-            // 3. Consultar actividades existentes dentro de la ventana
+            // 3. Consultar actividades existentes.
             var actividades = await _repositorioActividadMuseo.FindAllAsync(
                 windowStart,
                 windowEnd);
 
-            // 4. Expandir y normalizar las actividades existentes
+            // 4. Excluir la actividad que se está reprogramando, si corresponde.
+            if (!string.IsNullOrWhiteSpace(eventoIdExcluir))
+            {
+                actividades = actividades
+                    .Where(actividad => actividad.Id != eventoIdExcluir)
+                    .ToList();
+            }
+
+            // 5. Expandir y normalizar las actividades existentes.
             var actividadesExistentes = _activityAvailabilityFactory.Create(
                 actividades,
                 windowStart,
                 windowEnd);
 
-            // 5. Consultar recursos activos
+            // 6. Consultar recursos activos.
             var recursosActivos = await _repositorioRecurso.FindActivosAsync();
 
-            // Disponibilidad mínima encontrada para cada recurso
+            // Disponibilidad mínima encontrada para cada recurso.
             var disponibilidad = recursosActivos.ToDictionary(
-                r => r.Id,
-                r => r.CantidadTotal);
+                recurso => recurso.Id,
+                recurso => recurso.CantidadTotal);
 
-            // 6. Revisar cada ocurrencia de la nueva actividad
+            // 7. Revisar cada ocurrencia de la nueva actividad.
             foreach (var timeSlotNuevo in timeSlotsNuevaActividad)
             {
                 var actividadesSolapadas = actividadesExistentes
-                    .Where(a => a.TimeSlots.Any(
+                    .Where(actividad => actividad.TimeSlots.Any(
                         slot => slot.SeSolapaCon(timeSlotNuevo)))
                     .ToList();
 
-                // Agrupamos una sola vez todos los recursos ocupados
-                // por las actividades que se solapan con esta ocurrencia.
+                // Agrupar los recursos ocupados por las actividades solapadas.
                 var ocupadosPorRecurso = actividadesSolapadas
-                    .SelectMany(a => a.Actividad.Recursos)
-                    .GroupBy(r => r.RecursoId)
+                    .SelectMany(actividad => actividad.Actividad.Recursos)
+                    .GroupBy(recurso => recurso.RecursoId)
                     .ToDictionary(
-                        g => g.Key,
-                        g => g.Sum(r => r.CantidadAsignada));
+                        grupo => grupo.Key,
+                        grupo => grupo.Sum(recurso => recurso.CantidadAsignada));
 
-                // Calculamos disponibilidad para cada recurso activo
+                // Calcular disponibilidad para cada recurso activo.
                 foreach (var recurso in recursosActivos)
                 {
                     ocupadosPorRecurso.TryGetValue(
@@ -116,15 +123,14 @@ namespace Application.MuseumResources.ApplicationServices
                     var cantidadDisponible =
                         recurso.CantidadTotal - cantidadOcupada;
 
-                    // Nos quedamos con la menor disponibilidad
-                    // encontrada entre todas las ocurrencias.
+                    // Conservar la menor disponibilidad entre las ocurrencias.
                     disponibilidad[recurso.Id] = Math.Min(
                         disponibilidad[recurso.Id],
                         cantidadDisponible);
                 }
             }
 
-            // 7. Construir respuesta
+            // 8. Construir respuesta.
             return recursosActivos
                 .Select(recurso => new DisponibilidadRecursoDto
                 {
@@ -137,4 +143,3 @@ namespace Application.MuseumResources.ApplicationServices
         }
     }
 }
-

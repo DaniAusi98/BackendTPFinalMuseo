@@ -158,5 +158,55 @@ namespace Domain.VisitasGrupales.DomainServices
             return visitasAutoguiadas.Count(
                 visita => visita.Horario.SeSolapaCon(slot));
         }
+        public Task<bool> ValidarDisponibilidadSlot(
+    VisitaGrupalAutoguiada visita,
+    IReadOnlyCollection<VisitaGrupalAutoguiada> visitasAutoguiadas,
+    ConfiguracionHorarioAutoguiada configuracion,
+    HorarioAperturaMuseo calendario)
+        {
+            ArgumentNullException.ThrowIfNull(visita);
+            ArgumentNullException.ThrowIfNull(visitasAutoguiadas);
+            ArgumentNullException.ThrowIfNull(configuracion);
+            ArgumentNullException.ThrowIfNull(calendario);
+
+            var slot = visita.Horario;
+
+            // Verificar que la fecha esté habilitada.
+            if (!configuracion.EstaDisponibleEnFecha(slot.Inicio))
+                return Task.FromResult(false);
+
+            // Verificar que el horario corresponda a un slot configurado.
+            var slotsConfigurados = configuracion.GenerarSlotsDisponibles(
+                DateOnly.FromDateTime(slot.Inicio));
+
+            bool slotConfigurado = slotsConfigurados.Any(s =>
+                s.Inicio == slot.Inicio &&
+                s.Fin == slot.Fin);
+
+            if (!slotConfigurado)
+                return Task.FromResult(false);
+
+            // Verificar que el museo esté abierto.
+            if (!calendario.EstaAbierto(slot.Inicio, slot.Fin))
+                return Task.FromResult(false);
+
+            // Verificar que no exista otra visita en el mismo horario.
+            bool horarioOcupado = visitasAutoguiadas.Any(v =>
+                v.Horario.Inicio == slot.Inicio);
+
+            if (horarioOcupado)
+                return Task.FromResult(false);
+
+            // Verificar cantidad máxima de visitas simultáneas.
+            int visitasSimultaneas = ContarVisitasSimultaneas(
+                slot,
+                visitasAutoguiadas);
+
+            int cuposDisponibles = Math.Max(
+                0,
+                configuracion.VisitasSimultaneasMaximas - visitasSimultaneas);
+
+            return Task.FromResult(cuposDisponibles > 0);
+        }
     }
 }

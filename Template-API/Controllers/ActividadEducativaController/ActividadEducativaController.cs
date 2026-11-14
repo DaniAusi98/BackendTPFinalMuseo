@@ -1,10 +1,14 @@
-﻿using Application.ActividadesEducativas.UseCases.Commands.CrearActividadEducativa;
+﻿using Application.ActividadesEducativas.UseCases.Commands.CancelarActEducativa;
+using Application.ActividadesEducativas.UseCases.Commands.CrearActividadEducativa;
+using Application.ActividadesEducativas.UseCases.Commands.UpdateActividaEducativa;
 using Application.ActividadesEducativas.UseCases.Queries;
 using Application.ActividadesEducativas.UseCases.Queries.GetActEducacion;
 using Application.ActividadesEducativas.UseCases.Queries.GetActividadesEducativas;
 using Application.ActividadesEducativas.UseCases.Queries.GetById;
 using Application.ActividadesEducativas.UseCases.Queries.ProyectosEducativos;
 using Application.ActividadesEducativas.UseCases.Queries.SalasDispActEducativas;
+using Application.Eventos.DataTransferObjets;
+
 using Core.Application;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,6 +61,41 @@ namespace Controllers.ActividadEducativaController
             var actividadId = await _commandQueryBus.Send(command);
             return Created($"api/[Controller]/{actividadId}", new { Id = actividadId });
         }
+        [HttpPut("update-actividad-educativa")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateActividadEducativa(
+            [FromForm] UpdateActividadEducativaCommand command,
+            [FromForm] List<IFormFile>? imagenes)
+        {
+            if (command is null)
+                return BadRequest();
+
+            command.ImagenesNuevas = [];
+
+            if (imagenes is not null && imagenes.Count > 0)
+            {
+                foreach (var img in imagenes.Where(i => i.Length > 0))
+                {
+                    using var memoryStream = new MemoryStream();
+                    await img.CopyToAsync(memoryStream);
+
+                    command.ImagenesNuevas.Add(new ArchivoNuevoDto
+                    {
+                        Nombre = img.FileName,
+                        ContentType = img.ContentType,
+                        Contenido = memoryStream.ToArray()
+                    });
+                }
+            }
+
+            var actividadActualizada = await _commandQueryBus.Send(command);
+
+            if (actividadActualizada is null)
+                return NotFound(
+                    $"No se encontró la actividad educativa con el ID {command.ActividadEducativaId}.");
+
+            return Ok(actividadActualizada);
+        }
         [HttpGet("actividadeseducativas")]
         public async Task<IActionResult> GetActividadesEducativas(
         [FromQuery] DateTime desde,
@@ -108,12 +147,14 @@ namespace Controllers.ActividadEducativaController
         public async Task<IActionResult> ObtenerDisponibilidadEvento(
             [FromQuery] DateTime desde,
             [FromQuery] DateTime hasta,
-            [FromQuery] List<string> salasIds)
+            [FromQuery] List<string> salasIds,
+            [FromQuery] string? actividadEducativaIdExcluir = null)
         {
             var query = new DispActividadesEducativasQuery(
                 desde,
                 hasta,
-                salasIds);
+                salasIds,
+                actividadEducativaIdExcluir);
 
             var resultado = await _commandQueryBus.Send(query);
 
@@ -132,6 +173,20 @@ namespace Controllers.ActividadEducativaController
             var query = new ObtenerSalasParaActEducQuery();
             var resultado = await _commandQueryBus.Send(query);
             return Ok(resultado);
+        }
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> Cancel(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
+
+            await _commandQueryBus.Send(
+                new CancelarActEducativaCommand
+                {
+                    ActEducativaId = id
+                });
+
+            return NoContent();
         }
         private string BuildPublicImageUrl(string fileName)
         {

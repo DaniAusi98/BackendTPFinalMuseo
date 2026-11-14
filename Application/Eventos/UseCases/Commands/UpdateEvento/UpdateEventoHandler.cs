@@ -1,10 +1,13 @@
-﻿using Application.Common.ApplicationServices;
-using Application.Eventos.DataTransferObjets;
+﻿
+using Application.ActividadMuseo.Repositories;
+using Application.ApplicationMuseo.Constants;
+using Application.Availability.Producers;
+using Application.Common.ApplicationServices;
 using Application.Eventos.Repositories;
 using Application.Eventos.UseCases.Commands.UpdateEvento;
+using Application.Exceptions;
 using Application.MuseumResources.Repositories;
 using Core.Application;
-using Core.Application.Mapping;
 using Domain.ActividadMuseo.Entities;
 using Domain.Common.ValueObjets;
 
@@ -15,11 +18,14 @@ namespace Application.Eventos.UseCases.UpdateEvento
         IStorageService storageService,
         IRepositorioSala repositorioSala,
         IRepositorioRecurso repositorioRecurso,
-        IRepositorioPropuestaEvento repositorioPropuestaEvento)
-        : IRequestCommandHandler<UpdateEventoCommand, EventoDto>
+        IRepositorioPropuestaEvento repositorioPropuestaEvento,
+        EventAvailabilityProducerService eventAvailabilityProducerService,
+        IRepositorioActividadReprogramada repositorioActividadReprogramada
+    ) : IRequestCommandHandler<UpdateEventoCommand, string>
     {
         private readonly IRepositorioEvento _repositorioEvento =
             repositorioEvento ?? throw new ArgumentNullException(nameof(repositorioEvento));
+
         private readonly IRepositorioPropuestaEvento repositorioPropuestaEvento1 =
             repositorioPropuestaEvento ?? throw new ArgumentNullException(nameof(repositorioPropuestaEvento));
 
@@ -32,7 +38,13 @@ namespace Application.Eventos.UseCases.UpdateEvento
         private readonly IStorageService _storageService =
             storageService ?? throw new ArgumentNullException(nameof(storageService));
 
-        public async Task<EventoDto> Handle(
+        private readonly EventAvailabilityProducerService _eventAvailabilityProducerService =
+            eventAvailabilityProducerService;
+
+        private readonly IRepositorioActividadReprogramada _repositorioActividadReprogramada =
+            repositorioActividadReprogramada;
+
+        public async Task<string> Handle(
             UpdateEventoCommand command,
             CancellationToken cancellationToken)
         {
@@ -42,13 +54,24 @@ namespace Application.Eventos.UseCases.UpdateEvento
             if (evento is null)
                 return null;
 
-            // 1. Guardar las URLs anteriores para identificar las imágenes eliminadas.
+            var horarioAnterior = evento.Horario;
+
+            // Comprobar si realmente cambió el horario.
+            var nuevoHorario = new TimeSlot(
+                command.Inicio,
+                command.Fin);
+
+            bool cambioHorario =
+                horarioAnterior.Inicio != nuevoHorario.Inicio ||
+                horarioAnterior.Fin != nuevoHorario.Fin;
+
+            // 1. Guardar las URLs anteriores.
             var imagenesAnteriores = evento.UrlImagenes.ToList();
 
             // 2. Conservar las imágenes que envía el frontend.
-            var imagenesConservadas = command.UrlImagenes
-                .Where(url => !string.IsNullOrWhiteSpace(url))
-                .ToList();
+            var imagenesConservadas = command.UrlImagenes?
+             .Where(url => !string.IsNullOrWhiteSpace(url))
+             .ToList() ?? [];
 
             // 3. Guardar las imágenes nuevas.
             if (command.ImagenesNuevas is not null)
@@ -85,51 +108,75 @@ namespace Application.Eventos.UseCases.UpdateEvento
                 .Select(r => new RecursoAsignado(
                     r.RecursoId,
                     r.CantidadAsignada,
-                    evento.Horario.Inicio,
-                    evento.Horario.Fin))
+                    nuevoHorario.Inicio,
+                    nuevoHorario.Fin))
                 .ToList();
 
-            // 5. Actualizar la entidad.
-            evento.Actualizar(
-                nombreyApellidoSolicitante: command.NombreyApellidoSolicitante,
-                telefonoSolicitante: new Telefono(command.TelefonoSolicitante),
-                emailSolicitante: new Email(command.EmailSolicitante),
-                tipoEvento: command.TipoEvento,
-                tituloEvento: command.TituloEvento,
-                salas: salas,
-                requiereDifusion: command.RequiereDifusion,
-                solicitaFlyer: command.SolicitarAsistenciaDifusion,
-                institucion: command.Institucion,
-                descripcionEvento: command.DescripcionEvento,
-                fundamentacionEvento: command.FundamentacionEvento,
-                tipoPublico: command.TipoPublico,
-                ConcurrenciaEstimada: command.ConcurrenciaEstimada,
-                recursos: recursosAsignados,
-                urlImagenes: imagenesConservadas,
-                recurrenceRule: command.RRule);
-
-            // 6. Persistir los cambios.
-            _repositorioEvento.Update(evento.Id, evento);
-
-            // 7. Eliminar físicamente las imágenes que se quitaron.
-            var imagenesEliminadas = imagenesAnteriores
-                .Except(imagenesConservadas)
-                .ToList();
-
-            foreach (var url in imagenesEliminadas)
+            try
             {
-                _storageService.EliminarArchivo(url, "eventos");
+                // 5. Actualizar la entidad.
+                evento.Actualizar(
+                    nombreyApellidoSolicitante: command.NombreyApellidoSolicitante,
+                    telefonoSolicitante: new Telefono(command.TelefonoSolicitante),
+                    emailSolicitante: new Email(command.EmailSolicitante),
+                    tipoEvento: command.TipoEvento,
+                    tituloEvento: command.TituloEvento,
+                    salas: salas,
+                    requiereDifusion: command.RequiereDifusion,
+                    solicitaFlyer: command.SolicitarAsistenciaDifusion,
+                    nuevoHorario,
+                    institucion: command.Institucion,
+                    descripcionEvento: command.DescripcionEvento,
+                    fundamentacionEvento: command.FundamentacionEvento,
+                    tipoPublico: command.TipoPublico,
+                    ConcurrenciaEstimada: command.ConcurrenciaEstimada,
+                    recursos: recursosAsignados,
+                    recurrenceRule: command.RRule);
+
+                // 6. Comprobar disponibilidad excluyendo el evento original.
+                var disponible = await _eventAvailabilityProducerService
+                    .EstaDisponibleAsync(evento, evento.Id);
+
+                if (!disponible)
+                {
+                    throw new BussinessException(
+                        "El horario seleccionado no se encuentra disponible.");
+                }
+
+                // 7. Persistir los cambios del evento.
+                _repositorioEvento.Update(evento.Id, evento);
+
+                // 8. Registrar la reprogramación solamente si cambió el horario.
+                if (cambioHorario)
+                {
+                    var registroReprogramacion = new ActividadReprogramada(
+                        evento.Id,
+                        horarioAnterior,
+                        nuevoHorario,
+                        command.MotivoReprogramacion);
+
+                    await _repositorioActividadReprogramada
+                        .AddAsync(registroReprogramacion);
+                }
+
+                // 9. Eliminar físicamente las imágenes que se quitaron.
+                var imagenesEliminadas = imagenesAnteriores
+                    .Except(imagenesConservadas)
+                    .ToList();
+
+                foreach (var url in imagenesEliminadas)
+                {
+                    _storageService.EliminarArchivo(url, "eventos");
+                }
+
+                return evento.Id.ToString();
             }
-
-            var propuesta = await repositorioPropuestaEvento1
-                .FindByEventoIdAsync(command.EventoId);
-
-            propuesta?.RegistrarFormularioCompletado();
-
-            repositorioPropuestaEvento1.Update(propuesta.Id, propuesta);
-
-            // 8. Devolver el evento actualizado.
-            return evento.To<EventoDto>();
+            catch (Exception ex)
+            {
+                throw new BussinessException(
+                    ApplicationConstants.PROCESS_EXECUTION_EXCEPTION,
+                    ex.InnerException ?? ex);
+            }
         }
     }
 }

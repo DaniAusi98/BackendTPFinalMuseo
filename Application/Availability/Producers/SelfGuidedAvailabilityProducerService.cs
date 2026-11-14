@@ -218,5 +218,110 @@ namespace Application.Availability.Producers
 
             return approved;
         }
+        // ============================================================
+        // VALIDAR UN ÚNICO SLOT PARA REPROGRAMACIÓN
+        // ============================================================
+
+        public async Task<bool> IsSlotAvailableAsync(
+            VisitaGrupalAutoguiada visita)
+        {
+            var desde = visita.Horario.Inicio;
+            var hasta = visita.Horario.Fin;
+
+            // 1. OBTENER VISITAS EXISTENTES
+
+            var visitasAutoguiadas =
+                await _repositorioVisitaGrupalAutoguiada
+                    .GetActiveSelfGuidedTours(desde, hasta);
+
+            // Excluir la visita original que estamos reprogramando.
+            visitasAutoguiadas = visitasAutoguiadas
+                .Where(v => v.Id != visita.Id)
+                .ToList();
+
+            var configuracion =
+                await _repositorioConfiguracionHorarioAutoguiada
+                    .ObtenerConfiguracionActivaAsync();
+
+            var calendario =
+                await _repositorioCalendario
+                    .ObtenerCalendarioActivoAsync();
+
+            if (configuracion == null)
+            {
+                throw new InvalidOperationException(
+                    "No hay configuración activa para visitas autoguiadas.");
+            }
+
+            if (calendario == null)
+            {
+                throw new InvalidOperationException(
+                    "No hay calendario activo del museo.");
+            }
+
+            // 2. VALIDAR DISPONIBILIDAD PROPIA DE AUTOGUIADAS
+
+            var disponible =
+                await _servicioDisponibilidadSlotsAutoguiadas
+                    .ValidarDisponibilidadSlot(
+                        visita,
+                        visitasAutoguiadas,
+                        configuracion,
+                        calendario);
+
+            if (!disponible)
+                return false;
+
+            // 3. OBTENER ACTIVIDADES EXISTENTES
+
+            var actividadesExistentes =
+                await _repositorioActividadMuseo
+                    .FindAllAsync(desde, hasta);
+
+            // Excluir la visita original.
+            actividadesExistentes = actividadesExistentes
+                .Where(a => a.Id != visita.Id)
+                .ToList();
+
+            var existingActivities =
+                _availabilityFactory.Create(
+                    actividadesExistentes,
+                    desde,
+                    hasta);
+
+            // 4. PREPARAR EL CANDIDATO
+
+            var entry = new CandidateEntry(
+                Id: Guid.NewGuid(),
+                Candidate: visita,
+                TimeSlots: new List<TimeSlot>
+                {
+            visita.Horario
+                },
+                Original: visita,
+                Source: "SelfGuidedService"
+            );
+
+            // 5. CONTEXTO BASE
+
+            var baseCtx = new AvailabilityContext
+            {
+                Start = desde,
+                End = hasta,
+                ExistingActivities = existingActivities,
+                Metadata = new Dictionary<string, object>()
+            };
+
+            // 6. VALIDAR CON AVAILABILITY ENGINE
+
+            var results = await _engine.CheckManyAsync(
+                baseCtx,
+                new List<CandidateEntry> { entry });
+
+            if (!results.TryGetValue(entry.Id, out var result))
+                return false;
+
+            return result.IsOk;
+        }
     }
 }

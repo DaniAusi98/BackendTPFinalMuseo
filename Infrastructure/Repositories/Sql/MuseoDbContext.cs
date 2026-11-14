@@ -55,6 +55,7 @@ namespace Infrastructure.Repositories.Sql
         public DbSet<BloqueoSala> BloqueoSala { get; set; }
         public DbSet<PropuestaEvento> PropuestasEvento { get; set; }
         public DbSet<PropuestaMuestra> PropuestasMuestra { get; set; }
+        public DbSet<ActividadReprogramada> ActividadesReprogramadas { get; set; }
         protected MuseoDbContext()
         {
         }
@@ -100,6 +101,7 @@ namespace Infrastructure.Repositories.Sql
             modelBuilder.ApplyConfiguration(new MuestraTemporalConfiguration());
             modelBuilder.ApplyConfiguration(new PropuestaEventoConfiguracion());
             modelBuilder.ApplyConfiguration(new PropuestaMuestraConfigurations());
+            modelBuilder.ApplyConfiguration(new ActividadReprogramadaConfiguration());
 
 
 

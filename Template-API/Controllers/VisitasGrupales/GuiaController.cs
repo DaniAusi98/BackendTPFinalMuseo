@@ -79,7 +79,7 @@ namespace Controllers.VisitasGrupales
 
             return Created($"api/[Controller]/{id}", new { Id = id });
         }
-        [HttpPut("api/v1/[Controller]")]
+        [HttpPut("update")]
         public async Task<IActionResult> Update(UpdateGuiaCommand command)
         {
             if (command is null) return BadRequest();
@@ -89,7 +89,7 @@ namespace Controllers.VisitasGrupales
             return NoContent();
         }
 
-        [HttpDelete("api/v1/[Controller]/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrEmpty(id)) return BadRequest();

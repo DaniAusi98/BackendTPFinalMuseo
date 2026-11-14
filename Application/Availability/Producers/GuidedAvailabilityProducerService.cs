@@ -21,9 +21,7 @@ namespace Application.Availability.Producers
         IRepositorioCalendarioMuseo repositorioCalendario,
         IRepositorioSala repositorioSala,
         IRepositorioTematicas repositorioTematicas,
-        ActivityAvailabilityFactory availabilityFactory, // <--- 2) INYECTAMOS EN EL CONSTRUCTOR
-
-
+        ActivityAvailabilityFactory availabilityFactory,
         AvailabilityEngine engine,
         ILogger<GuidedAvailabilityProducerService> logger)
     {
@@ -33,11 +31,10 @@ namespace Application.Availability.Producers
         private readonly ActividadMuseo.Repositories.IRepositorioActividadMuseo _repositorioActividadMuseo = repositorioActividadMuseo;
         private readonly IRepositorioConfiguracionVisitasGrupalesGuiadas _repositorioConfiguracion = repositorioConfiguracion;
         private readonly IRepositorioCalendarioMuseo _repositorioCalendario = repositorioCalendario;
-        private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory; // <--- 1) AGREGAMOS EL CAMPO
+        private readonly ActivityAvailabilityFactory _availabilityFactory = availabilityFactory;
         private readonly AvailabilityEngine _engine = engine;
         private readonly IRepositorioTematicas _repositorioTematicas = repositorioTematicas;
         private readonly IRepositorioSala _repositorioSala = repositorioSala;
-
         private readonly ILogger<GuidedAvailabilityProducerService> _logger = logger;
 
         public async Task<List<TurnoDisponible>> GetAvailableTurnsAsync(
@@ -54,9 +51,7 @@ namespace Application.Availability.Producers
                 desde,
                 hasta);
 
-            // ============================================================
             // 1) PREFETCH
-            // ============================================================
 
             var guias =
                 await _repositorioGuia.ObtenerGuiasConDisponibilidadAsync();
@@ -65,7 +60,8 @@ namespace Application.Availability.Producers
                 await _repositorioVisitaGuiada.GetActiveGuidedTours(
                     desde,
                     hasta);
-            //en caso de que se pase un id de visita, se filtra para no tener en cuenta la misma visita cuando se consulta disponiblidad en una reprogramacion 
+
+            // Excluir la visita original en caso de reprogramación.
             if (!string.IsNullOrEmpty(visitaId))
             {
                 visitasGuiadasExistentes = visitasGuiadasExistentes
@@ -84,7 +80,7 @@ namespace Application.Availability.Producers
             if (configuracion == null)
             {
                 throw new InvalidOperationException(
-                    "No hay configuraci�n activa para visitas guiadas.");
+                    "No hay configuración activa para visitas guiadas.");
             }
 
             if (calendario == null)
@@ -93,9 +89,7 @@ namespace Application.Availability.Producers
                     "No hay calendario activo del museo.");
             }
 
-            // ============================================================
             // 2) GENERAR TURNOS CANDIDATOS
-            // ============================================================
 
             var candidatosTurnos =
                 await _servicioGuiadas.CalcularDisponibilidad(
@@ -107,7 +101,7 @@ namespace Application.Availability.Producers
                     calendario);
 
             _logger.LogInformation(
-                "[GuidedAvailabilityProducer] Servicio devolvi� {Cantidad} turnos",
+                "[GuidedAvailabilityProducer] Servicio devolvió {Cantidad} turnos",
                 candidatosTurnos.Count);
 
             candidatosTurnos = candidatosTurnos
@@ -115,7 +109,7 @@ namespace Application.Availability.Producers
                 .ToList();
 
             _logger.LogInformation(
-                "[GuidedAvailabilityProducer] Turnos disponibles despu�s del filtro: {Cantidad}",
+                "[GuidedAvailabilityProducer] Turnos disponibles después del filtro: {Cantidad}",
                 candidatosTurnos.Count);
 
             var actividadesEnRango =
@@ -126,55 +120,38 @@ namespace Application.Availability.Producers
                 "[GuidedAvailabilityProducer] Actividades existentes: {Cantidad}",
                 actividadesEnRango.Count);
 
-            // ============================================================
-            // 4) PREPARAR ACTIVIDADES EXISTENTES PARA EL ENGINE
-            //
-            // Ac� ocurre:
-            //
-            // Sin recurrencia:
-            //      Actividad + 1 slot
-            //
-            // Con recurrencia:
-            //      Actividad
-            //          ?
-            //      RecurrenceExpander
-            //          ?
-            //      slots generados dentro de la ventana
-            //          ?
-            //      CandidateEntry
-            //
-            // ============================================================
+            // 3) PREPARAR ACTIVIDADES EXISTENTES PARA EL ENGINE
 
             var existingActivities = _availabilityFactory.Create(
-               [.. actividadesEnRango],
-               desde,
-               hasta
-           );
+                [.. actividadesEnRango],
+                desde,
+                hasta
+            );
+
             _logger.LogInformation(
                 "[GuidedAvailabilityProducer] Existing CandidateEntries preparados: {Cantidad}",
                 existingActivities.Count);
 
-            // ============================================================
-            // 5) CREAR CANDIDATOS DE VISITAS GUIADAS
-            //
-            // Cada turno tiene UN SOLO TimeSlot.
-            // ============================================================
+            // 4) OBTENER SALAS
 
             List<Sala> salas;
 
             if (tematicasIds is { Count: > 0 })
             {
-                // Obtener las salas asociadas a las temáticas seleccionadas.
-                List<TematicaVisita> tematicas = await _repositorioTematicas.GetByIdsAsync(tematicasIds);
+                List<TematicaVisita> tematicas =
+                    await _repositorioTematicas.GetByIdsAsync(tematicasIds);
+
                 salas = [.. tematicas
-                .SelectMany(t => t.Salas)
-                .DistinctBy(s => s.Id)];
+                    .SelectMany(t => t.Salas)
+                    .DistinctBy(s => s.Id)];
             }
             else
             {
-                // Obtener todas las salas habilitadas para visitas guiadas.
-                salas = await _repositorioSala.ObtenerSalasVisitasGrupalesAsync();
+                salas =
+                    await _repositorioSala.ObtenerSalasVisitasGrupalesAsync();
             }
+
+            // 5) CREAR CANDIDATOS DE VISITAS GUIADAS
 
             var entries = new List<CandidateEntry>();
 
@@ -212,18 +189,12 @@ namespace Application.Availability.Producers
 
                 var entry = new CandidateEntry(
                     Id: Guid.NewGuid(),
-
                     Candidate: candidate,
-
-                    // Este candidato NO es recurrente.
-                    // Tiene solamente el turno que estamos verificando.
                     TimeSlots: new List<TimeSlot>
                     {
                         timeSlot
                     },
-
                     Original: turno,
-
                     Source: "GuidedService"
                 );
 
@@ -242,14 +213,7 @@ namespace Application.Availability.Producers
                 return new List<TurnoDisponible>();
             }
 
-            // ============================================================
             // 6) CONTEXTO BASE
-            //
-            // Ahora ExistingActivities ya no deber�a ser la fuente
-            // principal para solapamientos.
-            //
-            // El engine necesita trabajar con existingEntries.
-            // ============================================================
 
             var baseCtx = new AvailabilityContext
             {
@@ -267,9 +231,7 @@ namespace Application.Availability.Producers
                 }
             };
 
-            // ============================================================
             // 7) VALIDAR CON AVAILABILITY ENGINE
-            // ============================================================
 
             var results =
                 await _engine.CheckManyAsync(
@@ -277,23 +239,19 @@ namespace Application.Availability.Producers
                     entries);
 
             _logger.LogInformation(
-                "[GuidedAvailabilityProducer] AvailabilityEngine devolvi� {Cantidad} resultados",
+                "[GuidedAvailabilityProducer] AvailabilityEngine devolvió {Cantidad} resultados",
                 results.Count);
 
-            // ============================================================
             // 8) RECUPERAR TURNOS APROBADOS
-            // ============================================================
 
             var aprobados = new List<TurnoDisponible>();
 
             foreach (var entry in entries)
             {
-                if (!results.TryGetValue(
-                    entry.Id,
-                    out var result))
+                if (!results.TryGetValue(entry.Id, out var result))
                 {
                     _logger.LogWarning(
-                        "[GuidedAvailabilityProducer] No se encontr� resultado para {Id}",
+                        "[GuidedAvailabilityProducer] No se encontró resultado para {Id}",
                         entry.Id);
 
                     continue;
@@ -323,6 +281,196 @@ namespace Application.Availability.Producers
                 aprobados.Count);
 
             return aprobados;
+        }
+
+        // ============================================================
+        // VALIDAR UN ÚNICO TURNO
+        // ============================================================
+
+        public async Task<bool> IsTurnAvailableAsync(
+            TimeSlot horario,
+            string? visitaId = null,
+            List<string>? tematicasIds = null)
+        {
+            _logger.LogInformation(
+                "[GuidedAvailabilityProducer] Validando turno {Inicio} - {Fin}",
+                horario.Inicio,
+                horario.Fin);
+
+            // 1) PREFETCH
+
+            var guias =
+                await _repositorioGuia.ObtenerGuiasConDisponibilidadAsync();
+
+            var visitasGuiadasExistentes =
+                await _repositorioVisitaGuiada.GetActiveGuidedTours(
+                    horario.Inicio,
+                    horario.Fin);
+
+            // Excluir la visita original si es una reprogramación.
+            if (!string.IsNullOrEmpty(visitaId))
+            {
+                visitasGuiadasExistentes = visitasGuiadasExistentes
+                    .Where(v => v.Id != visitaId)
+                    .ToList();
+            }
+
+            var configuracion =
+                await _repositorioConfiguracion
+                    .ObtenerConfiguracionActivaAsync();
+
+            var calendario =
+                await _repositorioCalendario
+                    .ObtenerCalendarioActivoAsync();
+
+            if (configuracion == null)
+            {
+                throw new InvalidOperationException(
+                    "No hay configuración activa para visitas guiadas.");
+            }
+
+            if (calendario == null)
+            {
+                throw new InvalidOperationException(
+                    "No hay calendario activo del museo.");
+            }
+
+            // 2) VALIDAR DISPONIBILIDAD PROPIA DE VISITAS GUIADAS
+
+            var disponible =
+                await _servicioGuiadas.ValidarDisponibilidadTurno(
+                    horario,
+                    guias,
+                    visitasGuiadasExistentes,
+                    configuracion,
+                    calendario);
+
+            if (!disponible)
+            {
+                _logger.LogInformation(
+                    "[GuidedAvailabilityProducer] Turno rechazado por el servicio de visitas guiadas.");
+
+                return false;
+            }
+
+            // 3) OBTENER ACTIVIDADES EXISTENTES
+
+            var actividadesEnRango =
+                await _repositorioActividadMuseo.FindAllAsync(
+                    horario.Inicio,
+                    horario.Fin);
+
+            // Excluir también la visita original de las actividades generales.
+            if (!string.IsNullOrEmpty(visitaId))
+            {
+                actividadesEnRango = actividadesEnRango
+                    .Where(a => a.Id != visitaId)
+                    .ToList();
+            }
+
+            var existingActivities = _availabilityFactory.Create(
+                [.. actividadesEnRango],
+                horario.Inicio,
+                horario.Fin
+            );
+
+            // 4) OBTENER SALAS
+
+            List<Sala> salas;
+
+            if (tematicasIds is { Count: > 0 })
+            {
+                List<TematicaVisita> tematicas =
+                    await _repositorioTematicas.GetByIdsAsync(tematicasIds);
+
+                salas = [.. tematicas
+                    .SelectMany(t => t.Salas)
+                    .DistinctBy(s => s.Id)];
+            }
+            else
+            {
+                salas =
+                    await _repositorioSala.ObtenerSalasVisitasGrupalesAsync();
+            }
+
+            // 5) PREPARAR EL CANDIDATO
+
+            var email = new Email("sistema@localhost.com");
+            var telefono = new Telefono("1123456789");
+
+            var candidate = new VisitaGrupalGuiada(
+                usuarioVisitanteId: "system",
+                nombreSolicitante: "Sistema",
+                apellidoSolicitante: "Sistema",
+                emailSolicitante: email,
+                telefonoSolicitante: telefono,
+                nivelEducativo: null,
+                anioGrado: null,
+                cantidadPersonas: 1,
+                institucion: "Sistema",
+                emailInstitucion: email,
+                telefonoInstitucion: telefono,
+                paisInstitucion: "",
+                provinciaInstitucion: "",
+                ciudadInstitucion: "",
+                descripcionDiversidad: string.Empty,
+                motivoVisita: string.Empty,
+                observaciones: string.Empty,
+                horario: horario,
+                tematicas: Array.Empty<TematicaVisita>(),
+                salas: salas
+            );
+
+            var entry = new CandidateEntry(
+                Id: Guid.NewGuid(),
+                Candidate: candidate,
+                TimeSlots: new List<TimeSlot>
+                {
+                    horario
+                },
+                Original: horario,
+                Source: "GuidedService"
+            );
+
+            // 6) CONTEXTO BASE
+
+            var baseCtx = new AvailabilityContext
+            {
+                Start = horario.Inicio,
+                End = horario.Fin,
+
+                ExistingActivities = existingActivities,
+
+                Metadata = new Dictionary<string, object>
+                {
+                    {
+                        AvailabilityMetadataKeys.GuidesPrefetched,
+                        guias
+                    }
+                }
+            };
+
+            // 7) VALIDAR CON AVAILABILITY ENGINE
+
+            var results = await _engine.CheckManyAsync(
+                baseCtx,
+                new List<CandidateEntry> { entry });
+
+            if (!results.TryGetValue(entry.Id, out var result))
+            {
+                _logger.LogWarning(
+                    "[GuidedAvailabilityProducer] No se encontró resultado para el candidato {Id}",
+                    entry.Id);
+
+                return false;
+            }
+
+            _logger.LogInformation(
+                "[GuidedAvailabilityProducer] Resultado del turno: {Disponible}. {Mensaje}",
+                result.IsOk,
+                result.Message);
+
+            return result.IsOk;
         }
     }
 }

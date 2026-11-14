@@ -1,23 +1,24 @@
 ﻿using Application.ActividadesEducativas.DataTransferObjets;
 using Application.Availability.Producers;
-using Application.Eventos.UseCases.Queries;
 using Core.Application;
 using Microsoft.Extensions.Logging;
-
 
 namespace Application.ActividadesEducativas.UseCases.Queries
 {
     internal sealed class DispActividadesEducativasHandler(
-      DispActEducativaProducerService producerService,
-      ILogger<DispActividadesEducativasHandler> logger) : IRequestQueryHandler<DispActividadesEducativasQuery, DispActividadEducativaDto>
+        DispActEducativaProducerService producerService,
+        ILogger<DispActividadesEducativasHandler> logger)
+        : IRequestQueryHandler<DispActividadesEducativasQuery, DispActividadEducativaDto>
     {
         private readonly DispActEducativaProducerService _producerService = producerService
-                ?? throw new ArgumentNullException(nameof(producerService));
-        private readonly ILogger<DispActividadesEducativasHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            ?? throw new ArgumentNullException(nameof(producerService));
+
+        private readonly ILogger<DispActividadesEducativasHandler> _logger = logger
+            ?? throw new ArgumentNullException(nameof(logger));
 
         public async Task<DispActividadEducativaDto> Handle(
-           DispActividadesEducativasQuery request,
-           CancellationToken cancellationToken)
+            DispActividadesEducativasQuery request,
+            CancellationToken cancellationToken)
         {
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -37,7 +38,8 @@ namespace Application.ActividadesEducativas.UseCases.Queries
                 var resultado = await _producerService.GetActEducativaAvailabilityAsync(
                     request.Desde,
                     request.Hasta,
-                    request.SalasIds);
+                    request.SalasIds,
+                    request.ActividadEducativaIdExcluir);
 
                 _logger.LogInformation(
                     "[ObtenerDisponibilidadEventoHandler] Disponibilidad calculada exitosamente. " +

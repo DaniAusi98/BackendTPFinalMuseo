@@ -10,6 +10,7 @@ using Domain.Common.ValueObjets;
 using Microsoft.Extensions.Logging;
 using static Domain.ActividadesAreaEducacion.Enums.Enums;
 using static Domain.ActividadMuseo.Enums.Enums;
+
 using ActividadMuseoEntity = Domain.ActividadMuseo.Entities.ActividadBase;
 
 namespace Application.Availability.Producers
@@ -53,7 +54,8 @@ namespace Application.Availability.Producers
         public async Task<DispActividadEducativaDto> GetActEducativaAvailabilityAsync(
             DateTime desde,
             DateTime hasta,
-            List<string> salasIds)
+            List<string> salasIds,
+            string? actividadEducativaIdExcluir = null)
         {
             if (desde.Date > hasta.Date)
                 throw new ArgumentException(
@@ -76,7 +78,10 @@ namespace Application.Availability.Producers
 
             // 2. Obtener las actividades existentes que pueden generar conflictos.
             var actividadesEnRango =
-                await ObtenerActividadesConConflictoPotencial(desde, hasta);
+                await ObtenerActividadesConConflictoPotencial(
+                    desde,
+                    hasta,
+                    actividadEducativaIdExcluir);
 
             // 3. Preparar las actividades existentes para el motor.
             var existingActivities = _availabilityFactory.Create(
@@ -88,8 +93,11 @@ namespace Application.Availability.Producers
                 "Actividades existentes preparadas: {Cantidad}",
                 existingActivities.Count);
 
-            // 4. Generar candidatos de 30 minutos usando las franjas
-            // operativas reales del calendario.
+            // 4. Obtener las salas una sola vez.
+            var salas = await _repositorioSalaMuseo
+                .ObtenerSalasporIdsAsync(salasIds);
+
+            // 5. Generar candidatos de 30 minutos usando las franjas operativas.
             var candidatosEventos = new List<CandidateEntry>();
 
             for (var fecha = desde.Date;
@@ -97,18 +105,11 @@ namespace Application.Availability.Producers
                  fecha = fecha.AddDays(1))
             {
                 var franjasOperativas = calendario
-                    .ObtenerFranjasOperativas(
-                        DateOnly.FromDateTime(fecha))
+                    .ObtenerFranjasOperativas(DateOnly.FromDateTime(fecha))
                     .ToList();
 
                 if (franjasOperativas.Count == 0)
-                {
-                    _logger.LogDebug(
-                        "No hay franjas operativas para {Fecha}",
-                        fecha.Date);
-
                     continue;
-                }
 
                 foreach (var franja in franjasOperativas)
                 {
@@ -120,27 +121,36 @@ namespace Application.Availability.Producers
                             inicioSlot,
                             inicioSlot.AddMinutes(30));
 
-                        var eventoFicticio = await CrearEventoFicticio(
-                            timeSlot,
-                            salasIds);
+                        var actividadFicticia = new ActividadEducativa(
+                            titulo: "TituloFicticio",
+                            tipoActividadEducativa: TipoActividadEducativa.Otros,
+                            proyectoVinculadaId: "proyectoficticio",
+                            institucionVinculada: "InstitucionFicticia",
+                            publicoObjetivo: "publicoFicticio",
+                            observaciones: "observaciones",
+                            horario: timeSlot,
+                            salas: salas,
+                            requiereDifusion: false,
+                            solicitaFlyer: false,
+                            cantidadAsistentes: 15,
+                            urlImagenes: null,
+                            rrule: null);
 
-                        var candidato = new CandidateEntry(
+                        candidatosEventos.Add(new CandidateEntry(
                             Guid.NewGuid(),
-                            eventoFicticio,
+                            actividadFicticia,
                             new List<TimeSlot> { timeSlot }.AsReadOnly(),
                             null,
-                            "EventoCandidate");
-
-                        candidatosEventos.Add(candidato);
+                            "ActividadEducativaCandidate"));
                     }
                 }
             }
 
             _logger.LogInformation(
-                "Candidatos generados: {Cantidad}",
+                "Candidatos de actividades educativas generados: {Cantidad}",
                 candidatosEventos.Count);
 
-            // 5. Validar candidatos con el motor de disponibilidad.
+            // 6. Validar candidatos con el motor de disponibilidad.
             var contexto = new AvailabilityContext
             {
                 Start = desde,
@@ -157,11 +167,7 @@ namespace Application.Availability.Producers
                 contexto,
                 candidatosEventos);
 
-            _logger.LogInformation(
-                "Validación completada. Resultados: {Cantidad}",
-                resultados.Count);
-
-            // 6. Convertir los resultados al DTO de salida.
+            // 7. Convertir los resultados al DTO de salida.
             var horariosDisponibles = new List<HorarioDisponibleDto>();
 
             foreach (var candidato in candidatosEventos)
@@ -192,37 +198,105 @@ namespace Application.Availability.Producers
             };
         }
 
+        // Valida una actividad educativa concreta.
+        // Se utiliza tanto para crear como para actualizar actividades.
+        public async Task<bool> EstaDisponibleAsync(
+            ActividadEducativa actividad,
+            string? actividadIdExcluir = null)
+        {
+            ArgumentNullException.ThrowIfNull(actividad);
+
+            var desde = actividad.Horario.Inicio;
+            var hasta = actividad.Horario.Fin;
+
+            // 1. Obtener el calendario activo.
+            var calendario = await _repositorioCalendario
+                .ObtenerCalendarioActivoAsync()
+                ?? throw new InvalidOperationException(
+                    "No hay calendario activo del museo.");
+
+            // 2. Comprobar que el horario esté dentro de una franja operativa.
+            var franjasOperativas = calendario
+                .ObtenerFranjasOperativas(DateOnly.FromDateTime(desde))
+                .ToList();
+
+            var horarioOperativo = franjasOperativas.Any(franja =>
+                desde >= franja.Inicio &&
+                hasta <= franja.Fin);
+
+            if (!horarioOperativo)
+                return false;
+
+            // 3. Obtener actividades existentes excluyendo la actual.
+            var actividadesEnRango =
+                await ObtenerActividadesConConflictoPotencial(
+                    desde,
+                    hasta,
+                    actividadIdExcluir);
+
+            // 4. Preparar actividades existentes para el motor.
+            var existingActivities = _availabilityFactory.Create(
+                actividadesEnRango.Cast<ActividadMuseoEntity>().ToList(),
+                desde,
+                hasta);
+
+            // 5. Crear un único candidato con la actividad recibida.
+            var candidato = new CandidateEntry(
+                Guid.NewGuid(),
+                actividad,
+                new List<TimeSlot> { actividad.Horario }.AsReadOnly(),
+                null,
+                "ActividadEducativaCandidate");
+
+            var candidatos = new List<CandidateEntry>
+            {
+                candidato
+            };
+
+            // 6. Crear el contexto de disponibilidad.
+            var contexto = new AvailabilityContext
+            {
+                Start = desde,
+                End = hasta,
+                ExistingActivities = existingActivities,
+                Metadata = new Dictionary<string, object>
+                {
+                    { "tipoActividad", TipoActividad.EventoActividadExterna },
+                    {
+                        "salasIds",
+                        actividad.Salas.Select(sala => sala.Id).ToList()
+                    }
+                }
+            };
+
+            // 7. Validar el candidato.
+            var resultados = await _engine.CheckManyAsync(
+                contexto,
+                candidatos);
+
+            // 8. Devolver el resultado.
+            return resultados.TryGetValue(candidato.Id, out var resultado)
+                && resultado.IsOk;
+        }
+
         private async Task<List<ActividadMuseoEntity>>
             ObtenerActividadesConConflictoPotencial(
                 DateTime desde,
-                DateTime hasta)
+                DateTime hasta,
+                string? actividadIdExcluir = null)
         {
-            return await _repositorioActividadMuseo.FindAllAsync(
-                desde,
-                hasta);
-        }
+            var actividades = await _repositorioActividadMuseo
+                .FindAllAsync(desde, hasta);
 
-        private async Task<ActividadEducativa> CrearEventoFicticio(
-            TimeSlot timeSlot,
-            List<string> salasIds)
-        {
-            var salas = await _repositorioSalaMuseo
-                .ObtenerSalasporIdsAsync(salasIds);
+            // Excluir la actividad que se está actualizando.
+            if (!string.IsNullOrWhiteSpace(actividadIdExcluir))
+            {
+                actividades = actividades
+                    .Where(actividad => actividad.Id != actividadIdExcluir)
+                    .ToList();
+            }
 
-            return new ActividadEducativa(
-                titulo: "TituloFicticio",
-                tipoActividadEducativa: TipoActividadEducativa.Otros,
-                proyectoVinculadaId: "proyectoficticio",
-                institucionVinculada: "InstitucionFicticia",
-                publicoObjetivo: "publicoFicticio",
-                observaciones: "observaciones",
-                horario: timeSlot,
-                salas: salas,
-                requiereDifusion: false,
-                solicitaFlyer: false,
-                cantidadAsistentes: 15,
-                urlImagenes: null,
-                rrule: null);
+            return actividades;
         }
     }
 }

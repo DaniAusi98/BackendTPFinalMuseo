@@ -1,4 +1,5 @@
-﻿using Core.Domain.Entities;
+﻿
+using Core.Domain.Entities;
 using Domain.Common.Exceptions;
 using Domain.Common.ValueObjets;
 
@@ -6,31 +7,54 @@ namespace Domain.ActividadMuseo.Entities
 {
     public class ActividadReprogramada : DomainEntity<string>
     {
-
-        public string ActividadOriginalId { get; private set; }
-        public string ActividadNuevaId { get; private set; }
+        public string ActividadId { get; private set; }
+        public ActividadBase Actividad { get; private set; }
 
         public TimeSlot HorarioAnterior { get; private set; }
         public TimeSlot HorarioNuevo { get; private set; }
 
-        public ActividadReprogramada(string idActividadOriginal, string idActividadNueva, TimeSlot horarioAnterior, TimeSlot horarioNuevo)
+        public DateTime FechaReprogramacion { get; private set; }
+
+        public string? Motivo { get; private set; }
+
+        public string? UsuarioId { get; private set; }
+
+        private ActividadReprogramada() { }
+
+        public ActividadReprogramada(
+            string actividadId,
+            TimeSlot horarioAnterior,
+            TimeSlot horarioNuevo,
+            string? motivo = null,
+            string? usuarioId = null)
         {
-            if (string.IsNullOrEmpty(idActividadOriginal))
-                throw new ArgumentNullException("El id de la actividad reprogramada no puede estar vacío.");
-            if (string.IsNullOrEmpty(idActividadNueva))
-                throw new ArgumentNullException("El id de la nueva actividad  no puede estar vacío.");
+            if (string.IsNullOrWhiteSpace(actividadId))
+                throw new DomainException("El id de la actividad no puede estar vacío.");
+
             if (horarioAnterior is null)
-                throw new DomainException("El horario no puede ser nulo.");
+                throw new DomainException("El horario anterior no puede ser nulo.");
+
             if (horarioNuevo is null)
-                throw new DomainException("El horario no puede ser nulo.");
+                throw new DomainException("El horario nuevo no puede ser nulo.");
+
+            if (horarioAnterior.Equals(horarioNuevo))
+                throw new DomainException("El nuevo horario debe ser diferente del anterior.");
 
             Id = Guid.NewGuid().ToString();
-            ActividadOriginalId = idActividadOriginal;
-            ActividadNuevaId = idActividadNueva;
+
+            ActividadId = actividadId;
             HorarioAnterior = horarioAnterior;
             HorarioNuevo = horarioNuevo;
 
+            FechaReprogramacion = DateTime.UtcNow;
+
+            Motivo = string.IsNullOrWhiteSpace(motivo)
+                ? null
+                : motivo.Trim();
+
+            UsuarioId = string.IsNullOrWhiteSpace(usuarioId)
+                ? null
+                : usuarioId;
         }
     }
-
 }

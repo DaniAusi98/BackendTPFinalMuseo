@@ -17,18 +17,33 @@ namespace Application.ActividadesEducativas.Mappings
             CreateMap<ProyectosAreaEducacion, ProyectoEducativoDto>();
 
             CreateMap<ActividadEducativa, ActividadEducativaDto>()
-
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.Titulo))
-                .ForMember(dest => dest.TipoActividadEducativa, opt => opt.MapFrom(src => src.TipoActividadEducativa.ToString()))
-                .ForMember(dest => dest.ProyectoVinculado, opt => opt.MapFrom(src => src.ProyectoVinculada))
-                .ForMember(dest => dest.InstitucionVinculada, opt => opt.MapFrom(src => src.InstitucionVinculada))
-                .ForMember(dest => dest.PublicoObjetivo, opt => opt.MapFrom(src => src.PublicoObjetivo))
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado.ToString()))
-                .ForMember(dest => dest.CantidadPersonas, opt => opt.MapFrom(src => src.CantidadPersonas))
-                .ForMember(dest => dest.TimeSlot, opt => opt.MapFrom(src => src.Horario))
-                .ForMember(dest => dest.Salas, opt => opt.MapFrom(src => src.Salas))
-                .ForMember(dest => dest.Recursos, opt => opt.MapFrom(src => src.Recursos));
+             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+             .ForMember(dest => dest.Titulo, opt => opt.MapFrom(src => src.Titulo))
+             .ForMember(dest => dest.TipoActividadEducativa, opt => opt.MapFrom(src => src.TipoActividadEducativa.ToString()))
+             .ForMember(dest => dest.ProyectoVinculado, opt => opt.MapFrom(src => src.ProyectoVinculada))
+             .ForMember(dest => dest.InstitucionVinculada, opt => opt.MapFrom(src => src.InstitucionVinculada))
+             .ForMember(dest => dest.PublicoObjetivo,
+                 opt => opt.MapFrom(src => src.PublicoObjetivo))
+             .ForMember(dest => dest.Estado,
+                 opt => opt.MapFrom(src => src.Estado.ToString()))
+             .ForMember(dest => dest.CantidadPersonas,
+                 opt => opt.MapFrom(src => src.CantidadPersonas))
+             .ForMember(dest => dest.TimeSlot,
+                 opt => opt.MapFrom(src => src.Horario))
+             .ForMember(dest => dest.Salas,
+                 opt => opt.MapFrom(src => src.Salas))
+             .ForMember(dest => dest.Recursos,
+                 opt => opt.MapFrom(src => src.Recursos))
+             .ForMember(dest => dest.Observaciones,
+                 opt => opt.MapFrom(src => src.Observaciones))
+             .ForMember(dest => dest.RequiereDifusion,
+                 opt => opt.MapFrom(src => src.RequiereDifusion))
+             .ForMember(dest => dest.SolicitarAsistenciaDifusion,
+                 opt => opt.MapFrom(src => src.SolicitaFlyer))
+             .ForMember(dest => dest.UrlImagenes,
+                 opt => opt.MapFrom(src => src.UrlImagenes))
+             .ForMember(dest => dest.RRule,
+                 opt => opt.MapFrom(src => src.RRule));
         }
     }
 }

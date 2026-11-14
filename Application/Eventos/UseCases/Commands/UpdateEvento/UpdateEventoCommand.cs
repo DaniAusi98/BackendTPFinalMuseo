@@ -6,7 +6,7 @@ using static Domain.Eventos.Enums.Enums;
 
 namespace Application.Eventos.UseCases.Commands.UpdateEvento
 {
-    public class UpdateEventoCommand : IRequestCommand<EventoDto>
+    public class UpdateEventoCommand : IRequestCommand<string>
     {
         public string EventoId { get; set; }
 
@@ -63,6 +63,7 @@ namespace Application.Eventos.UseCases.Commands.UpdateEvento
         /// </summary>
         public string? RRule { get; set; }
 
+        public string? MotivoReprogramacion { get; set; }
 
 
 

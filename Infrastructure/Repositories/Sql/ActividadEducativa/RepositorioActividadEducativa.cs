@@ -1,6 +1,7 @@
 ﻿using Application.ActividadesEducativas.Repositories;
 using Core.Infraestructure.Repositories.Sql;
 using Microsoft.EntityFrameworkCore;
+using static Domain.ActividadMuseo.Enums.Enums;
 
 
 namespace Infrastructure.Repositories.Sql.ActividadEducativa
@@ -34,7 +35,7 @@ namespace Infrastructure.Repositories.Sql.ActividadEducativa
                     // Caso B: Actividades recurrentes que YA empezaron en el pasado o empiezan ahora.
                     // Si su primera cita hist�rica empez� despu�s de 'fechaHasta', es imposible que generen ocurrencias hoy.
                     (string.IsNullOrEmpty(a.RRule) && a.Horario.Inicio <= fechaHasta))
-
+                .Where(a => a.Estado == EstadoActividad.Activa)
                 .OrderByDescending(a => a.Horario.Inicio)
                 .ToListAsync();
 

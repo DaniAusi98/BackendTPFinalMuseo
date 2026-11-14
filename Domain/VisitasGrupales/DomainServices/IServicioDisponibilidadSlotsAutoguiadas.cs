@@ -11,5 +11,12 @@ namespace Domain.VisitasGrupales.DomainServices
             IReadOnlyCollection<VisitaGrupalAutoguiada> visitasAutoguiadas,
             ConfiguracionHorarioAutoguiada configuracion,
             HorarioAperturaMuseo calendario);
+
+
+        Task<bool> ValidarDisponibilidadSlot(
+            VisitaGrupalAutoguiada visita,
+            IReadOnlyCollection<VisitaGrupalAutoguiada> visitasAutoguiadas,
+            ConfiguracionHorarioAutoguiada configuracion,
+            HorarioAperturaMuseo calendario);
     }
 }

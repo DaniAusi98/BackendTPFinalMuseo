@@ -13,10 +13,16 @@ namespace Application.ActividadesEducativas.UseCases.Queries
         public DateTime Hasta { get; set; }
 
         /// <summary>
-        /// IDs de las salas donde se quiere realizar el evento.
-        /// La disponibilidad se calcula considerando conflictos en estas salas.
+        /// IDs de las salas donde se quiere realizar la actividad.
         /// </summary>
         public List<string> SalasIds { get; set; } = new();
+
+        /// <summary>
+        /// ID de la actividad educativa que se excluye del cálculo de disponibilidad.
+        /// Se utiliza al reprogramar una actividad existente.
+        /// </summary>
+        public string? ActividadEducativaIdExcluir { get; set; }
+
         public DispActividadesEducativasQuery()
         {
         }
@@ -24,11 +30,13 @@ namespace Application.ActividadesEducativas.UseCases.Queries
         public DispActividadesEducativasQuery(
             DateTime desde,
             DateTime hasta,
-            List<string> salasIds)
+            List<string> salasIds,
+            string? actividadEducativaIdExcluir = null)
         {
             Desde = desde;
             Hasta = hasta;
             SalasIds = salasIds ?? throw new ArgumentNullException(nameof(salasIds));
+            ActividadEducativaIdExcluir = actividadEducativaIdExcluir;
         }
     }
 }

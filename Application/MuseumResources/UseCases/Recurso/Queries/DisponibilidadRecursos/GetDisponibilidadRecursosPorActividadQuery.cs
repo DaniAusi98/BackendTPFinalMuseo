@@ -10,6 +10,8 @@ namespace Application.MuseumResources.UseCases.Recurso.Queries.DisponibilidadRec
 
         public DateTime Fin { get; set; }
 
-        public string RRule { get; set; }
+        public string? RRule { get; set; }
+
+        public string? EventoIdExcluir { get; set; }
     }
 }

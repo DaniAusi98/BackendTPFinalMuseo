@@ -21,7 +21,8 @@ namespace Application.MuseumResources.UseCases.Recurso.Queries.DisponibilidadRec
             return await _disponibilidadRecursosService.ConsultarAsync(
                 request.Inicio,
                 request.Fin,
-                request.RRule);
+                request.RRule,
+                request.EventoIdExcluir);
         }
     }
 }

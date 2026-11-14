@@ -1,5 +1,8 @@
 ﻿using Application.Eventos.DataTransferObjets;
+using Application.Eventos.UseCases.Commands.CancelarEvento;
+using Application.Eventos.UseCases.Commands.CancelarMuestra;
 using Application.Eventos.UseCases.Commands.CrearEvento;
+using Application.Eventos.UseCases.Commands.CrearMuestra;
 using Application.Eventos.UseCases.Commands.UpdateEvento;
 using Application.Eventos.UseCases.Commands.UpdateMuestra;
 using Application.Eventos.UseCases.Queries;
@@ -139,6 +142,41 @@ namespace Controllers.Evento
         }
 
         // ============================================================
+        // CREAR MUESTRA
+        // ============================================================
+        [HttpPost("crear-muestra")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> CrearMuestra(
+            [FromForm] CrearMuestraCommand command,
+            [FromForm] List<IFormFile>? imagenes)
+        {
+            if (command is null)
+                return BadRequest();
+
+            if (imagenes is not null && imagenes.Count > 0)
+            {
+                command.ImagenesNuevas = [];
+
+                foreach (var img in imagenes.Where(i => i.Length > 0))
+                {
+                    using var memoryStream = new MemoryStream();
+                    await img.CopyToAsync(memoryStream);
+
+                    command.ImagenesNuevas.Add(new ArchivoNuevoDto
+                    {
+                        Nombre = img.FileName,
+                        ContentType = img.ContentType,
+                        Contenido = memoryStream.ToArray()
+                    });
+                }
+            }
+
+            var muestraId = await _commandQueryBus.Send(command);
+
+            return Created($"api/[Controller]/{muestraId}", new { Id = muestraId });
+        }
+
+        // ============================================================
         // COMPLETAR -ACTUALIZAR MUESTRA
         // ============================================================
 
@@ -179,25 +217,66 @@ namespace Controllers.Evento
             // Retornamos el objeto modificado con un 200 OK
             return Ok(muestraActualizado);
         }
+        [HttpPut("update-muestra")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateMuestra(
+       [FromForm] UpdateMuestraCommand command,
+       [FromForm] List<IFormFile>? imagenes)
+        {
+            if (command is null) return BadRequest();
+
+            // Mapeamos los archivos binarios HTTP nativos al DTO puro de bytes
+            if (imagenes is not null && imagenes.Count > 0)
+            {
+                command.ImagenesNuevas = [];
+
+                foreach (var img in imagenes.Where(i => i.Length > 0))
+                {
+                    using var memoryStream = new MemoryStream();
+                    await img.CopyToAsync(memoryStream);
+
+                    command.ImagenesNuevas.Add(new ArchivoNuevoDto
+                    {
+                        Nombre = img.FileName,
+                        ContentType = img.ContentType,
+                        Contenido = memoryStream.ToArray()
+                    });
+                }
+            }
+
+            var muestraActualizado = await _commandQueryBus.Send(command);
+
+            if (muestraActualizado == null)
+            {
+                return NotFound($"No se encontró el registro con el ID {command.MuestraId}.");
+            }
+
+            // Retornamos el objeto modificado con un 200 OK
+            return Ok(muestraActualizado);
+        }
 
         ///Disponibilidad para el formCalendar///
+
 
 
         [HttpGet("disponibilidad")]
         public async Task<IActionResult> ObtenerDisponibilidadEvento(
             [FromQuery] DateTime desde,
             [FromQuery] DateTime hasta,
-            [FromQuery] List<string> salasIds)
+            [FromQuery] List<string> salasIds,
+            [FromQuery] string? eventoIdExcluir)
         {
             var query = new ObtenerDisponibilidadEventoQuery(
                 desde,
                 hasta,
-                salasIds);
+                salasIds,
+                eventoIdExcluir);
 
             var resultado = await _commandQueryBus.Send(query);
 
             return Ok(resultado);
         }
+
 
         ///Validacion de recurrencia Form///
 
@@ -324,6 +403,36 @@ namespace Controllers.Evento
             var query = new SalaDispEventosQuery();
             var resultado = await _commandQueryBus.Send(query);
             return Ok(resultado);
+        }
+
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> Cancel(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
+
+            await _commandQueryBus.Send(
+                new CancelarEventoCommand
+                {
+                    EventoId = id
+                });
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}/cancelar-muestra")]
+        public async Task<IActionResult> CancelarMuestra(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest();
+
+            await _commandQueryBus.Send(
+                new CancelarMuestraCommand
+                {
+                    MuestraId = id
+                });
+
+            return NoContent();
         }
 
 

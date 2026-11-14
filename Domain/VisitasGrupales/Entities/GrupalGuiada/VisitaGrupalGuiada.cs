@@ -222,6 +222,21 @@ namespace Domain.VisitasGrupales.Entities.GrupalGuiada
             CancelarActividad();
         }
 
+        public void ActualizarDatosSolicitante(
+            string nombreSolicitante,
+            string apellidoSolicitante,
+            Email emailSolicitante,
+            Telefono telefonoSolicitante)
+        {
+            ArgumentNullException.ThrowIfNull(emailSolicitante);
+            ArgumentNullException.ThrowIfNull(telefonoSolicitante);
+
+            NombreSolicitante = nombreSolicitante?.Trim() ?? string.Empty;
+            ApellidoSolicitante = apellidoSolicitante?.Trim() ?? string.Empty;
+            EmailSolicitante = emailSolicitante;
+            TelefonoSolicitante = telefonoSolicitante;
+        }
+
 
         public void CambiarEstadoAReprogramada()
         {
