@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Application.MuseumResources.UseCases.MuseumGallery.Commands.CreateMuseumGallery
 {
-    public class CreateSalaCommandValidator:AbstractValidator<CreateMuseumGalleryCommand>
+    public class CreateSalaCommandValidator:AbstractValidator<CreateSalaCommand>
     {
         public CreateSalaCommandValidator()
         {

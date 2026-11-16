@@ -12,7 +12,6 @@ using Application.MuseumResources.ApplicationServices;
 using Application.PersonalMuseo.ApplicationServices;
 using Application.Reportes.ApplicationServices;
 using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
-using Application.Usuario.UseCases.Commands.UpdateUsuario;
 using Application.VisitaGrupal.ApplicationServices;
 using Core.Application;
 using Domain.VisitasGrupales.DomainServices;

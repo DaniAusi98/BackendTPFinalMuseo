@@ -2,6 +2,7 @@
 {
     public class PropuestaEventoDto
     {
+        public string Id { get; set; }
         public string EventoId { get; private set; }
         public EventoDto Evento { get; private set; }
 

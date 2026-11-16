@@ -1,4 +1,3 @@
-using Application.Eventos.UseCases.Queries;
 using Application.MuseumResources.UseCases.MuseumGallery.Commands.CreateMuseumGallery;
 using Application.MuseumResources.UseCases.MuseumGallery.Commands.DeleteMuseumGallery;
 using Application.MuseumResources.UseCases.MuseumGallery.Commands.UpdateMuseumGallery;
@@ -10,11 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Controllers
 {
     [ApiController]
-    public class MuseumGalleryController(ICommandQueryBus commandQueryBus) : BaseController
+    [Route("api/v1/[controller]")]
+    public class SalaController(ICommandQueryBus commandQueryBus) : BaseController
     {
         private readonly ICommandQueryBus _commandQueryBus = commandQueryBus ?? throw new ArgumentNullException(nameof(commandQueryBus));
 
-        [HttpGet("api/v1/[Controller]")]
+        [HttpGet("get-all")]
         public async Task<IActionResult> GetAll(uint pageIndex = 1, uint pageSize = 10)
         {
             var entities = await _commandQueryBus.Send(new GetAllMuseumGalleriesQuery() { PageIndex = pageIndex, PageSize = pageSize });
@@ -25,15 +25,15 @@ namespace Controllers
         [HttpGet("api/v1/[Controller]/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            if (id<0 || id>int.MaxValue) return BadRequest();
+            if (id < 0 || id > int.MaxValue) return BadRequest();
 
             var entity = await _commandQueryBus.Send(new GetMuseumGalleryByQuery { SalaId = id });
 
             return Ok(entity);
         }
 
-        [HttpPost("api/v1/[Controller]")]
-        public async Task<IActionResult> Create(CreateMuseumGalleryCommand command)
+        [HttpPost("crear-sala")]
+        public async Task<IActionResult> Create(CreateSalaCommand command)
         {
             if (command is null) return BadRequest();
 
@@ -62,6 +62,6 @@ namespace Controllers
             return NoContent();
         }
 
-        
+
     }
 }

@@ -25,17 +25,7 @@ namespace Controllers
         /// <summary>
         /// Confirma el correo de un usuario a partir de un token recibido por email
         /// </summary>
-        [HttpGet("confirmar-email")]
-        public async Task<IActionResult> ConfirmarEmail(string token)
-        {
-            if (string.IsNullOrWhiteSpace(token))
-                return BadRequest("Token inválido.");
 
-            // Enviamos el token al handler de dominio que valida y confirma
-            _ = await _commandQueryBus.Send(new ConfirmarEmailUsuarioCommand { Token = token });
-
-            return Ok("Correo confirmado correctamente.");
-        }
 
         /// <summary>
         /// Crea un nuevo usuario visitante
@@ -116,25 +106,11 @@ namespace Controllers
             return Ok(user);
         }
         [HttpPost("confirm-email")]
-        public async Task<IActionResult> ConfirmEmail(
-            [FromBody] ConfirmEmailRequest request)
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
         {
-            var result = await IConfirmarEmailService.ExecuteAsync(
-                request.UserId,
-                request.Token);
+            var result = await _commandQueryBus.Send(request);
 
-            if (!result)
-            {
-                return BadRequest(new
-                {
-                    message = "Error al confirmar el correo electrónico. El token puede ser inválido o haber expirado."
-                });
-            }
-
-            return Ok(new
-            {
-                message = "Correo confirmado correctamente."
-            });
+            return Ok(result);
         }
 
     }

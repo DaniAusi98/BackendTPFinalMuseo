@@ -29,7 +29,6 @@
 		<Folder Include="Common\UseCases\Provincia\Notifications\" />
 		<Folder Include="Common\UseCases\Provincia\Queries\" />
 		<Folder Include="PersonalMuseo\Repositories\" />
-		<Folder Include="PersonalMuseo\UseCases\Queries\" />
 		<Folder Include="Reportes\Validators\" />
 		<Folder Include="Reportes\Repositories\" />
 		<Folder Include="VisitaGrupal\UseCases\Queries\GetTurnosVisitas\" />

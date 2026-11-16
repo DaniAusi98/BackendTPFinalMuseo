@@ -17,9 +17,9 @@ namespace Infrastructure.Adapters.EmailSender.ResendEmailService.User
             string userId,
             string token)
         {
-            var frontendUrl = _configuration["Frontend:BaseUrl"];
+            var frontendUrl = _configuration["FrontendSitioWeb:BaseUrl"];
 
-            return $"{frontendUrl}/confirm-email"+$"?userId={userId}"+$"&token={Uri.EscapeDataString(token)}";
+            return $"{frontendUrl}/confirm-email" + $"?userId={userId}" + $"&token={Uri.EscapeDataString(token)}";
         }
     }
 }

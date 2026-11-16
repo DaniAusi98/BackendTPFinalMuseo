@@ -2,6 +2,7 @@
 using Core.Infraestructure.Repositories.Sql;
 using Domain.Eventos.Entities;
 using Microsoft.EntityFrameworkCore;
+using static Domain.ActividadMuseo.Enums.Enums;
 
 namespace Infrastructure.Repositories.Sql.Eventos
 {
@@ -10,8 +11,9 @@ namespace Infrastructure.Repositories.Sql.Eventos
         public async Task<List<PropuestaEvento>> FindIncludeAllAsync()
         {
             return await Repository
+                .Where(p => p.Evento.Estado == EstadoActividad.Activa)
                 .Include(p => p.Evento)
-                   .ThenInclude(e => e.Salas)
+                    .ThenInclude(e => e.Salas)
                 .ToListAsync();
         }
 

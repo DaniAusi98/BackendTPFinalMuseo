@@ -1,12 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Application.Usuario.ApplicationServices.ApplicationServiceInterfaces;
-
-namespace Application.Usuario.UseCases.Commands.UpdateUsuario
+namespace Application.Usuario.ApplicationServices.ApplicationServiceInterfaces
 {
     public class ConfirmEmailServiceResponse : IConfirmEmailService
     {

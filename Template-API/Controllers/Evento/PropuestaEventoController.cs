@@ -1,4 +1,6 @@
 ﻿using Application.Eventos.UseCases.Commands.CrearPropuestaEvento;
+using Application.Eventos.UseCases.Commands.DeletePropuestaMuestra;
+using Application.Eventos.UseCases.Commands.EliminarPorpuestaEvento;
 using Application.Eventos.UseCases.Commands.ReenviarFormularioEvento;
 using Application.Eventos.UseCases.Queries.GetAllPropuestas;
 using Application.Eventos.UseCases.Queries.GetAllPropuestas.GetAllExhibitions;
@@ -46,6 +48,17 @@ namespace Controllers.Evento
             return Ok(entities);
         }
 
+
+        [HttpGet("{id}/muestra")]
+        public async Task<IActionResult> GetByExhibitionId(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            var entity = await _commandQueryBus.Send(new GetExhibitionByIdQuery { PropuestaId = id });
+
+            return Ok(entity);
+        }
+
         [HttpGet("get-all-exhibitions")]
         public async Task<IActionResult> GetAllExhibitions(uint pageIndex = 1, uint pageSize = 10)
         {
@@ -63,13 +76,6 @@ namespace Controllers.Evento
             return Ok(entity);
         }
 
-
-
-
-
-
-
-
         [HttpPost("{id}/reenviar-formulario")]
         public async Task<IActionResult> ReenviarFormulario(
            string id,
@@ -86,6 +92,25 @@ namespace Controllers.Evento
             });
         }
 
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeletePropuestaEvento(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return BadRequest();
+
+            await _commandQueryBus.Send(new DeletePropuestaEventoCommand { PropuestaId = id });
+
+            return NoContent();
+        }
+        [HttpDelete("delete-muestra/{id}")]
+        public async Task<IActionResult> DeletePropuestaMuestra(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return BadRequest();
+            await _commandQueryBus.Send(new DeletePropuestaMuestraCommand { PropuestaId = id });
+
+            return NoContent();
+        }
 
 
 

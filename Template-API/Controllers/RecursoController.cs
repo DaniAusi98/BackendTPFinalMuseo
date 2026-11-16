@@ -10,11 +10,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Controllers
 {
     [ApiController]
+    [Route("api/v1/[controller]")]
     public class RecursoController(ICommandQueryBus commandQueryBus) : BaseController
     {
         private readonly ICommandQueryBus _commandQueryBus = commandQueryBus ?? throw new ArgumentNullException(nameof(commandQueryBus));
 
-        [HttpGet("api/v1/[Controller]")]
+        [HttpGet("get-all")]
         public async Task<IActionResult> GetAll(uint pageIndex = 1, uint pageSize = 10)
         {
             var entities = await _commandQueryBus.Send(new GetAllRecursosQuery() { PageIndex = pageIndex, PageSize = pageSize });
@@ -53,7 +54,7 @@ namespace Controllers
             return Ok(resultado);
         }
 
-        [HttpPost("api/v1/[Controller]")]
+        [HttpPost("create-resource")]
         public async Task<IActionResult> Create(CreateRecursoCommand command)
         {
             if (command is null) return BadRequest();

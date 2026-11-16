@@ -1,13 +1,11 @@
 
-using System.ComponentModel.DataAnnotations;
-
 using Core.Application;
-
+using System.ComponentModel.DataAnnotations;
 using static Domain.RecursoMuseo.Enums.Enums;
 
 namespace Application.MuseumResources.UseCases.MuseumGallery.Commands.CreateMuseumGallery
 {
-    public class CreateMuseumGalleryCommand : IRequestCommand<string>
+    public class CreateSalaCommand : IRequestCommand<string>
     {
         [Required]
         public string Nombre { get; set; }
@@ -20,9 +18,9 @@ namespace Application.MuseumResources.UseCases.MuseumGallery.Commands.CreateMuse
         [Required]
         public UbicacionSala Ubicacion { get; set; }
 
-        public CreateMuseumGalleryCommand()
+        public CreateSalaCommand()
         {
-                
+
         }
     }
 }

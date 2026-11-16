@@ -90,6 +90,7 @@ namespace Infrastructure.Registrations
             services.AddScoped<IConfirmUserUrl, ConfirmUserUrl>();
             services.AddScoped<IConfirmUserUrlDashboard, ConfirmUserUrlDashboard>();
             services.AddScoped<IGenerarUrlFormularioEvento, UrlFormularioEvento>();
+            services.AddScoped<IConfirmChangeEmailUrlDashboard, ConfirmChangeEmailUrlDashboard>();
 
 
 
